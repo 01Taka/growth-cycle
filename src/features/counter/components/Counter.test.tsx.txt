@@ -1,0 +1,50 @@
+import { fireEvent, screen } from '@testing-library/react'; // 💡 FIX: screenとfireEventをインポート
+import { describe, expect, it, vi } from 'vitest'; // 💡 FIX: vitestのグローバル関数をインポート
+
+import { renderWithContext } from '../../../test/utils';
+import { CounterContext } from '../context/CounterContext';
+import { createMockCounterContextValue } from '../test/mocks/useCounterStorageMock';
+import { Counter } from './Counter';
+
+// ------------------------------------
+// 🧪 テストケース
+// ------------------------------------
+describe('Counter Component (Vitest Mock)', () => {
+  // 初期値 0 のテスト
+  it('初期値がContextから取得された値（5）で表示されるべき', () => {
+    // 依存フックが返す状態
+    const initialCount = 5;
+    const setCountMock = vi.fn();
+    const mockContextValue = createMockCounterContextValue(initialCount, setCountMock);
+
+    renderWithContext(<Counter />, CounterContext, mockContextValue);
+
+    // 初期値 5 が表示されていることを確認
+    // 💡 screen.getByText を使用
+    expect(screen.getByText('5')).toBeInTheDocument();
+  });
+
+  // カウントアップ処理のテスト
+  it('カウントアップボタンを押すと、setCountが正しいインクリメント量（1）で呼び出されるべき', () => {
+    const initialCount = 5;
+    // 💡 setCountMockをvi.fn()として定義し、呼び出しを追跡
+    const setCountMock = vi.fn();
+    const mockContextValue = createMockCounterContextValue(initialCount, setCountMock);
+
+    renderWithContext(<Counter />, CounterContext, mockContextValue);
+
+    // 初期値 5 が表示されていることを確認
+    expect(screen.getByText('5')).toBeInTheDocument();
+
+    // 💡 screen.getByRole を使用してボタンを取得
+    const button = screen.getByRole('button', { name: /カウントアップして保存/i });
+    fireEvent.click(button);
+
+    // Counter.tsxの定義に基づき、インクリメント量 1 が渡されたことを検証
+    expect(setCountMock).toHaveBeenCalledWith(1);
+    expect(setCountMock).toHaveBeenCalledTimes(1);
+
+    // UIはモックの戻り値が変わらないため、5のままのはず
+    expect(screen.getByText('5')).toBeInTheDocument();
+  });
+});
