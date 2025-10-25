@@ -2,8 +2,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Box, Center, Image, Loader, Stack, Text } from '@mantine/core'; // Box, Stackを追加
 import DefaultPlantImage from '@/assets/images/default_plant.png';
-import { Subject } from '@/types/study-shared-types';
-import { logger } from '@/utils/logger';
+import { Subject } from '@/shared/types/study-shared-types';
+import { logger } from '@/shared/utils/logger';
 import { usePlantImages } from '../context/PlantImagesContext';
 
 interface PlantImageItemProps {

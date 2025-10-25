@@ -1,6 +1,6 @@
 import React from 'react';
 import { PlantImageItem } from '@/features/plants/components/PlantImageItem';
-import { LearningCycle } from '@/types/study-log-types';
+import { LearningCycle } from '@/shared/types/study-log-types';
 import { createSeededRandom } from '../../functions/cyrb128';
 import { getDeterministicRandom } from '../../functions/deterministic-random';
 

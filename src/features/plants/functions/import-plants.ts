@@ -1,7 +1,7 @@
 // src/api/imageLoader.ts
 
 // Subject型とSubjectSchemaは適切な場所からインポートしてください
-import { Subject, SubjectSchema } from '@/types/study-shared-types';
+import { Subject, SubjectSchema } from '@/shared/types/study-shared-types';
 
 // 🚨 Viteの静的インポート: すべての画像ファイルを事前に取得
 const ALL_PLANT_IMAGE_IMPORTS = import.meta.glob('/src/assets/plants/**/*.png');
