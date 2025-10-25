@@ -1,7 +1,8 @@
 import React from 'react';
+import { Card } from '@mantine/core';
 import { PlantImageItem } from '@/features/plants/components/PlantImageItem';
-import { LearningCycle } from '@/shared/types/study-log-types';
-import { createSeededRandom } from '../../functions/cyrb128';
+import { useSubjectColorMap } from '@/shared/hooks/useSubjectColor';
+import { LearningCycle } from '@/shared/types/learning-cycle-types';
 import { getDeterministicRandom } from '../../functions/deterministic-random';
 
 interface ReviewLearningCycleItemProps {
@@ -15,9 +16,11 @@ export const ReviewLearningCycleItem: React.FC<ReviewLearningCycleItemProps> = (
   const maxIndex = 16;
   const plantIndex = Math.floor(random * (maxIndex + 1));
 
+  const subjectTheme = useSubjectColorMap(learningCycle.subject);
+
   return (
-    <div>
+    <Card bg={subjectTheme.bgCard}>
       <PlantImageItem subject={learningCycle.subject} index={plantIndex} width={64} height={64} />
-    </div>
+    </Card>
   );
 };

@@ -31,7 +31,6 @@ export const SubjectSchema = z.union([
   z.literal('science'),
   z.literal('socialStudies'),
   z.literal('english'),
-  z.literal('informatics'),
 ]);
 
 export type Subject = z.infer<typeof SubjectSchema>;
