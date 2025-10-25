@@ -21,7 +21,7 @@ export interface LearningCycle {
   /** 問題集の科目を保持します。（textbookIdから参照可能ですが、冗長性のために保持） */
   subject: Subject;
   /** このログに適用された設定情報です。 */
-  settings: StudySettings;
+  settings: LearningSettings;
   /** 実行された全テストセッションのリストです。 */
   sessions: TestSession[];
   /**
@@ -35,11 +35,11 @@ export interface LearningCycle {
 /**
  * テストの設定情報を保持します。
  */
-export interface StudySettings {
+export interface LearningSettings {
   /** 実行するテストのモードです。 */
   testMode: TestMode;
   /** 勉強フェーズに費やした時間（ミリ秒）です。 */
-  studyDurationMs: number;
+  learningDurationMs: number;
   /** テストフェーズに費やした時間（ミリ秒）です。 */
   testDurationMs: number;
 
@@ -50,7 +50,7 @@ export interface StudySettings {
 
   /** テストに含まれる問題のリストです。具体的な問題の詳細を保持し、冗長性を保ちます。 */
   problems: {
-    /** StudyLog内で一意となる、問題の相対インデックスです。 */
+    /** LearningCycle内で一意となる、問題の相対インデックスです。 */
     index: number;
     /** 紐づくユニットのIDです。 */
     unitId: string;
@@ -79,7 +79,7 @@ export interface TestSession {
  * 個々の問題に対するテスト結果を保持します。
  */
 export interface TestResult {
-  /** StudyLog.settings.problems のindexと対応する問題のインデックスです。 */
+  /** LearningCycle.settings.problems のindexと対応する問題のインデックスです。 */
   problemIndex: number;
   /** ユーザーによる自己評価です。 */
   selfEvaluation: TestSelfEvaluation;

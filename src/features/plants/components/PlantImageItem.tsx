@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Box, Center, Image, Loader, Stack, Text } from '@mantine/core'; // Box, Stackを追加
 import DefaultPlantImage from '@/assets/images/default_plant.png';
 import { Subject } from '@/types/study-shared-types';
+import { logger } from '@/utils/logger';
 import { usePlantImages } from '../context/PlantImagesContext';
 
 interface PlantImageItemProps {
@@ -33,7 +34,6 @@ export const PlantImageItem: React.FC<PlantImageItemProps> = ({
 
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   // subjectが変更されるたびに画像をロードするEffect
   useEffect(() => {
@@ -43,7 +43,6 @@ export const PlantImageItem: React.FC<PlantImageItemProps> = ({
 
       if (isMounted) {
         setIsLoading(true);
-        setError(null);
         setImageUrls([]);
       }
 
@@ -53,11 +52,7 @@ export const PlantImageItem: React.FC<PlantImageItemProps> = ({
           setImageUrls(urls);
         }
       } catch (e) {
-        console.error('Primary image loading failed:', e);
-        if (isMounted) {
-          // エラーフラグをセット
-          setError('ロード中にエラーが発生しました。');
-        }
+        logger.error('Primary image loading failed:', e);
       } finally {
         if (isMounted) {
           setIsLoading(false);
@@ -74,6 +69,11 @@ export const PlantImageItem: React.FC<PlantImageItemProps> = ({
 
   // 🎯 表示する画像のURLを計算
   const imageUrlToDisplay = useMemo(() => {
+    if (typeof index !== 'number') {
+      logger.error(`index is Invalid value: ${index}`);
+      return null;
+    }
+
     const totalImages = imageUrls.length;
 
     if (totalImages === 0) {
