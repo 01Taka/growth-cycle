@@ -2,21 +2,13 @@ import React from 'react';
 import { Card, Flex, Stack, Text } from '@mantine/core';
 import { PlantImageItem } from '@/features/plants/components/PlantImageItem';
 import { useSubjectColorMap } from '@/shared/hooks/useSubjectColor';
-import { Subject } from '@/shared/types/study-shared-types';
 import { AuraEffect } from './AuraEffect';
 import { GiveWaterButton } from './GiveWaterButton';
+import { ReviewLearningCycleItemProps } from './shared-types';
 import { UnitPill } from './UnitPill';
 
-interface ReviewLearningCycleItemProps {
-  isAchieved: boolean;
-  plantIndex: number;
-  subject: Subject;
-  unitNames: string[];
-  testDurationMin: number;
-}
-
 export const ReviewLearningCycleItem: React.FC<ReviewLearningCycleItemProps> = ({
-  isAchieved,
+  isCompleted,
   plantIndex,
   subject,
   unitNames,
@@ -24,17 +16,20 @@ export const ReviewLearningCycleItem: React.FC<ReviewLearningCycleItemProps> = (
 }) => {
   const subjectTheme = useSubjectColorMap(subject);
 
+  // Cardの幅をレスポンシブ対応（親要素に応じて最大幅100%）
   return (
     <Card
-      bg={isAchieved ? subjectTheme.disabled : subjectTheme.bgCard}
+      w="100%" // 親要素に合わせて幅を100%に設定
+      bg={isCompleted ? subjectTheme.disabled : subjectTheme.bgCard}
       radius={16}
       style={{
-        border: isAchieved ? undefined : `3px solid ${subjectTheme.border}`,
+        border: isCompleted ? undefined : `3px solid ${subjectTheme.border}`,
       }}
     >
       <Flex gap={'xs'}>
-        <Stack style={{ width: 64, position: 'relative' }}>
-          {isAchieved && (
+        {/* 左側の画像エリア: 幅を固定値 (64px) に設定 */}
+        <Stack w={64} miw={64} style={{ position: 'relative' }}>
+          {isCompleted && (
             <Text
               style={{
                 fontWeight: 'bold',
@@ -62,7 +57,7 @@ export const ReviewLearningCycleItem: React.FC<ReviewLearningCycleItemProps> = (
             height={64}
             style={{ position: 'relative', zIndex: 1000 }}
           />
-          {!isAchieved && (
+          {!isCompleted && (
             <AuraEffect
               color={subjectTheme.border}
               size={64}
@@ -73,21 +68,41 @@ export const ReviewLearningCycleItem: React.FC<ReviewLearningCycleItemProps> = (
           )}
         </Stack>
 
-        <Stack gap={5}>
-          <Flex style={{ overflow: 'auto' }}>
-            {unitNames.map((unitName) => (
-              <UnitPill subject={subject} unitName={unitName} disabled={isAchieved} size="lg" />
+        {/* 右側のコンテンツエリア: flex: 1 で残りの幅を占有するように設定 */}
+        <Stack flex={1} miw={0} gap={5}>
+          {/* ユニットピルのコンテナを修正: 親の幅を超えないようにmaw="100%"を設定 */}
+          <Flex w="100%" flex={1} style={{ overflow: 'auto' }}>
+            {unitNames.map((unitName, index) => (
+              <UnitPill
+                key={index}
+                subject={subject}
+                unitName={unitName}
+                disabled={isCompleted}
+                size="lg"
+              />
             ))}
           </Flex>
-          <Flex justify={'space-between'} align={'center'} style={{ marginLeft: 10 }}>
-            <Text style={{ color: isAchieved ? subjectTheme.disabledText : subjectTheme.text }}>
+          {/* 目標時間とボタンのFlexコンテナ: 幅100%を確保し、中身を左右に配置 */}
+          <Flex
+            justify={'space-between'}
+            align={'center'}
+            style={{ marginLeft: 10 }}
+            w="100%" // Stackの幅全体を使うように明示
+          >
+            <Text
+              style={{
+                color: isCompleted ? subjectTheme.disabledText : subjectTheme.text,
+                // テキストが折り返さないように nowrap を適用（目標時間を保護）
+                whiteSpace: 'nowrap',
+              }}
+            >
               目標: {testDurationMin}分
             </Text>
             <GiveWaterButton
-              isAchieved={isAchieved}
-              color={isAchieved ? subjectTheme.accent : subjectTheme.textRevers}
-              bgColor={isAchieved ? subjectTheme.disabled : subjectTheme.accent}
-              borderColor={isAchieved ? subjectTheme.accent : undefined}
+              isCompleted={isCompleted}
+              color={isCompleted ? subjectTheme.accent : subjectTheme.textRevers}
+              bgColor={isCompleted ? subjectTheme.disabled : subjectTheme.accent}
+              borderColor={isCompleted ? subjectTheme.accent : undefined}
             />
           </Flex>
         </Stack>

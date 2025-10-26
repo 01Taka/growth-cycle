@@ -3,14 +3,14 @@ import { IoIosWater, IoMdCheckmark } from 'react-icons/io';
 import { ActionIcon } from '@mantine/core';
 
 interface GiveWaterButtonProps {
-  isAchieved: boolean;
+  isCompleted: boolean;
   color: string;
   bgColor: string;
   borderColor?: string;
 }
 
 export const GiveWaterButton: React.FC<GiveWaterButtonProps> = ({
-  isAchieved,
+  isCompleted,
   color,
   bgColor,
   borderColor,
@@ -24,7 +24,7 @@ export const GiveWaterButton: React.FC<GiveWaterButtonProps> = ({
       radius="xl"
       aria-label="水やり"
     >
-      {isAchieved ? (
+      {isCompleted ? (
         <IoMdCheckmark color={color} size={30} fontWeight="bold" />
       ) : (
         <IoIosWater color={color} size={24} />

@@ -30,6 +30,8 @@ export interface LearningCycle {
    */
   nextReviewAt: Timestamp;
   latestAttemptedAt: Timestamp;
+  cycleStartAt: Timestamp;
+  isReviewTarget: boolean;
 }
 
 /**
