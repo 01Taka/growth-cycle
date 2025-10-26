@@ -1,92 +1,187 @@
 import { Subject } from '../types/study-shared-types';
 import { SubjectColorMap } from './subjectColorType';
 
+// SubjectColorMap の定義に 'accent' を含むことを前提とします。
+// 例: type SubjectColorMap = { text: string; textRevers: string; bgScreen: string; bgCard: string; bgChip: string; border: string; disabled: string; disabledText: string; accent: string; };
+
 export const SUBJECT_COLORS: Record<Subject, Record<'light' | 'dark', SubjectColorMap>> = {
   // --- 1. 国語 (赤ベース) ---
   japanese: {
     light: {
-      text: '#2c0000', // 濃い赤茶色 (可読性重視)
+      // 濃い赤黒色。白背景での可読性を確保。
+      text: '#6a0000',
+      textRevers: '#ffe0e0',
       bgScreen: '#ffffff', // 白
-      bgCard: '#ffecec', // 非常に薄いピンク (赤のニュアンス)
-      bgChip: '#ffcdd2', // 薄い赤/ピンク
-      border: '#ef9a9a', // やや明るい赤
+      // 非常に薄い赤。彩度を上げたベースカラー。
+      bgCard: '#ffedee',
+      // 鮮やかな赤のサブカラー。
+      bgChip: '#ffc1c1',
+      // 鮮やかな赤のボーダー。
+      border: '#ff6b6b',
+      disabled: '#fce8e8',
+      disabledText: '#b08a8a',
+      // 💥 最も鮮やかな赤 (Primary)
+      accent: '#ff3d3d',
     },
     dark: {
-      text: '#ffebed', // 非常に薄いピンク (ハイライト)
-      bgScreen: '#440000', // 深い赤/マルーン
-      bgCard: '#6d1010', // 暗めの赤
-      bgChip: '#9e3636', // 中くらいの赤
-      border: '#c66767', // やや明るい赤のボーダー
+      text: '#ffe0e0', // 明るい赤色。暗い背景での可読性を確保。
+      textRevers: '#6a0000',
+      // 非常に濃いディープマルーン。
+      bgScreen: '#3a0000',
+      // 暗めの鮮やかな赤。
+      bgCard: '#6d0000',
+      // 明るい鮮やかな赤。
+      bgChip: '#a32f2f',
+      // 鮮やかな赤のボーダー。
+      border: '#ff7f7f',
+      disabled: '#4a3030',
+      disabledText: '#d8baba',
+      // 💥 最も鮮やかな赤 (Accent)
+      accent: '#ff8f8f',
     },
   },
 
   // --- 2. 数学 (青ベース) ---
   math: {
     light: {
-      text: '#0d304e', // 濃いネイビー/インクブルー (可読性重視)
+      // 濃いインクブルー。白背景での可読性を確保。
+      text: '#00206a',
+      textRevers: '#e0f0ff',
       bgScreen: '#ffffff', // 白
-      bgCard: '#f0f8ff', // 非常に薄い水色/スカイブルー
-      bgChip: '#b3e5fc', // 明るい水色/ライトブルー
-      border: '#81d4fa', // やや明るいスカイブルー
+      // 非常に薄い青。彩度を上げたベースカラー。
+      bgCard: '#e6f0ff',
+      // 鮮やかな青のサブカラー。
+      bgChip: '#b3d3ff',
+      // 鮮やかな青のボーダー。
+      border: '#6a9eff',
+      disabled: '#e0e8f8',
+      disabledText: '#8a9ab0',
+      // 💥 最も鮮やかな青 (Primary)
+      accent: '#3a7fff',
     },
     dark: {
-      text: '#e6f7ff', // 非常に薄い水色 (ハイライト)
-      bgScreen: '#0d183f', // 非常に濃いディープブルー/インディゴ
-      bgCard: '#1a2e63', // 暗めのブルー/ネイビー
-      bgChip: '#2b478d', // ミディアムブルー/ロイヤルブルー
-      border: '#4569c7', // やや明るいブルーのボーダー
+      text: '#e0f0ff', // 明るい青色。暗い背景での可読性を確保。
+      textRevers: '#00206a',
+      // 非常に濃いディープインディゴ。
+      bgScreen: '#001844',
+      // 暗めの鮮やかな青。
+      bgCard: '#183a6a',
+      // 明るい鮮やかな青。
+      bgChip: '#3a66a3',
+      // 鮮やかな青のボーダー。
+      border: '#7fa3ff',
+      disabled: '#303a4a',
+      disabledText: '#b0bac6',
+      // 💥 最も鮮やかな青 (Accent)
+      accent: '#8fa3ff',
     },
   },
 
+  // --- 3. 理科 (緑ベース) ---
   science: {
     light: {
-      text: '#174020', // 濃い森の緑 (可読性重視)
+      // 濃いフォレストグリーン。白背景での可読性を確保。
+      text: '#105010',
+      textRevers: '#e0ffe0',
       bgScreen: '#ffffff', // 白
-      bgCard: '#f0fff5', // 非常に薄いミントグリーン
-      bgChip: '#c8e6c9', // 薄い緑/パステルグリーン
-      border: '#a5d6a7', // やや明るいリーフグリーン
+      // 非常に薄いミント。彩度を上げたベースカラー。
+      bgCard: '#effff0',
+      // 鮮やかな緑のサブカラー。
+      bgChip: '#c7ffc7',
+      // 鮮やかな緑のボーダー。
+      border: '#8aff8a',
+      disabled: '#e8f8e8',
+      disabledText: '#90a090',
+      // 💥 最も鮮やかな緑 (Primary)
+      accent: '#3add3aff',
     },
     dark: {
-      text: '#f0fff0', // 非常に薄いグリーン (ハイライト)
-      bgScreen: '#0c3816', // 非常に濃いフォレストグリーン
-      bgCard: '#1a5e2a', // 暗めのモスグリーン
-      bgChip: '#2b8a41', // ミディアムグリーン/エメラルドグリーン
-      border: '#4caf50', // やや明るいグリーンのボーダー
+      text: '#e0ffe0', // 明るい緑色。暗い背景での可読性を確保。
+      textRevers: '#105010',
+      // 非常に濃いディープフォレスト。
+      bgScreen: '#0a300a',
+      // 暗めの鮮やかな緑。
+      bgCard: '#1a501a',
+      // 明るい鮮やかな緑。
+      bgChip: '#3a8a3a',
+      // 鮮やかな緑のボーダー。
+      border: '#8aff8a',
+      disabled: '#304030',
+      disabledText: '#b0c0b0',
+      // 💥 最も鮮やかな緑 (Accent)
+      accent: '#a0ffb0',
     },
   },
 
   // --- 4. 社会 (オレンジベース) ---
   socialStudies: {
     light: {
-      text: '#5c3300', // 濃い茶色/セピア色 (可読性重視、歴史のイメージ)
+      // 濃いセピアブラウン。白背景での可読性を確保。
+      text: '#6a3000',
+      textRevers: '#fff5e0',
       bgScreen: '#ffffff', // 白
-      bgCard: '#fffaf0', // 非常に薄いクリーム色
-      bgChip: '#ffe082', // 明るいゴールド/山吹色
-      border: '#ffb300', // 鮮やかなオレンジイエロー
+      // 非常に薄いクリーム。彩度を上げたベースカラー。
+      bgCard: '#fff8eb',
+      // 鮮やかなオレンジのサブカラー。
+      bgChip: '#ffdf99',
+      // 鮮やかなオレンジのボーダー。
+      border: '#ffb74d',
+      disabled: '#f8e8d8',
+      disabledText: '#b0a090',
+      // 💥 最も鮮やかなオレンジ/アンバー (Primary)
+      accent: '#ff9800',
     },
     dark: {
-      text: '#fff8e1', // 非常に薄いイエロー (ハイライト)
-      bgScreen: '#3d2500', // 非常に濃いディープブラウン/アースカラー
-      bgCard: '#6e4400', // 暗めのオレンジブラウン
-      bgChip: '#a36d1a', // ミディアムなテラコッタ/琥珀色
-      border: '#d49830', // やや明るいゴールドブラウンのボーダー
+      text: '#fff5e0', // 明るいアンバー。暗い背景での可読性を確保。
+      textRevers: '#6a3000',
+      // 非常に濃いディープブラウン。
+      bgScreen: '#3a2000',
+      // 暗めの鮮やかなオレンジ。
+      bgCard: '#6a4000',
+      // 明るい鮮やかなオレンジ。
+      bgChip: '#a36a2a',
+      // 鮮やかなオレンジのボーダー。
+      border: '#ffc44d',
+      disabled: '#4a3a30',
+      disabledText: '#c6b6a6',
+      // 💥 最も鮮やかなオレンジ/イエロー (Accent)
+      accent: '#ffd700',
     },
   },
 
+  // --- 5. 英語 (紫ベース) ---
   english: {
     light: {
-      text: '#3a0050', // 濃いパープル/インク色 (可読性重視)
+      // 濃いディープパープル。白背景での可読性を確保。
+      text: '#4a0070',
+      textRevers: '#fce0ff',
       bgScreen: '#ffffff', // 白
-      bgCard: '#fcf0ff', // 非常に薄いラベンダー/ライラック
-      bgChip: '#e1bee7', // 薄いパステルパープル
-      border: '#ce93d8', // やや明るいアメジスト
+      // 非常に薄いラベンダー。彩度を上げたベースカラー。
+      bgCard: '#fef0ff',
+      // 鮮やかな紫のサブカラー。
+      bgChip: '#e5b3ff',
+      // 鮮やかな紫のボーダー。
+      border: '#b76aff',
+      disabled: '#f0e0f8',
+      disabledText: '#9a8aab',
+      // 💥 最も鮮やかなマゼンタ/フクシア (Primary)
+      accent: '#c638ff',
     },
     dark: {
-      text: '#f9f0ff', // 非常に薄いパープル (ハイライト)
-      bgScreen: '#260c38', // 非常に濃いディープバイオレット/インディゴ
-      bgCard: '#451a69', // 暗めのパープル/ナス紺
-      bgChip: '#6e2b9c', // ミディアムなロイヤルパープル
-      border: '#9c54d3', // やや明るいバイオレットのボーダー
+      text: '#fce0ff', // 明るいフクシア。暗い背景での可読性を確保。
+      textRevers: '#4a0070',
+      // 非常に濃いディープバイオレット。
+      bgScreen: '#2a004a',
+      // 暗めの鮮やかな紫。
+      bgCard: '#4a1a6a',
+      // 明るい鮮やかな紫。
+      bgChip: '#7a3a9a',
+      // 鮮やかな紫のボーダー。
+      border: '#e07aff',
+      disabled: '#40304a',
+      disabledText: '#c6b6d6',
+      // 💥 最も鮮やかなマゼンタ/フクシア (Accent)
+      accent: '#ff90ff',
     },
   },
 };

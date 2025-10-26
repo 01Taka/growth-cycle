@@ -1,6 +1,7 @@
 // src/components/PlantImageItem.tsx
 import React, { useEffect, useMemo, useState } from 'react';
-import { Box, Center, Image, Loader, Stack, Text } from '@mantine/core'; // Box, Stackを追加
+import { Box, Center, Image, Loader, MantineStyleProp, Stack, Text } from '@mantine/core';
+// Box, Stackを追加
 import DefaultPlantImage from '@/assets/images/default_plant.png';
 import { Subject } from '@/shared/types/study-shared-types';
 import { logger } from '@/shared/utils/logger';
@@ -17,6 +18,7 @@ interface PlantImageItemProps {
   width?: number | string;
   /** 画像の高さ */
   height?: number | string;
+  style?: MantineStyleProp;
 }
 
 /**
@@ -29,6 +31,7 @@ export const PlantImageItem: React.FC<PlantImageItemProps> = ({
   isLoop = false,
   width = 160,
   height = 160,
+  style,
 }) => {
   const { getPlantImagesBySubject: fetchImages } = usePlantImages();
 
@@ -185,7 +188,7 @@ export const PlantImageItem: React.FC<PlantImageItemProps> = ({
       alt={altText}
       height={height}
       fit="contain"
-      style={{ width: width, maxWidth: '100%' }}
+      style={{ width: width, maxWidth: '100%', ...style }}
     />
   );
 };

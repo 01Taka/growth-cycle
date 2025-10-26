@@ -21,6 +21,8 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
     "@mantine/core": "8.3.4",
     "@mantine/hooks": "8.3.4",
     "firebase": "^12.4.0",
