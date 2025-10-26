@@ -54,7 +54,7 @@ export const ReviewLearningCycleItem: React.FC<ReviewLearningCycleItemProps> = (
           <PlantImageItem
             subject={subject}
             type="adult"
-            index={plantIndex}
+            imageIndex={plantIndex}
             width={45}
             height={64}
             style={{ position: 'relative', zIndex: 1000 }}
