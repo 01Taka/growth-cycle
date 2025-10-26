@@ -1,5 +1,6 @@
 import React from 'react';
-import { Card, Flex, Stack, Text } from '@mantine/core';
+import { Card, Flex, Image, Stack, Text } from '@mantine/core';
+import StarEffect from '@/assets/images/star.png';
 import { PlantImageItem } from '@/features/plants/components/PlantImageItem';
 import { useSubjectColorMap } from '@/shared/hooks/useSubjectColor';
 import { AuraEffect } from './AuraEffect';
@@ -65,6 +66,22 @@ export const ReviewLearningCycleItem: React.FC<ReviewLearningCycleItemProps> = (
               blurRadius={18}
               opacity={0.9}
               style={{ position: 'absolute', top: 0, left: -12, zIndex: 0 }}
+            />
+          )}
+          {isCompleted && (
+            <Image
+              src={StarEffect}
+              alt={'star'}
+              fit="contain"
+              style={{
+                width: 80,
+                height: 80,
+                maxWidth: '100%',
+                position: 'absolute',
+                top: -15,
+                left: -12,
+                zIndex: 1000,
+              }}
             />
           )}
         </Stack>

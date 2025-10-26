@@ -3,8 +3,9 @@ import {
   convertLearningCyclesToReviewItemMap,
   createReviewCountGetter,
   createReviewItemGetter,
+  filterTodayLearningCycles,
 } from '../functions/convert-learning-cycle';
-import { dummyLearningCycle, dummyLearningCycles } from '../utils/learning-cycle-dummy';
+import { dummyLearningCycles } from '../utils/learning-cycle-dummy';
 import { HomeReviewCard } from './review/HomeReviewCard';
 import { GrowthPresentation } from './startStudy/GrowthPresentation';
 
@@ -13,9 +14,11 @@ interface HomeMainProps {}
 export const HomeMain: React.FC<HomeMainProps> = ({}) => {
   const reviewPropsMap = useMemo(
     () => convertLearningCyclesToReviewItemMap(dummyLearningCycles),
-    [dummyLearningCycle]
+    [dummyLearningCycles]
   );
 
+  const todayCycles = filterTodayLearningCycles(dummyLearningCycles);
+  const learnings = todayCycles.map((cycle) => ({ subject: cycle.subject }));
   const getItem = createReviewItemGetter(reviewPropsMap);
   const getCount = createReviewCountGetter(reviewPropsMap);
 
@@ -29,12 +32,7 @@ export const HomeMain: React.FC<HomeMainProps> = ({}) => {
         yesterdayItems={getItem(-1)}
         lastWeekItems={getItem(-7)}
       />
-      <GrowthPresentation
-        currentStep={2}
-        subject="science"
-        totalSteps={3}
-        onStartStudy={() => {}}
-      />
+      <GrowthPresentation learnings={learnings} onStartStudy={() => {}} />
     </div>
   );
 };

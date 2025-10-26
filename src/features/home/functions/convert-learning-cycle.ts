@@ -155,3 +155,9 @@ export const createReviewItemGetter = (reviewMap: ReviewItemMap): ReviewItemGett
     return [];
   };
 };
+
+export const filterTodayLearningCycles = (cycles: LearningCycle[]) => {
+  return cycles.filter(
+    (cycle) => cycle.isReviewTarget && getDaysDifference(cycle.latestAttemptedAt.toMillis()) === 0
+  );
+};

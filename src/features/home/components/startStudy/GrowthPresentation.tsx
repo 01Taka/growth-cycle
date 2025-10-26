@@ -13,14 +13,13 @@ import {
 } from '@mantine/core';
 import { PlantImageItem } from '@/features/plants/components/PlantImageItem';
 import { Subject } from '@/shared/types/study-shared-types';
+import { StudyCountView } from './StudyCountView';
 
 /**
  * プレゼンテーションコンポーネントのProps型定義
  */
 interface GrowthPresentationProps {
-  currentStep: number; // 現在のステップ (例: 2)
-  totalSteps: number; // 全体のステップ数 (例: 3)
-  subject: Subject; // PlantImageItemに渡すためのsubject（例: "数学"）
+  learnings: { subject: Subject }[];
   onStartStudy: () => void; // 「勉強スタート」ボタンクリック時のハンドラ
 }
 
@@ -56,113 +55,63 @@ const theme = createTheme({
   primaryShade: 6,
 });
 
-// 個々の種の成長ステップを示すコンポーネント (PlantImageItemを使用)
-const SeedGrowthStep: React.FC<{ index: number; currentStep: number; subject: Subject }> = ({
-  index,
-  currentStep,
-  subject,
-}) => {
-  const isCompleted = index < currentStep; // 既に成長済み
-  const dirtColor = isCompleted ? 'orange.8' : 'gray.5'; // 土の色
-
-  return (
-    <Stack align="center" gap={rem(2)}>
-      {/* ユーザー指定のカスタムコンポーネント */}
-      <PlantImageItem subject={subject} type="bud" index={index} width={rem(36)} height={rem(36)} />
-      {/* 土のビジュアル */}
-      <Box
-        style={{
-          width: rem(36),
-          height: rem(8),
-          borderRadius: rem(4),
-          backgroundColor: dirtColor,
-        }}
-      />
-    </Stack>
-  );
-};
-
 /**
  * メインのプレゼンテーションコンポーネント
  */
 export const GrowthPresentation: React.FC<GrowthPresentationProps> = ({
-  currentStep,
-  totalSteps,
-  subject,
+  learnings,
   onStartStudy,
 }) => {
-  // ステップ表示用の配列を生成 [0, 1, 2, ...]
-  const steps = Array.from({ length: totalSteps }, (_, i) => i);
-
   return (
-    <MantineProvider theme={theme}>
-      <Card
-        shadow="xl"
-        padding="xl"
-        radius="lg"
-        withBorder={false}
-        style={{
-          backgroundColor: theme.colors?.['custom-blue']?.[6], // 背景の青色
-          color: 'white',
-          textAlign: 'center',
-          maxWidth: rem(350),
-          margin: '0 auto',
-          boxShadow: `0 8px 16px rgba(0, 0, 0, 0.2), 0 0 10px ${theme.colors?.['custom-blue']?.[6]}`,
-        }}
-      >
-        <Stack gap="lg" align="center">
-          {/* タイトルセクション (FaSeedlingを使用) */}
-          <Group gap="sm" style={{ padding: rem(10) }}>
-            <FaSeedling color="white" size={rem(24)} />
-            <Text fw={700} fz="xl" style={{ color: 'white' }}>
-              新しい知識を植える
-            </Text>
-          </Group>
-
-          {/* 説明文 */}
-          <Text fz="sm" style={{ color: 'white', opacity: 0.9 }}>
-            新しいタネを植えて、成長の物語を始めよう！
+    <Card
+      shadow="xl"
+      padding="md"
+      radius="lg"
+      withBorder={false}
+      style={{
+        backgroundColor: theme.colors?.['custom-blue']?.[3], // 背景の青色
+        border: `3px solid ${theme.colors?.['custom-blue']?.[6]}`,
+        color: 'white',
+        textAlign: 'center',
+        margin: '10px',
+        boxShadow: `0 8px 16px rgba(0, 0, 0, 0.2), 0 0 10px ${theme.colors?.['custom-blue']?.[6]}`,
+      }}
+    >
+      <Stack gap="sm" align="center">
+        {/* タイトルセクション (FaSeedlingを使用) */}
+        <Group gap="sm" style={{ padding: rem(10) }}>
+          <FaSeedling color="black" />
+          <Text fw={500} fz="h2" style={{ color: 'black' }}>
+            新しい知識を植える
           </Text>
+        </Group>
 
-          {/* 進捗表示 */}
-          <Group justify="center" align="flex-start" gap="xl" mt="md" mb="md">
-            {/* ステップ数を左側に表示 */}
-            <Text fw={700} fz={rem(36)} style={{ color: 'white' }}>
-              {currentStep}/{totalSteps}
-            </Text>
+        {/* 説明文 */}
+        <Text fz="sm" style={{ color: 'black', opacity: 0.9 }}>
+          新しいタネを植えて、成長の物語を始めよう！
+        </Text>
 
-            {/* 成長ステップのビジュアル表示 */}
-            <Group gap="sm" justify="center">
-              {steps.map((stepIndex) => (
-                <SeedGrowthStep
-                  key={stepIndex}
-                  index={stepIndex}
-                  currentStep={currentStep}
-                  subject={subject}
-                />
-              ))}
-            </Group>
-          </Group>
+        {/* 進捗表示 */}
+        <StudyCountView learnings={learnings} maxLearningNum={3} />
 
-          {/* ボタン (FaRocketを使用) */}
-          <Button
-            onClick={onStartStudy}
-            size="lg"
-            radius="xl"
-            style={{
-              backgroundColor: theme.colors?.['custom-green']?.[7], // ボタンの緑色
-              color: 'white',
-              fontWeight: 700,
-              paddingLeft: rem(30),
-              paddingRight: rem(30),
-              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-            }}
-            leftSection={<FaRocket size={rem(20)} style={{ paddingRight: rem(4) }} />}
-          >
-            勉強スタート
-          </Button>
-        </Stack>
-      </Card>
-    </MantineProvider>
+        {/* ボタン (FaRocketを使用) */}
+        <Button
+          onClick={onStartStudy}
+          size="lg"
+          radius="xl"
+          style={{
+            backgroundColor: theme.colors?.['custom-green']?.[7], // ボタンの緑色
+            color: 'white',
+            fontWeight: 700,
+            paddingLeft: rem(30),
+            paddingRight: rem(30),
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+          }}
+          leftSection={<FaRocket />}
+        >
+          勉強スタート
+        </Button>
+      </Stack>
+    </Card>
   );
 };

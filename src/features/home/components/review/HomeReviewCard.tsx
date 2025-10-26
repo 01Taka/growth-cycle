@@ -36,11 +36,9 @@ export const HomeReviewCard: React.FC<HomeReviewCardProps> = ({
   const [activeTab, setActiveTab] = useState<ReviewPeriod>('yesterday');
 
   // Styles for the main card and header elements
-  const cardBgColor = '#fdf8ee'; // Light beige/tan for the main card
+  const cardBgColor = '#DED3C2'; // Light beige/tan for the main card
+  const cardBorderColor = '#EA8E00';
   const orangeButtonColor = '#f8b449'; // The specific orange tone for the buttons
-
-  // 現在選択されているタブに基づいて表示するアイテムリストを決定
-  const itemsToDisplay = activeTab === 'yesterday' ? yesterdayItems : lastWeekItems;
 
   // 現在の合計残りタスク数
   const remainingTasks =
@@ -60,7 +58,13 @@ export const HomeReviewCard: React.FC<HomeReviewCardProps> = ({
   // -------------------------------------------------------------
 
   return (
-    <Card shadow="sm" padding="md" radius="lg" bg={cardBgColor} style={{ margin: '10px' }}>
+    <Card
+      shadow="sm"
+      padding="md"
+      radius="lg"
+      bg={cardBgColor}
+      style={{ margin: '10px', border: `3px solid ${cardBorderColor}` }}
+    >
       <CardSection withBorder={false} p="md">
         <Stack>
           {/* Header Section: 今日の復習 and 残り N タスク */}
@@ -80,7 +84,6 @@ export const HomeReviewCard: React.FC<HomeReviewCardProps> = ({
             </Pill>
           </Flex>
 
-          {/* ------------------------------------------------------------- */}
           {/* Review Tabs Section: 昨日の復習 and 先週の復習 */}
           <Tabs
             value={activeTab} // 現在のstateと連携
@@ -146,7 +149,6 @@ export const HomeReviewCard: React.FC<HomeReviewCardProps> = ({
               </Stack>
             </Tabs.Panel>
           </Tabs>
-          {/* ------------------------------------------------------------- */}
         </Stack>
       </CardSection>
     </Card>
