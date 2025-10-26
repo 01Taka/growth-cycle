@@ -1,10 +1,9 @@
 import React from 'react';
-import { IconPlant2, IconRocket } from '@tabler/icons-react';
+import { FaRocket, FaSeedling } from 'react-icons/fa'; // React Iconsから必要なアイコンをインポート
 import {
   Box,
   Button,
   Card,
-  Center,
   createTheme,
   Group,
   MantineProvider,
@@ -12,9 +11,8 @@ import {
   Stack,
   Text,
 } from '@mantine/core';
-
-// React-Icons を使う場合は以下のようにインポートします（例：FaSeedling）
-// import { FaSeedling } from 'react-icons/fa';
+import { PlantImageItem } from '@/features/plants/components/PlantImageItem';
+import { Subject } from '@/shared/types/study-shared-types';
 
 /**
  * プレゼンテーションコンポーネントのProps型定義
@@ -22,6 +20,7 @@ import {
 interface GrowthPresentationProps {
   currentStep: number; // 現在のステップ (例: 2)
   totalSteps: number; // 全体のステップ数 (例: 3)
+  subject: Subject; // PlantImageItemに渡すためのsubject（例: "数学"）
   onStartStudy: () => void; // 「勉強スタート」ボタンクリック時のハンドラ
 }
 
@@ -57,44 +56,20 @@ const theme = createTheme({
   primaryShade: 6,
 });
 
-// 個々の種の成長ステップを示すコンポーネント
-const SeedGrowthStep: React.FC<{ index: number; currentStep: number }> = ({
+// 個々の種の成長ステップを示すコンポーネント (PlantImageItemを使用)
+const SeedGrowthStep: React.FC<{ index: number; currentStep: number; subject: Subject }> = ({
   index,
   currentStep,
+  subject,
 }) => {
   const isCompleted = index < currentStep; // 既に成長済み
-  const isCurrent = index + 1 === currentStep; // 現在のステップ
-
-  // アイコンのスタイル設定
-  let iconComponent = null;
-  let color = 'gray.4';
-  let dirtColor = 'gray.3';
-
-  if (isCompleted || isCurrent) {
-    // 成長中の双葉のアイコン。画像に合わせて色を調整
-    const plantColor = isCurrent ? '#FFD700' : '#4C6EF5'; // 現在は黄色、完了は青
-    iconComponent = (
-      <IconPlant2
-        style={{
-          width: rem(32),
-          height: rem(32),
-          filter: isCurrent ? 'drop-shadow(0 0 5px #FFD700)' : 'drop-shadow(0 0 5px #4C6EF5)', // キラキラ効果
-        }}
-        color={plantColor}
-        stroke={1.5}
-      />
-    );
-    color = isCurrent ? 'yellow' : 'blue';
-    dirtColor = 'orange.8'; // 土の色を濃く
-  } else {
-    // 未達成のステップは何もなし
-    dirtColor = 'gray.5';
-    iconComponent = <Box style={{ width: rem(32), height: rem(32) }} />;
-  }
+  const dirtColor = isCompleted ? 'orange.8' : 'gray.5'; // 土の色
 
   return (
     <Stack align="center" gap={rem(2)}>
-      {iconComponent}
+      {/* ユーザー指定のカスタムコンポーネント */}
+      <PlantImageItem subject={subject} type="bud" index={index} width={rem(36)} height={rem(36)} />
+      {/* 土のビジュアル */}
       <Box
         style={{
           width: rem(36),
@@ -113,13 +88,13 @@ const SeedGrowthStep: React.FC<{ index: number; currentStep: number }> = ({
 export const GrowthPresentation: React.FC<GrowthPresentationProps> = ({
   currentStep,
   totalSteps,
+  subject,
   onStartStudy,
 }) => {
   // ステップ表示用の配列を生成 [0, 1, 2, ...]
   const steps = Array.from({ length: totalSteps }, (_, i) => i);
 
   return (
-    // MantineProvider でカスタムテーマを適用
     <MantineProvider theme={theme}>
       <Card
         shadow="xl"
@@ -127,18 +102,18 @@ export const GrowthPresentation: React.FC<GrowthPresentationProps> = ({
         radius="lg"
         withBorder={false}
         style={{
-          backgroundColor: theme.colors['custom-blue'][6], // 背景の青色
+          backgroundColor: theme.colors?.['custom-blue']?.[6], // 背景の青色
           color: 'white',
           textAlign: 'center',
-          maxWidth: rem(350), // 最大幅を設定して中央寄せにする
+          maxWidth: rem(350),
           margin: '0 auto',
-          boxShadow: `0 8px 16px rgba(0, 0, 0, 0.2), 0 0 10px ${theme.colors['custom-blue'][6]}`, // ボックスシャドウを画像に合わせて調整
+          boxShadow: `0 8px 16px rgba(0, 0, 0, 0.2), 0 0 10px ${theme.colors?.['custom-blue']?.[6]}`,
         }}
       >
         <Stack gap="lg" align="center">
-          {/* タイトルセクション */}
+          {/* タイトルセクション (FaSeedlingを使用) */}
           <Group gap="sm" style={{ padding: rem(10) }}>
-            <IconPlant2 color="white" style={{ width: rem(24), height: rem(24) }} />
+            <FaSeedling color="white" size={rem(24)} />
             <Text fw={700} fz="xl" style={{ color: 'white' }}>
               新しい知識を植える
             </Text>
@@ -159,27 +134,30 @@ export const GrowthPresentation: React.FC<GrowthPresentationProps> = ({
             {/* 成長ステップのビジュアル表示 */}
             <Group gap="sm" justify="center">
               {steps.map((stepIndex) => (
-                <SeedGrowthStep key={stepIndex} index={stepIndex} currentStep={currentStep} />
+                <SeedGrowthStep
+                  key={stepIndex}
+                  index={stepIndex}
+                  currentStep={currentStep}
+                  subject={subject}
+                />
               ))}
             </Group>
           </Group>
 
-          {/* ボタン */}
+          {/* ボタン (FaRocketを使用) */}
           <Button
             onClick={onStartStudy}
             size="lg"
             radius="xl"
             style={{
-              backgroundColor: theme.colors['custom-green'][7], // ボタンの緑色
+              backgroundColor: theme.colors?.['custom-green']?.[7], // ボタンの緑色
               color: 'white',
               fontWeight: 700,
               paddingLeft: rem(30),
               paddingRight: rem(30),
               boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
             }}
-            leftSection={
-              <IconRocket style={{ width: rem(20), height: rem(20) }} fill="white" stroke={0} />
-            }
+            leftSection={<FaRocket size={rem(20)} style={{ paddingRight: rem(4) }} />}
           >
             勉強スタート
           </Button>
@@ -188,7 +166,3 @@ export const GrowthPresentation: React.FC<GrowthPresentationProps> = ({
     </MantineProvider>
   );
 };
-
-// 使用例 (App.tsx などで利用)
-// import { GrowthPresentation } from './GrowthPresentation';
-// const App = () => <GrowthPresentation currentStep={2} totalSteps={3} onStartStudy={() => console.log('Start!')} />;

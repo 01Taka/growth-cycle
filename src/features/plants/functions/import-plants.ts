@@ -1,9 +1,9 @@
 // Subject型とSubjectSchemaは適切な場所からインポートしてください
+import { ImportPlantsType, ImportPlantsTypeSchema } from '@/shared/types/plant-shared-types';
 import { Subject, SubjectSchema } from '@/shared/types/study-shared-types';
 
 // 🚨 Viteの静的インポート: すべての画像ファイルを事前に取得
-const ALL_PLANT_IMAGE_IMPORTS = import.meta.glob('/src/assets/plants/**/*.png');
-type ImportPlantsType = 'adult' | 'bud';
+const ALL_PLANT_IMAGE_IMPORTS = import.meta.glob('/src/assets/images/plants/**/*.png');
 
 /**
  * 検証済みの教科名に基づき、対応するディレクトリからすべての画像URLを非同期にロードする。
@@ -14,6 +14,7 @@ export const getPlantImagesBySubject = async (
   subject: Subject,
   type: ImportPlantsType
 ): Promise<string[]> => {
+  ImportPlantsTypeSchema.parse(type);
   SubjectSchema.parse(subject); // 1. Zodによるランタイム検証
 
   // 2. 実行時フィルタリング用のプレフィックスを生成

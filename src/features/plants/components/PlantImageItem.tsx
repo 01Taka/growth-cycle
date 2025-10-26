@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Box, Center, Image, Loader, MantineStyleProp, Stack, Text } from '@mantine/core';
 // Box, Stackを追加
 import DefaultPlantImage from '@/assets/images/default_plant.png';
+import { ImportPlantsType } from '@/shared/types/plant-shared-types';
 import { Subject } from '@/shared/types/study-shared-types';
 import { logger } from '@/shared/utils/logger';
 import { usePlantImages } from '../context/PlantImagesContext';
@@ -10,6 +11,7 @@ import { usePlantImages } from '../context/PlantImagesContext';
 interface PlantImageItemProps {
   /** 外部から渡されるロード対象の教科名 */
   subject: Subject;
+  type: ImportPlantsType;
   /** 表示する画像のインデックス (0から始まる) */
   index: number;
   /** インデックスが画像の総数を超えた場合に、画像をループして表示するかどうか */
@@ -27,6 +29,7 @@ interface PlantImageItemProps {
  */
 export const PlantImageItem: React.FC<PlantImageItemProps> = ({
   subject,
+  type,
   index,
   isLoop = false,
   width = 160,
@@ -50,7 +53,7 @@ export const PlantImageItem: React.FC<PlantImageItemProps> = ({
       }
 
       try {
-        const urls = await fetchImages(subject);
+        const urls = await fetchImages(subject, type);
         if (isMounted) {
           setImageUrls(urls);
         }
