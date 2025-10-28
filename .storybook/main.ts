@@ -6,7 +6,7 @@ const config: StorybookConfig = {
     disableTelemetry: true,
     enableCrashReports: false,
   },
-  stories: ['../src/**/*.mdx', '../src/**/*.stories.@(js|jsx|ts|tsx)'],
+  stories: ['../src/**/*.stories.@(js|jsx|ts|tsx)'], // '../src/**/*.mdx',
   addons: ['@storybook/addon-themes', '@storybook/addon-onboarding', 'storybook-addon-mantine'],
   framework: {
     name: '@storybook/react-vite',

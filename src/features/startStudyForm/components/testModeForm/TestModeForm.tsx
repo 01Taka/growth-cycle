@@ -1,27 +1,32 @@
 import React from 'react';
 import { Flex } from '@mantine/core';
 import { TestMode } from '@/shared/types/study-shared-types';
+import { TEST_MODE_BUTTON_CONFIGS } from '../../shared/constants/test-mode-form-config';
 import { useTheme } from '../../shared/useTheme';
-import { testModeButtonsConfig } from './test-mode-form-config';
-import { TestModeSelectButton } from './TestModeSelectButton';
+import { StartStudyFormSelectButton } from '../shared/StartStudyFormSelectButton';
 
 interface TestModeFormProps {
   selectedMode: TestMode | null;
+  onClick: (type: TestMode, disabled: boolean) => void;
 }
 
-export const TestModeForm: React.FC<TestModeFormProps> = ({ selectedMode }) => {
+export const TestModeForm: React.FC<TestModeFormProps> = ({ selectedMode, onClick }) => {
   const getTheme = useTheme();
 
   return (
-    <Flex gap={10}>
-      {Object.values(testModeButtonsConfig).map((config) => (
-        <TestModeSelectButton
-          {...config}
-          theme={getTheme(
-            selectedMode === null || selectedMode === config.type ? config.themeColor : 'disabled'
-          )}
-        />
-      ))}
+    <Flex gap={10} h={140}>
+      {Object.values(TEST_MODE_BUTTON_CONFIGS).map((config) => {
+        const disabled = selectedMode !== null && selectedMode !== config.type;
+        return (
+          <StartStudyFormSelectButton
+            key={config.type}
+            {...config}
+            theme={getTheme(disabled ? 'disabled' : config.themeColor)}
+            disabled={disabled}
+            onClick={() => onClick(config.type, disabled)}
+          />
+        );
+      })}
     </Flex>
   );
 };

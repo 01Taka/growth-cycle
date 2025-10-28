@@ -1,11 +1,27 @@
-export interface SelectStudyTimeButtonProps {
+import { TestMode } from '@/shared/types/study-shared-types';
+import { ThemeColor } from './theme';
+
+export type StudyTimeButtonType = 'compact' | 'balance' | 'long';
+export type TestRangeInputType = 'individual' | 'bulk';
+
+export interface StudyTimeSelectButtonConfig {
+  type: StudyTimeButtonType;
   label: string;
   timeMin: number;
   explanations: string[];
-  theme: {
-    text: string;
-    textSub: string;
-    bg: string;
-    border: string;
-  };
+  themeColor: ThemeColor | 'disabled'; // どのテーマを使うか
+}
+
+export interface TestModeSelectButtonConfig {
+  type: TestMode;
+  label: string;
+  explanations: string[];
+  themeColor: ThemeColor;
+}
+
+export interface TestRangeSelectButtonConfig {
+  type: TestRangeInputType;
+  label: string;
+  explanations: string[];
+  themeColor: ThemeColor;
 }
