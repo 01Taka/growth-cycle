@@ -1,6 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Modal } from '@mantine/core';
-import { useIndividualRangeFormItems } from '../../hooks/useIndividualRangeFormItems';
+import { Modal, Stack } from '@mantine/core';
+import {
+  useIndividualRangeFormItems,
+  UseIndividualRangeFormItemsReturn,
+} from '../../hooks/useIndividualRangeFormItems';
 import {
   IndividualProblemRange,
   IndividualRangeFormValue,
@@ -12,9 +15,9 @@ import { EnteredTestRangeDisplay } from './EnteredTestRangeDisplay';
 import { IndividualRangeForm } from './individualRangeForm/IndividualRangeForm';
 
 interface TestRangeFormProps {
+  formItemsHook: UseIndividualRangeFormItemsReturn;
   units: string[];
   categories: string[];
-  onChange: (value: IndividualRangeFormValue[]) => void;
   onCreateNewUnit: (value: string) => void;
   onCreateNewCategories: (category: string) => void;
 }
@@ -28,14 +31,13 @@ function smallestPowerOfTwo(n: number): number {
 }
 
 export const TestRangeForm: React.FC<TestRangeFormProps> = ({
-  units,
-  categories,
-  onChange,
+  formItemsHook,
+  units = [],
+  categories = [],
   onCreateNewUnit,
   onCreateNewCategories,
 }) => {
   const [opened, setOpened] = useState(false);
-  const formItemsHook = useIndividualRangeFormItems();
 
   // 2. sharedSetting の管理を親で行う
   const sharedSetting = React.useMemo(
@@ -71,12 +73,8 @@ export const TestRangeForm: React.FC<TestRangeFormProps> = ({
     [formItemsHook.formItemValues]
   );
 
-  useEffect(() => {
-    onChange(formItemsHook.formItemValues);
-  }, [formItemsHook.formItemValues, onChange]);
-
   return (
-    <>
+    <Stack w={'100%'} align="center">
       <StartStudyFormSelectButton
         label="テスト範囲を入力"
         theme={getTheme('yellow')}
@@ -93,6 +91,6 @@ export const TestRangeForm: React.FC<TestRangeFormProps> = ({
           initialMaxProblemNumber={smallestPowerOfTwo(128)}
         />
       </Modal>
-    </>
+    </Stack>
   );
 };

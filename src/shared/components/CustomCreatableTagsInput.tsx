@@ -49,6 +49,7 @@ interface CustomTagsInputProps {
   disableCreation?: boolean;
   /** 新規作成が無効化されている場合に表示するメッセージ。 */
   creationDisabledMessage?: string;
+  shouldCloseOnOptionSubmit?: boolean;
 }
 
 /**
@@ -71,6 +72,7 @@ export const CustomCreatableTagsInput = forwardRef<HTMLInputElement, CustomTagsI
       createNewLabel = (search) => `+ 新しい "${search}" を作成`,
       disableCreation = false,
       creationDisabledMessage = '新規作成は無効化されています',
+      shouldCloseOnOptionSubmit = false,
       ...others
     },
     ref
@@ -137,6 +139,10 @@ export const CustomCreatableTagsInput = forwardRef<HTMLInputElement, CustomTagsI
       }
 
       setSearch('');
+
+      if (shouldCloseOnOptionSubmit) {
+        combobox.closeDropdown();
+      }
     };
 
     // ドロップダウンオプションのレンダリング
@@ -216,6 +222,7 @@ export const CustomCreatableTagsInput = forwardRef<HTMLInputElement, CustomTagsI
                   value={search}
                   onBlur={() => combobox.closeDropdown()}
                   onFocus={() => combobox.openDropdown()}
+                  onClick={() => combobox.openDropdown()}
                   onChange={(event) => {
                     combobox.openDropdown();
                     setSearch(event.currentTarget.value);

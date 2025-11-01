@@ -18,8 +18,6 @@ export const UnitForm: React.FC<UnitFormProps> = ({
   onChange,
   onCreateNewUnit,
 }) => {
-  console.log(value);
-
   return (
     <div>
       <CustomCreatableTagsInput
@@ -28,6 +26,7 @@ export const UnitForm: React.FC<UnitFormProps> = ({
         value={value}
         error={error}
         // 値が変更されたときに外部の状態を更新する
+        shouldCloseOnOptionSubmit
         onChange={onChange}
         onCreate={onCreateNewUnit}
       />
