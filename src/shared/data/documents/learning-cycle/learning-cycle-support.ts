@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { SubjectSchema } from '@/shared/types/subject-types';
 
 // ------------------------------------------------------------
 // 共有型とスキーマ (study-shared-types.ts に相当)
@@ -9,7 +10,7 @@ import { z } from 'zod';
  */
 export const TestModeSchema = z
   .union([z.literal('memory'), z.literal('skill')])
-  .describe('i18n:test_mode.mode'); // i18nキーに置き換え
+  .describe('i18n:test_mode.mode');
 
 export type TestMode = z.infer<typeof TestModeSchema>;
 
@@ -23,7 +24,7 @@ export const TestSelfEvaluationSchema = z
     z.literal('confident'),
     z.literal('unrated'),
   ])
-  .describe('i18n:evaluation.self_evaluation'); // i18nキーに置き換え
+  .describe('i18n:evaluation.self_evaluation');
 
 export type TestSelfEvaluation = z.infer<typeof TestSelfEvaluationSchema>;
 
@@ -32,8 +33,10 @@ export type TestSelfEvaluation = z.infer<typeof TestSelfEvaluationSchema>;
  */
 export const UnitDetailSchema = z
   .object({
-    id: z.string().describe('i18n:shared.unit_id'), // i18nキーに置き換え
-    name: z.string().describe('i18n:shared.unit_name'), // i18nキーに置き換え
+    id: z.string().describe('i18n:shared.unit_id'),
+    name: z.string().describe('i18n:shared.unit_name'),
+    subject: SubjectSchema,
+    textbookIds: z.array(z.string()),
   })
   .describe('i18n:shared.unit_detail');
 
@@ -44,8 +47,10 @@ export interface UnitDetail extends z.infer<typeof UnitDetailSchema> {}
  */
 export const CategoryDetailSchema = z
   .object({
-    id: z.string().describe('i18n:shared.category_id'), // i18nキーに置き換え
-    name: z.string().describe('i18n:shared.category_name'), // i18nキーに置き換え
+    id: z.string().describe('i18n:shared.category_id'),
+    name: z.string().describe('i18n:shared.category_name'),
+    subject: SubjectSchema,
+    textbookIds: z.array(z.string()),
   })
   .describe('i18n:shared.category_detail');
 

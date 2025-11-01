@@ -40,7 +40,7 @@ export const StudyPlant: React.FC<StudyPlantProps> = ({
           <PlantImageItem
             subject={subject}
             type={type}
-            index={index}
+            imageIndex={index}
             width={soilWidth}
             height={soilWidth}
           />

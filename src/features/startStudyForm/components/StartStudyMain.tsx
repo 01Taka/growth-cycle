@@ -1,32 +1,70 @@
-import React from 'react';
-import { Textbook } from '@/shared/data/documents/textbook-types';
+import React, { useEffect, useState } from 'react';
 import { Creations } from '@/shared/types/creatable-form-items-types';
-import { createEmptyLearningCycle } from '../functions/create-learning-cycle';
+import { createEmptyLearningCycle } from '../functions/create-learning-cycle-client-data';
+import {
+  getAllCategoryMasterData, // 追加
+  getAllUnitMasterData,
+  runLearningCycleScenario,
+} from '../functions/createLearningCycleInPseudoServer';
 import { StartStudyFormCreatableItems, StartStudyFormValues } from '../types/form-types';
 import { StartStudyForm } from './StartStudyForm';
+
+// UnitとCategoryのマスターデータの型を仮定
 
 interface StartStudyMainProps {}
 
 export const StartStudyMain: React.FC<StartStudyMainProps> = ({}) => {
-  const dummyTextbook: Textbook = {
-    id: 'dummy-id',
-    name: '化学のセミナー',
-    subject: 'science',
+  // 1. 取得したデータを保持するためのstate
+  const [existUnits, setExistUnits] = useState<string[]>([]);
+  const [existCategories, setExistCategories] = useState<string[]>([]);
+
+  // 2. useEffectを使ってコンポーネントマウント時にデータを取得
+  useEffect(() => {
+    // useEffectのコールバック関数自体はasyncにできないため、内部で非同期関数を定義し即時実行
+    const fetchMasterData = async () => {
+      try {
+        const unitsData = await getAllUnitMasterData('user_low_study');
+        const categoriesData = await getAllCategoryMasterData('user_low_study');
+
+        // 3. stateを更新
+        setExistUnits(unitsData.map((data) => data.name));
+        setExistCategories(categoriesData.map((data) => data.name));
+      } catch (error) {
+        console.error('マスターデータの取得中にエラーが発生しました:', error);
+        // エラーハンドリング（必要に応じてエラー状態をセットするなど）
+      }
+    };
+
+    fetchMasterData();
+    // 依存配列を空（[]）にすることで、コンポーネントのマウント時（初回レンダリング後）に一度だけ実行される
+  }, []);
+
+  // --- 既存のロジック ---
+  const getLabelList = (creations: Creations<StartStudyFormCreatableItems>) => {
+    return {
+      units: creations.units ? Object.values(creations.units).map((unit) => unit.label) : [],
+      categories: creations.categories
+        ? Object.values(creations.categories).map((category) => category.label)
+        : [],
+    };
   };
 
-  const handleSubmit = (
+  const handleSubmit = async (
     value: StartStudyFormValues,
     creations: Creations<StartStudyFormCreatableItems>
   ) => {
-    const data = createEmptyLearningCycle(dummyTextbook, value, creations);
-    console.log(data);
+    const data = createEmptyLearningCycle('eng-textbook-002', value);
+    const { units, categories } = getLabelList(creations);
+    await runLearningCycleScenario(data, units, categories);
   };
+  // --- 既存のロジック ---
 
+  // 4. stateに保持したデータをpropsとして渡す
   return (
     <div>
       <StartStudyForm
-        existUnits={['UnitA', 'UnitB']}
-        existCategories={['CategoryA', 'CategoryB']}
+        existUnits={existUnits}
+        existCategories={existCategories}
         handleSubmit={handleSubmit}
       />
     </div>

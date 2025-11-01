@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Center, Image, Loader, MantineStyleProp, Stack, Text } from '@mantine/core';
 import ErrorPlantImage from '@/assets/images/default_plant.png';
-import { Subject } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { ImportPlantsType } from '@/shared/types/plant-shared-types';
+import { Subject } from '@/shared/types/subject-types';
 import { logger } from '@/shared/utils/logger';
 import { usePlantImages } from '../context/PlantImagesContext';
 import { DEFAULT_PLANTS_MAP } from '../default-plants';
