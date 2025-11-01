@@ -1,13 +1,13 @@
 import React from 'react';
 import { Stack } from '@mantine/core';
 import { STUDY_TIME_BUTTON_CONFIGS } from '../../shared/constants/study-time-buttons-config';
-import { StudyTimeButtonType } from '../../shared/shared-props-types';
+import { StudyTimeButtonType, StudyTimeSelectButtonConfig } from '../../shared/shared-props-types';
 import { useTheme } from '../../shared/useTheme';
 import { StudyTimeSelectButton } from './StudyTimeSelectButton';
 
 interface StudyTimeFormProps {
   selectedType: StudyTimeButtonType | null;
-  onClick: (type: StudyTimeButtonType, disabled: boolean) => void;
+  onClick: (config: StudyTimeSelectButtonConfig, disabled: boolean) => void;
 }
 
 export const StudyTimeForm: React.FC<StudyTimeFormProps> = ({ selectedType, onClick }) => {
@@ -23,7 +23,7 @@ export const StudyTimeForm: React.FC<StudyTimeFormProps> = ({ selectedType, onCl
             {...config}
             theme={getTheme(disabled ? 'disabled' : config.themeColor)}
             disabled={disabled}
-            onClick={() => onClick(config.type, disabled)}
+            onClick={() => onClick(config, disabled)}
           />
         );
       })}

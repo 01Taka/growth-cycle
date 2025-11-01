@@ -2,12 +2,13 @@ import React from 'react';
 import { Flex } from '@mantine/core';
 import { TestMode } from '@/shared/types/study-shared-types';
 import { TEST_MODE_BUTTON_CONFIGS } from '../../shared/constants/test-mode-form-config';
+import { TestModeSelectButtonConfig } from '../../shared/shared-props-types';
 import { useTheme } from '../../shared/useTheme';
 import { StartStudyFormSelectButton } from '../shared/StartStudyFormSelectButton';
 
 interface TestModeFormProps {
   selectedMode: TestMode | null;
-  onClick: (type: TestMode, disabled: boolean) => void;
+  onClick: (config: TestModeSelectButtonConfig, disabled: boolean) => void;
 }
 
 export const TestModeForm: React.FC<TestModeFormProps> = ({ selectedMode, onClick }) => {
@@ -23,7 +24,7 @@ export const TestModeForm: React.FC<TestModeFormProps> = ({ selectedMode, onClic
             {...config}
             theme={getTheme(disabled ? 'disabled' : config.themeColor)}
             disabled={disabled}
-            onClick={() => onClick(config.type, disabled)}
+            onClick={() => onClick(config, disabled)}
           />
         );
       })}

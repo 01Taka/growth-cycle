@@ -23,8 +23,9 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
-    "@mantine/core": "8.3.4",
-    "@mantine/hooks": "8.3.4",
+    "@mantine/core": "^8.3.6",
+    "@mantine/form": "^8.3.6",
+    "@mantine/hooks": "^8.3.6",
     "@tabler/icons-react": "^3.35.0",
     "date-fns": "^4.1.0",
     "firebase": "^12.4.0",
