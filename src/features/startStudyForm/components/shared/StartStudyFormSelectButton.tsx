@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Stack, Text } from '@mantine/core';
+import { Button, MantineStyleProp, Stack, Text } from '@mantine/core';
 import { sharedStyle } from '@/shared/styles/shared-styles';
 import { Theme } from '../../shared/theme';
 
@@ -7,6 +7,7 @@ interface StartStudyFormSelectButtonProps {
   label: string;
   explanations: string[];
   theme: Theme;
+  style?: MantineStyleProp;
   disabled?: boolean;
   onClick: () => void;
 }
@@ -15,17 +16,19 @@ export const StartStudyFormSelectButton: React.FC<StartStudyFormSelectButtonProp
   label,
   explanations,
   theme,
+  style,
   disabled = false,
   onClick,
 }) => {
   return (
     <Button
-      w={'50%'}
-      h={'100%'}
       style={{
         ...(disabled ? sharedStyle.disabledButton : sharedStyle.button),
         backgroundColor: theme.bg,
         border: `2px solid ${theme.border}`,
+        width: '50%',
+        height: '100%',
+        ...style,
       }}
       onClick={onClick}
     >

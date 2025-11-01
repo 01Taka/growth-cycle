@@ -22,7 +22,7 @@ import {
   IndividualRangeFormHandlers,
   IndividualRangeFormValue,
   OnFinishEditModeArgs,
-} from '../shared-types';
+} from '../../../shared/shared-test-range-types';
 import { ProblemNumberSelect } from './ProblemNumberSelect';
 
 // EditModeViewに渡すために必要なプロパティ
@@ -64,11 +64,11 @@ export const EditModeView: React.FC<EditModeViewProps> = ({
   const buttonMessage = useMemo(() => {
     const messages: string[] = [];
     if (isNewUnit && value?.unit) {
-      messages.push(`🚀 新しいユニット: ${value.unit}`);
+      messages.push(`🚀 新ユニット: ${value.unit}`);
     }
 
     if (isNewCategory && value?.category) {
-      messages.push(`✨ 新しいカテゴリー: ${value.category}`);
+      messages.push(`✨ 新カテゴリー: ${value.category}`);
     }
 
     if (messages.length === 0) {
@@ -94,8 +94,8 @@ export const EditModeView: React.FC<EditModeViewProps> = ({
         <Flex w={'20%'} align={'center'} style={{ flexShrink: 0 }}>
           {!hasNewItem && (
             <>
-              <IconChevronLeft size={20} color="gray" />
-              <Text style={{ color: 'gray' }}>閉じる</Text>
+              <IconChevronLeft size={20} color="skyblue" />
+              <Text style={{ color: 'skyblue' }}>保存</Text>
             </>
           )}
         </Flex>
@@ -151,7 +151,6 @@ export const EditModeView: React.FC<EditModeViewProps> = ({
             ) : null
           }
         />
-        {/* ProblemNumberSelectは内部でデザイン調整が必要ですが、ここではそのまま使用 */}
         <ProblemNumberSelect
           label="問題番号"
           value={value.problemNumber ?? 1}

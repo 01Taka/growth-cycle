@@ -43,6 +43,9 @@ export const ProblemNumberSelect: React.FC<ProblemNumberSelectProps> = ({
       value={value.toString()}
       style={{ ...style }}
       styles={{ ...styles }}
+      variant="filled"
+      radius="md"
+      size="md"
       data={[
         ...rangeAsStringArray(1, maxProblemNumber + 1),
         { value: 'expansion', label: 'もっとみる' },

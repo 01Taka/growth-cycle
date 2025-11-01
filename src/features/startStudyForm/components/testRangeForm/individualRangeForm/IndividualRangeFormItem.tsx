@@ -6,7 +6,7 @@ import {
   IndividualRangeFormHandlers,
   IndividualRangeFormValue,
   OnFinishEditModeArgs,
-} from '../shared-types';
+} from '../../../shared/shared-test-range-types';
 import { DisplayModeView } from './DisplayModeView';
 import { EditModeView } from './EditModeView';
 

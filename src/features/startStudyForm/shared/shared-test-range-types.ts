@@ -17,11 +17,19 @@ export interface IndividualRangeFormValue {
   id: number;
   unit?: string;
   category?: string;
-  problemNumber?: number;
+  problemNumber: number;
 }
 
 export interface OnFinishEditModeArgs {
   isNewUnit: boolean;
   isNewCategory: boolean;
   value: IndividualRangeFormValue;
+}
+
+export interface IndividualProblemRange {
+  id: number;
+  problemIndex: number;
+  unit: string;
+  category: string;
+  problemNumber: number;
 }

@@ -4,7 +4,10 @@ import React from 'react';
 import { IconChevronRight, IconPencil, IconTrash } from '@tabler/icons-react';
 import { Box, Divider, Flex, Group, Paper, rem, Text, ThemeIcon } from '@mantine/core'; // Dividerを追加
 
-import { IndividualRangeFormHandlers, IndividualRangeFormValue } from '../shared-types';
+import {
+  IndividualRangeFormHandlers,
+  IndividualRangeFormValue,
+} from '../../../shared/shared-test-range-types';
 import { ProblemNumberSelect } from './ProblemNumberSelect';
 
 // DisplayModeViewに渡すために必要なプロパティ
@@ -100,7 +103,7 @@ export const DisplayModeView: React.FC<DisplayModeViewProps> = ({
             <Text size="sm" fw={600} c="dimmed">
               問題番号
             </Text>
-            <Box style={{ flexShrink: 0 }}>
+            <Box style={{ flexShrink: 0, width: '50%' }}>
               <ProblemNumberSelect
                 value={value.problemNumber ?? 1}
                 maxProblemNumber={maxProblemNumber}

@@ -3,15 +3,19 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'; // 👈 useRef, useEffect をインポート
 
 // 既存の型定義をインポート
-import { IndividualRangeFormHandlers, IndividualRangeFormValue } from '../shared-types';
+import {
+  IndividualRangeFormHandlers,
+  IndividualRangeFormValue,
+} from '../shared/shared-test-range-types';
 
 // ---------------------------
-// 1. 状態管理の型定義 (変更なし)
+// 1. 状態管理の型定義
 // ---------------------------
 export type FormItemState = IndividualRangeFormValue[];
 
 export interface UseIndividualRangeFormItemsReturn {
   formItemValues: FormItemState;
+  isLastItemFilled: boolean;
   getItemProps: (index: number) => {
     value: IndividualRangeFormValue;
     handlers: IndividualRangeFormHandlers;
@@ -41,16 +45,23 @@ export const useIndividualRangeFormItems = (
 
   const [formItemValues, setFormItemValues] = useState<FormItemState>(initialValues);
 
-  // 💡 formItemValues の最新値を保持するための ref を追加
   const formItemValuesRef = useRef(formItemValues);
 
-  // 💡 formItemValues が更新されるたびに ref を同期する
   useEffect(() => {
     formItemValuesRef.current = formItemValues;
   }, [formItemValues]);
 
+  const isLastItemFilled = useMemo(() => {
+    if (formItemValues.length === 0) {
+      return false;
+    }
+    const lastItem = formItemValues[formItemValues.length - 1];
+
+    return !!lastItem.unit && !!lastItem.category;
+  }, [formItemValues]);
+
   // -------------------------
-  // 補助関数: 新しい空の要素を追加 (変更なし)
+  // 補助関数: 新しい空の要素を追加
   // -------------------------
   const appendEmptyItem = useCallback(() => {
     idNumber.current += 1;
@@ -65,7 +76,7 @@ export const useIndividualRangeFormItems = (
   }, []);
 
   // -------------------------
-  // 補助関数: 要素の値を更新 (変更なし)
+  // 補助関数: 要素の値を更新
   // -------------------------
   const updateItemValue = useCallback(
     (index: number, key: keyof IndividualRangeFormValue, newValue: any) => {
@@ -106,7 +117,7 @@ export const useIndividualRangeFormItems = (
   );
 
   // -------------------------
-  // 補助関数: 要素の削除 (変更なし)
+  // 補助関数: 要素の削除
   // -------------------------
   const removeItem = useCallback((index: number) => {
     setFormItemValues((prevValues) => {
@@ -145,6 +156,7 @@ export const useIndividualRangeFormItems = (
   return useMemo(
     () => ({
       formItemValues,
+      isLastItemFilled,
       setFormItemValues,
       getItemProps,
       appendEmptyItem,
