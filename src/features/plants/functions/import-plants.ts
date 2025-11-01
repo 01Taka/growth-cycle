@@ -1,6 +1,5 @@
-// Subject型とSubjectSchemaは適切な場所からインポートしてください
 import { ImportPlantsType, ImportPlantsTypeSchema } from '@/shared/types/plant-shared-types';
-import { Subject, SubjectSchema } from '@/shared/types/study-shared-types';
+import { Subject, SubjectSchema } from '@/shared/types/subject-types';
 import { logger } from '@/shared/utils/logger';
 
 // 🚨 Viteの静的インポート: すべての画像ファイルを事前に取得

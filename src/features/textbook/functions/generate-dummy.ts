@@ -1,4 +1,4 @@
-import { Subject } from '@/shared/types/study-shared-types';
+import { Subject } from '@/shared/types/subject-types';
 import { TextbookItemProps } from '../components/shared-props-types';
 
 /**

@@ -1,7 +1,7 @@
 import React from 'react';
 import { MantineSize, Pill } from '@mantine/core';
 import { useSubjectColorMap } from '@/shared/hooks/useSubjectColor';
-import { Subject } from '@/shared/types/study-shared-types';
+import { Subject } from '@/shared/types/subject-types';
 
 interface UnitPillProps {
   subject: Subject;

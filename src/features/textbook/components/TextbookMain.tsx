@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button } from '@mantine/core';
-import { Subject } from '@/shared/types/study-shared-types';
+import { Subject } from '@/shared/types/subject-types';
 import { generateDummyTextbookItemProps } from '../functions/generate-dummy';
 import { FilterChips } from './filterChip/FilterChips';
 import { TextbookList } from './TextbookList';

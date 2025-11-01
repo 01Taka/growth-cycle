@@ -1,5 +1,5 @@
 import { ImportPlantsType } from '@/shared/types/plant-shared-types';
-import { Subject } from '@/shared/types/study-shared-types';
+import { Subject } from '@/shared/types/subject-types';
 
 export interface PlantImagesContextValue {
   getPlantImageByIndexPromise: (

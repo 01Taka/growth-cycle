@@ -1,17 +1,11 @@
 import { useCallback, useMemo, useState } from 'react';
 import { ComboboxItem } from '@mantine/core';
-
-// 共通型
-type ItemList = ComboboxItem[] | string[];
-type CreatableItems = ComboboxItem[];
-
-// 内部処理で利用する、全てComboboxItem[]に正規化された型
-type NormalizedItems<T extends Record<string, ItemList>> = Record<keyof T, ComboboxItem[]>;
-
-/**
- * 新しいアイテムのvalueを生成するための関数。
- */
-export type GetValueFn<T extends string | number | symbol> = (fieldKey: T, label: string) => string;
+import {
+  CreatableItems,
+  GetValueFn,
+  ItemList,
+  NormalizedItems,
+} from '../types/creatable-form-items-types';
 
 interface UseCreatableFormItemsProps<T extends Record<string, any>> {
   initialCreations?: Partial<Record<keyof T, CreatableItems>>;

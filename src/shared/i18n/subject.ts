@@ -1,5 +1,5 @@
 import { Language } from '../types/language-types';
-import { Subject } from '../types/study-shared-types';
+import { Subject } from '../types/subject-types';
 
 export const subjectResources: Record<Language, Record<'subjects', Record<Subject, string>>> = {
   en: {

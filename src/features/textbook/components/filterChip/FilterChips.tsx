@@ -1,6 +1,6 @@
 import React from 'react';
 import { Flex } from '@mantine/core';
-import { Subject } from '@/shared/types/study-shared-types';
+import { Subject } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { FilterChip } from './FilterChip';
 
 interface FilterChipsProps {

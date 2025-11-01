@@ -1,4 +1,4 @@
-import { Subject } from '../types/study-shared-types';
+import { Subject } from '../types/subject-types';
 import { SubjectColorMap } from './subjectColorType';
 
 // SubjectColorMap の定義に 'accent' を含むことを前提とします。

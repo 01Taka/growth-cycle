@@ -1,6 +1,6 @@
 import React from 'react';
 import { Flex } from '@mantine/core';
-import { TestMode } from '@/shared/types/study-shared-types';
+import { TestMode } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { TEST_MODE_BUTTON_CONFIGS } from '../../shared/constants/test-mode-form-config';
 import { TestModeSelectButtonConfig } from '../../shared/shared-props-types';
 import { useTheme } from '../../shared/useTheme';

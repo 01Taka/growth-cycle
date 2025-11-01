@@ -1,4 +1,4 @@
-import { TestMode } from '@/shared/types/study-shared-types';
+import { TestMode } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { TestRangeSelectButtonConfig } from '../shared-props-types';
 
 export const TEST_RANGE_BUTTON_CONFIGS: Record<TestMode, TestRangeSelectButtonConfig> = {

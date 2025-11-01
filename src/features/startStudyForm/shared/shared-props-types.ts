@@ -1,4 +1,4 @@
-import { TestMode } from '@/shared/types/study-shared-types';
+import { TestMode } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { ThemeColor } from './theme';
 
 export type StudyTimeButtonType = 'compact' | 'balance' | 'long';

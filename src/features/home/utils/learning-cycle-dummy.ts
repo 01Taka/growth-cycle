@@ -1,5 +1,5 @@
 import { Timestamp } from 'firebase/firestore';
-import { LearningCycle } from '@/shared/types/learning-cycle-types';
+import { LearningCycle } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 
 const createMockTimestamp = (offsetMs: number = 0): Timestamp => {
   const now = Date.now() + offsetMs;

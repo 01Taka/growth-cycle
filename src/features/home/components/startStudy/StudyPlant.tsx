@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, rem } from '@mantine/core';
 import { PlantImageItem } from '@/features/plants/components/PlantImageItem';
 import { ImportPlantsType } from '@/shared/types/plant-shared-types';
-import { Subject } from '@/shared/types/study-shared-types';
+import { Subject } from '@/shared/types/subject-types';
 
 interface StudyPlantProps {
   subject: Subject | null;

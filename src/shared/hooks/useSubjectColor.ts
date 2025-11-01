@@ -3,7 +3,7 @@
 import { MantineColorScheme, useComputedColorScheme } from '@mantine/core';
 import { SUBJECT_COLORS } from '../theme/subjectColors';
 import { ColorRole, SubjectColorMap } from '../theme/subjectColorType';
-import { Subject } from '../types/study-shared-types';
+import { Subject } from '../types/subject-types';
 
 // roleが省略された場合のデフォルト値を定義
 const DEFAULT_ROLE: ColorRole = 'bgCard';

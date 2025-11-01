@@ -1,9 +1,7 @@
-import { LearningSettings } from './learning-cycle-types';
-
 /**
  * テストの設定情報を保持します。
  */
-export interface FormatLearningSettings extends LearningSettings {
+export interface FormatLearningSettings {
   /**
    * ユニットIDをキー、ユニット名を値とするマップです。
    */

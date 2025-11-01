@@ -1,5 +1,5 @@
 import { Timestamp } from 'firebase/firestore';
-import { Subject } from '@/shared/types/study-shared-types';
+import { Subject } from '@/shared/types/subject-types';
 
 export interface ReviewLearningCycleItemProps {
   isCompleted: boolean;

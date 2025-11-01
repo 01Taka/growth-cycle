@@ -1,6 +1,6 @@
 import React, { createContext, ReactNode, useContext, useMemo } from 'react';
 import { ImportPlantsType } from '@/shared/types/plant-shared-types';
-import { Subject } from '@/shared/types/study-shared-types';
+import { Subject } from '@/shared/types/subject-types';
 import { plantImageLoader } from '../functions/import-plants';
 import { PlantImagesContextValue } from './PlantImagesContextType';
 

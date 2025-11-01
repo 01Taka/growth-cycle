@@ -1,5 +1,5 @@
-import { FormatLearningSettings } from '@/shared/types/format-learning-cycle-types';
-import { LearningSettings } from '@/shared/types/learning-cycle-types';
+import { LearningSettings } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
+import { FormatLearningSettings } from '@/shared/data/format-documents/format-learning-cycle-types';
 
 /**
  * LearningSettingsを拡張し、unitMap, categoryMap、

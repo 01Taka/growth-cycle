@@ -1,0 +1,58 @@
+{
+  "test_mode": {
+    "mode": "Test Execution Mode",
+    "memory": "Memory Test (Retention)",
+    "skill": "Skill Test (Application Ability)"
+  },
+  "evaluation": {
+    "self_evaluation": "User Self-Evaluation after Test",
+    "notSure": "Not Sure",
+    "imperfect": "Imperfect",
+    "confident": "Confident",
+    "unrated": "Unrated"
+  },
+  "shared": {
+    "unit_id": "Unit ID",
+    "unit_name": "Unit Name",
+    "unit_detail": "Unit Detail",
+    "category_id": "Category ID",
+    "category_name": "Category Name",
+    "category_detail": "Category Detail",
+    "subject": "Textbook Subject"
+  },
+  "result": {
+    "test_result": "Single Problem Test Result",
+    "problem_index": "Problem Relative Index",
+    "self_evaluation": "User Self-Evaluation",
+    "is_correct": "Is Correct Flag",
+    "time_taken_ms": "Time Taken to Answer (ms)"
+  },
+  "session": {
+    "test_session": "Test Session Information",
+    "attempted_at": "Test Attempt Time (Timestamp)",
+    "results_list": "List of Results per Problem"
+  },
+  "problem": {
+    "detail": "Problem Details contained in the Learning Cycle",
+    "index": "Problem Relative Index",
+    "number": "Problem Number"
+  },
+  "cycle": {
+    "full_document_schema": "Full Learning Cycle Document Schema",
+    "client_input": "Client Input for New Creation",
+    "partial_update": "Document Partial Update Data",
+    "textbook_id": "Textbook/Course ID",
+    "learning_duration_ms": "Learning Duration (ms)",
+    "test_duration_ms": "Test Duration (ms)",
+    "problems": "Problem List",
+    "is_review_target": "Is Review Target Flag",
+    "cycle_start_at": "Cycle Start Time (Timestamp)",
+    "subject": "Textbook Subject",
+    "textbook_name": "Textbook/Course Name",
+    "units": "Target Unit List",
+    "categories": "Target Category List",
+    "sessions": "All Test Sessions List",
+    "next_review_at": "Next Recommended Review Date (Timestamp)",
+    "latest_attempted_at": "Latest Attempt Time (Timestamp)"
+  }
+}

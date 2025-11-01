@@ -1,6 +1,6 @@
 import React from 'react';
 import { Flex } from '@mantine/core';
-import { Subject } from '@/shared/types/study-shared-types';
+import { Subject } from '@/shared/types/subject-types';
 import { PlantImageItem } from '../../../plants/components/PlantImageItem';
 import { TextbookPlant } from '../shared-props-types';
 

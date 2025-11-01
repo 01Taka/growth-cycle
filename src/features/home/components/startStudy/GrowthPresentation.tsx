@@ -1,18 +1,7 @@
 import React from 'react';
 import { FaRocket, FaSeedling } from 'react-icons/fa'; // React Iconsから必要なアイコンをインポート
-import {
-  Box,
-  Button,
-  Card,
-  createTheme,
-  Group,
-  MantineProvider,
-  rem,
-  Stack,
-  Text,
-} from '@mantine/core';
-import { PlantImageItem } from '@/features/plants/components/PlantImageItem';
-import { Subject } from '@/shared/types/study-shared-types';
+import { Button, Card, createTheme, Group, rem, Stack, Text } from '@mantine/core';
+import { Subject } from '@/shared/types/subject-types';
 import { StudyCountView } from './StudyCountView';
 
 /**

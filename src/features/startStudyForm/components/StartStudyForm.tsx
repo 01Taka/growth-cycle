@@ -1,45 +1,37 @@
-import React, { ReactNode, useCallback, useMemo, useState } from 'react';
-import { Box, MultiSelect, Stack, Text } from '@mantine/core';
+import React, { ReactNode, useCallback, useMemo } from 'react';
+import { Box, Button, Stack, Text } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useCreatableFormItems } from '@/shared/hooks/useCreatableFormItems';
+import { Creations } from '@/shared/types/creatable-form-items-types';
 import { FormInputProps } from '@/shared/types/mantine-form-types';
-import { TestMode } from '@/shared/types/study-shared-types';
 import { useIndividualRangeFormItems } from '../hooks/useIndividualRangeFormItems';
 import { STUDY_TIME_BUTTON_CONFIGS } from '../shared/constants/study-time-buttons-config';
-import { IndividualRangeFormValue } from '../shared/shared-test-range-types';
+import {
+  StartStudyFormComponent,
+  StartStudyFormCreatableItems,
+  StartStudyFormValues,
+} from '../types/form-types';
 import { StudyTimeForm } from './studyTimeForm/StudyTimeForm';
 import { TestModeForm } from './testModeForm/TestModeForm';
 import { TestRangeForm } from './testRangeForm/TestRangeForm';
 import { TestTimeForm } from './testTimeForm/TestTimeForm';
-import TagsInputExample from './unitForm/ExampleUsage';
 import { UnitForm } from './unitForm/UnitForm';
 
-interface StartStudyFormProps {}
-
-interface FormComponent {
-  label: string;
-  form: ReactNode;
+interface StartStudyFormProps {
+  existUnits: string[];
+  existCategories: string[];
+  handleSubmit: (
+    value: StartStudyFormValues,
+    creations: Creations<StartStudyFormCreatableItems>
+  ) => void;
 }
 
-/**
- * フォームの状態の型定義
- */
-interface FormValues {
-  units: string[];
-  studyTimeMin: number | null;
-  testMode: TestMode | null;
-  testRange: IndividualRangeFormValue[];
-  testTimeMin: number;
-}
-
-interface CreatableFormItems {
-  units: string[];
-  categories: string[];
-}
-
-export const StartStudyForm: React.FC<StartStudyFormProps> = ({}) => {
-  // Mantine Formの設定
-  const form = useForm<FormValues>({
+export const StartStudyForm: React.FC<StartStudyFormProps> = ({
+  existUnits,
+  existCategories,
+  handleSubmit,
+}) => {
+  const form = useForm<StartStudyFormValues>({
     initialValues: {
       units: [],
       studyTimeMin: null,
@@ -47,28 +39,36 @@ export const StartStudyForm: React.FC<StartStudyFormProps> = ({}) => {
       testRange: [],
       testTimeMin: 15,
     },
-    validate: {},
+    validate: {
+      units: (value) => (value.length < 1 ? '単元を1つ以上選択してください' : null), // 配列の長さが1以上が必須
+      studyTimeMin: (value) => (value === null ? '勉強時間を選択してください' : null), // nullは埋められている必要あり
+      testMode: (value) => (value === null ? 'テストモードを選択してください' : null), // nullは埋められている必要あり
+      // testRange: 上書きするので省略,
+      testTimeMin: (value) => (value === null ? 'テスト時間を入力してください' : null), // nullは埋められている必要あり
+    },
   });
 
-  const { combinedItems, onCreate } = useCreatableFormItems<CreatableFormItems>({
-    initialExistingItems: { units: ['unitA', 'unitB'] },
-  });
+  const { creations, combinedItems, onCreate } =
+    useCreatableFormItems<StartStudyFormCreatableItems>({
+      initialExistingItems: { units: existUnits, categories: existCategories },
+    });
 
   const formItemsHook = useIndividualRangeFormItems();
 
+  // 依存配列を form.values.studyTimeMin に限定
   const selectedTimeType = useMemo(() => {
     const config = Object.values(STUDY_TIME_BUTTON_CONFIGS).find(
-      (value) => value.timeMin === form.getValues().studyTimeMin
+      (value) => value.timeMin === form.values.studyTimeMin // form.values を直接参照
     );
-
     return config ? config.type : null;
-  }, [form]);
+  }, [form.values.studyTimeMin]); // 依存配列に特定の値のみを使用
 
   const handleCreateNewUnit = useCallback(
     (unit: string) => {
       onCreate('units', unit);
-      if (form.getValues().units.every((item) => (item as string) !== unit)) {
-        form.insertListItem('units', unit);
+      // setFieldValue を使用して、既存の配列に新しいユニットを追加
+      if (!form.values.units.includes(unit)) {
+        form.setFieldValue('units', [...form.values.units, unit]);
       }
     },
     [form, onCreate]
@@ -81,7 +81,7 @@ export const StartStudyForm: React.FC<StartStudyFormProps> = ({}) => {
     [onCreate]
   );
 
-  const forms: FormComponent[] = useMemo(
+  const forms: StartStudyFormComponent[] = useMemo(
     () => [
       {
         label: '単元',
@@ -106,7 +106,7 @@ export const StartStudyForm: React.FC<StartStudyFormProps> = ({}) => {
         label: 'テストモード',
         form: (
           <TestModeForm
-            selectedMode={form.getValues().testMode}
+            selectedMode={form.values.testMode} // form.values を直接参照
             onClick={(config) => form.setFieldValue('testMode', config.type)}
           />
         ),
@@ -129,7 +129,7 @@ export const StartStudyForm: React.FC<StartStudyFormProps> = ({}) => {
       },
     ],
     [
-      form,
+      form, // form のメソッド（getInputProps, setFieldValueなど）のために残す
       combinedItems,
       formItemsHook,
       selectedTimeType,
@@ -139,19 +139,28 @@ export const StartStudyForm: React.FC<StartStudyFormProps> = ({}) => {
   );
 
   return (
-    <div>
+    // フォーム送信機能を有効化
+    <Box
+      component="form"
+      onSubmit={form.onSubmit((data) => {
+        handleSubmit({ ...data, testRange: formItemsHook.formItemValues }, creations);
+      })}
+    >
       <Stack gap={30}>
-        {forms.map((form) => (
-          <Stack>
+        {forms.map((item) => (
+          <Stack key={item.label}>
+            {' '}
+            {/* keyを追加 */}
             <Text size="lg" fw={700}>
-              {form.label}
+              {item.label}
             </Text>
             <Box w={'90%'} m={'auto'}>
-              {form.form}
+              {item.form}
             </Box>
           </Stack>
         ))}
+        <Button type="submit">学習開始</Button>
       </Stack>
-    </div>
+    </Box>
   );
 };

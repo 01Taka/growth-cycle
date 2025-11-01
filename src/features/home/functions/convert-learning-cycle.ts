@@ -1,4 +1,4 @@
-import { LearningCycle } from '@/shared/types/learning-cycle-types';
+import { LearningCycle } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 import { getDaysDifference } from '@/shared/utils/datetime/datetime-compare-utils';
 import { formatLearningSettings } from '@/shared/utils/format/formant-learning-settings';
 import { ReviewLearningCycleItemProps } from '../components/review/shared-types';

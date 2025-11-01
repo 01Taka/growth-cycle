@@ -1,0 +1,58 @@
+{
+  "test_mode": {
+    "mode": "テストの実行モード",
+    "memory": "記憶力テスト（定着度）",
+    "skill": "実力テスト（応用力）"
+  },
+  "evaluation": {
+    "self_evaluation": "ユーザーによる自己評価",
+    "notSure": "自信なし",
+    "imperfect": "不確実",
+    "confident": "確信あり",
+    "unrated": "未評価"
+  },
+  "shared": {
+    "unit_id": "ユニットID",
+    "unit_name": "ユニット名",
+    "unit_detail": "単元詳細",
+    "category_id": "カテゴリID",
+    "category_name": "カテゴリ名",
+    "category_detail": "カテゴリ詳細",
+    "subject": "問題集の科目"
+  },
+  "result": {
+    "test_result": "単一問題のテスト結果",
+    "problem_index": "問題の相対インデックス",
+    "self_evaluation": "ユーザーによる自己評価",
+    "is_correct": "正解フラグ",
+    "time_taken_ms": "解答にかかった時間 (ms)"
+  },
+  "session": {
+    "test_session": "テストセッション情報",
+    "attempted_at": "テスト実施時刻 (Timestamp)",
+    "results_list": "各問題の結果リスト"
+  },
+  "problem": {
+    "detail": "学習サイクルに含まれる問題の詳細",
+    "index": "問題の相対インデックス",
+    "number": "問題の通し番号"
+  },
+  "cycle": {
+    "full_document_schema": "学習サイクルの完全なドキュメントスキーマ",
+    "client_input": "クライアントからの新規作成インプット",
+    "partial_update": "ドキュメントの部分更新データ",
+    "textbook_id": "問題集/教科書ID",
+    "learning_duration_ms": "勉強時間 (ms)",
+    "test_duration_ms": "テスト時間 (ms)",
+    "problems": "問題リスト",
+    "is_review_target": "復習対象フラグ",
+    "cycle_start_at": "サイクル開始時刻 (Timestamp)",
+    "subject": "問題集の科目",
+    "textbook_name": "問題集/教科書名",
+    "units": "対象ユニットリスト",
+    "categories": "対象カテゴリリスト",
+    "sessions": "全テストセッションリスト",
+    "next_review_at": "次回の復習推奨日時 (Timestamp)",
+    "latest_attempted_at": "最新の試行日時 (Timestamp)"
+  }
+}
