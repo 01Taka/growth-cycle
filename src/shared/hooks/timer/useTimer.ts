@@ -1,3 +1,4 @@
+import { useCallback, useMemo } from 'react';
 import { UseTimerArgs, UseTimerResult } from './timer-types';
 import { useTimerLogic } from './useTimerLogic';
 import { useTimerState } from './useTimerState';
@@ -15,15 +16,28 @@ export const useTimer = (args: UseTimerArgs): UseTimerResult => {
 
   // 2. タイマーのロジック計算と操作関数を提供する useTimerLogic を呼び出し
   const timerLogic = useTimerLogic({
+    ...args,
     ...timerState,
-    intervalMs: args.intervalMs,
-    getNow: args.getNow,
-    onTimerEnd: args.onTimerEnd,
   });
+
+  const switchState = useCallback(
+    () => (timerLogic.isRunning ? timerLogic.stop() : timerLogic.start()),
+    [timerLogic.isRunning, timerLogic.stop, timerLogic.start]
+  );
+
+  const progress = useMemo(() => {
+    if (timerLogic.elapsedTime <= 0 || timerState.expectedDuration <= 0) {
+      return args.isDecreaseProgress ? 1 : 0;
+    }
+    const progress = Math.min(timerLogic.elapsedTime / timerState.expectedDuration, 1);
+    return args.isDecreaseProgress ? 1 - progress : progress;
+  }, [timerLogic.elapsedTime, timerState.expectedDuration, args.isDecreaseProgress]);
 
   // 3. 必要な結果を結合して返す
   return {
     ...timerState,
     ...timerLogic,
+    progress,
+    switchState,
   };
 };

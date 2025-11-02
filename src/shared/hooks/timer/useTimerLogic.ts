@@ -23,6 +23,7 @@ export const useTimerLogic = (args: UseTimerLogicArgs) => {
     isRunning,
     expectedDuration,
     intervalMs,
+    timerEndAction,
     onStateChange,
     onTimerEnd,
   } = args;
@@ -91,8 +92,22 @@ export const useTimerLogic = (args: UseTimerLogicArgs) => {
   useEffect(() => {
     if (isRunning && remainingTimeRef.current <= 0) {
       onTimerEnd?.();
+      if (timerEndAction === 'stop') {
+        stop();
+      } else if (timerEndAction === 'reset') {
+        reset();
+      }
     }
-  }, [isRunning, remainingTime, onTimerEnd, remainingTimeRef]);
+  }, [
+    expectedDuration,
+    isRunning,
+    remainingTime,
+    timerEndAction,
+    onTimerEnd,
+    stop,
+    reset,
+    remainingTimeRef,
+  ]);
 
   return {
     remainingTime,

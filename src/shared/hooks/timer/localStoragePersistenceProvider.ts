@@ -1,4 +1,4 @@
-import { FullTimerState, TimerPersistenceProvider } from './timer-types';
+import { TimerPersistenceProvider, TimerState } from './timer-types';
 
 /**
  * ローカルストレージを使用してタイマーの状態を永続化するプロバイダー。
@@ -15,9 +15,9 @@ export class LocalStorageTimerPersistenceProvider implements TimerPersistencePro
 
   /**
    * ローカルストレージからタイマーの状態をロードします。
-   * @returns {FullTimerState | null} 復元された状態、またはデータがない場合は null。
+   * @returns {TimerState | null} 復元された状態、またはデータがない場合は null。
    */
-  load(): FullTimerState | null {
+  load(): TimerState | null {
     try {
       // 1. localStorage から文字列を取得
       const stored = localStorage.getItem(this.key);
@@ -27,7 +27,7 @@ export class LocalStorageTimerPersistenceProvider implements TimerPersistencePro
       }
 
       // 2. JSON 文字列をオブジェクトにパース
-      const state: FullTimerState = JSON.parse(stored);
+      const state: TimerState = JSON.parse(stored);
 
       // タイムスタンプが number 型であることを保証するための簡易チェック
       if (typeof state.startTime !== 'number' || typeof state.expectedDuration !== 'number') {
@@ -46,9 +46,9 @@ export class LocalStorageTimerPersistenceProvider implements TimerPersistencePro
 
   /**
    * タイマーの現在の状態をローカルストレージに保存します。
-   * @param {FullTimerState} state - 保存するタイマーの現在の状態。
+   * @param {TimerState} state - 保存するタイマーの現在の状態。
    */
-  save(state: FullTimerState): void {
+  save(state: TimerState): void {
     try {
       // 1. 状態オブジェクトを JSON 文字列に変換
       const serialized = JSON.stringify(state);

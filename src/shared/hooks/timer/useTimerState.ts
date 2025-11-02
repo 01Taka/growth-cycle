@@ -1,8 +1,8 @@
 // hooks/useTimerState.ts (実装部分 - 修正と追加)
 import { useCallback, useEffect, useState } from 'react';
-import { FullTimerState, TimerState, UseTimerStateArgs, UseTimerStateResult } from './timer-types';
+import { TimerState, UseTimerStateArgs, UseTimerStateResult } from './timer-types';
 
-const defaultInitialState: FullTimerState = {
+const defaultInitialState: TimerState = {
   expectedDuration: 0,
   startTime: 0,
   stoppedAt: 0,
@@ -22,12 +22,12 @@ export const useTimerState = (args: UseTimerStateArgs): UseTimerStateResult => {
   // 1. ロード状態と内部状態の管理
   const [isLoaded, setIsLoaded] = useState(false);
 
-  const initialFullState: FullTimerState = {
+  const initialFullState: TimerState = {
     ...defaultInitialState,
     ...initialState,
   };
 
-  const [fullState, setFullState] = useState<FullTimerState>(initialFullState);
+  const [fullState, setFullState] = useState<TimerState>(initialFullState);
 
   // 2. 非同期ロード処理
   useEffect(() => {
@@ -65,9 +65,9 @@ export const useTimerState = (args: UseTimerStateArgs): UseTimerStateResult => {
 
   // 3. onStateChange コールバックの定義
   const onStateChange = useCallback(
-    (newState: TimerState) => {
+    (newState: Partial<TimerState>) => {
       setFullState((prev) => {
-        const newFullState: FullTimerState = {
+        const newFullState: TimerState = {
           ...prev,
           ...newState,
         };
@@ -90,7 +90,7 @@ export const useTimerState = (args: UseTimerStateArgs): UseTimerStateResult => {
   const setExpectedDuration = useCallback(
     (newDuration: number) => {
       setFullState((prev) => {
-        const newState: FullTimerState = {
+        const newState: TimerState = {
           ...prev,
           expectedDuration: newDuration,
         };
@@ -118,7 +118,6 @@ export const useTimerState = (args: UseTimerStateArgs): UseTimerStateResult => {
     onStateChange,
     setExpectedDuration,
 
-    currentState: fullState,
     isLoaded,
   };
 
