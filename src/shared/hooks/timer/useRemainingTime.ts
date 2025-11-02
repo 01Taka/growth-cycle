@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { UseRemainingTimeArgs } from './timer-types';
 
 /**
@@ -12,19 +12,13 @@ import { UseRemainingTimeArgs } from './timer-types';
  * @property {React.MutableRefObject<number>} remainingTimeRef - 残り時間を参照するためのrefオブジェクト。
  */
 const useRemainingTime = (args: UseRemainingTimeArgs) => {
-  const {
-    isRunning,
-    stoppedAt,
-    expectedEndAt,
-    expectedDuration,
-    getNow = () => Date.now(),
-    intervalMs = 1000,
-  } = args;
+  const { isRunning, stoppedAt, expectedEndAt, expectedDuration, intervalMs = 1000 } = args;
+  const getNow = useCallback(args.getNow ?? (() => Date.now()), [args.getNow]);
 
   /**
    * 現在のタイマーの状態に基づいた残り時間を計算する
    */
-  const getInitialRemaining = () => {
+  const getInitialRemaining = useCallback(() => {
     if (isRunning) {
       // 実行中: 終了予定時刻 - 現在時刻
       return expectedEndAt - getNow();
@@ -34,7 +28,7 @@ const useRemainingTime = (args: UseRemainingTimeArgs) => {
     }
     // 初期状態
     return expectedDuration;
-  };
+  }, []);
 
   const [remainingTimeState, setRemainingTimeState] = useState(getInitialRemaining());
   const remainingTimeRef = useRef<number>(remainingTimeState);

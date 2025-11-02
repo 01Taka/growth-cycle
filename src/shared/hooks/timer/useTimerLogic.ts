@@ -26,7 +26,7 @@ export const useTimerLogic = (args: UseTimerLogicArgs) => {
     onStateChange,
     onTimerEnd,
   } = args;
-  const getNow = args.getNow ?? (() => Date.now());
+  const getNow = useCallback(args.getNow ?? (() => Date.now()), [args.getNow]);
 
   const expectedEndAt = startTime + expectedDuration;
 
@@ -44,6 +44,8 @@ export const useTimerLogic = (args: UseTimerLogicArgs) => {
    */
   const stop = useCallback(() => {
     const now = getNow();
+
+    if (!isRunning && stoppedAt === 0 && startTime === 0) return;
     // タイマーが既に停止している場合は状態変更を行わない
     if (!isRunning && stoppedAt > 0) return;
 
@@ -87,11 +89,10 @@ export const useTimerLogic = (args: UseTimerLogicArgs) => {
 
   // タイマー終了時の自動停止処理
   useEffect(() => {
-    // 実行中かつ残り時間が 0 以下になったら自動的に stop を呼び出す
     if (isRunning && remainingTimeRef.current <= 0) {
       onTimerEnd?.();
     }
-  }, [isRunning, remainingTime, stop, remainingTimeRef]);
+  }, [isRunning, remainingTime, onTimerEnd, remainingTimeRef]);
 
   return {
     remainingTime,
