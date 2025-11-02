@@ -8,10 +8,10 @@ import { Subject } from '@/shared/types/subject-types';
 import { StudyActionButtons } from './StudyActionButtons';
 import { StudyHeader } from './StudyHeader';
 import { StudyPhasePlantDisplay } from './StudyPhasePlantDisplay';
-import { StudyShowRangeButton } from './StudyShowRangeButton';
 import { StudyTimer } from './StudyTimer';
 
 interface StudyPhaseProps {
+  isReadyTest: boolean;
   header: {
     subject: Subject;
     textbookName: string;
@@ -26,13 +26,19 @@ interface StudyPhaseProps {
   theme: SubjectColorMap;
 }
 
-export const StudyPhase: React.FC<StudyPhaseProps> = ({ header, plant, timer, theme }) => {
+export const StudyPhase: React.FC<StudyPhaseProps> = ({
+  isReadyTest,
+  header,
+  plant,
+  timer,
+  theme,
+}) => {
   return (
     <Stack align="center">
       <StudyHeader {...header} />
       <StudyTimer timer={timer} sectionColor={theme.border} buttonColor={theme.accent} />
 
-      <StudyActionButtons theme={theme} isReadyTest />
+      <StudyActionButtons theme={theme} isReadyTest={isReadyTest} />
       <StudyPhasePlantDisplay {...plant} />
     </Stack>
   );

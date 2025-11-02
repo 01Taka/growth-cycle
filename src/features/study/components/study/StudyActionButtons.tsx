@@ -1,6 +1,6 @@
 import React from 'react';
 import { IconArrowRight } from '@tabler/icons-react';
-import { Button, rem, Stack } from '@mantine/core';
+import { Button, Stack } from '@mantine/core';
 import { sharedStyle } from '@/shared/styles/shared-styles';
 import { SubjectColorMap } from '@/shared/theme/subjectColorType';
 import { toRGBA } from '@/shared/utils/color/color-convert-utils';

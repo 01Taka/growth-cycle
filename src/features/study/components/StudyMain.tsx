@@ -27,6 +27,7 @@ export const StudyMain: React.FC<StudyMainProps> = ({}) => {
       <ParticleOverlay color={theme.accent} />
       <Stack mt={16} style={{ backgroundColor: theme.bgScreen }}>
         <StudyPhase
+          isReadyTest={timer.remainingTime <= 0}
           header={{ subject: subject, textbookName: '論読', units: ['unitA', 'unitB'] }}
           plant={{
             subject: subject,
