@@ -1,39 +1,19 @@
-import React, { useMemo, useState } from 'react';
+import React from 'react';
 import { IconPlayerPause, IconPlayerPlay } from '@tabler/icons-react';
-import { Box, Button, Flex, rem, RingProgress, Stack, Text, TextInput } from '@mantine/core';
-import { LocalStorageTimerPersistenceProvider } from '@/shared/hooks/timer/localStoragePersistenceProvider';
+import { Button, Flex, rem, RingProgress, Stack, Text } from '@mantine/core';
+import { UseTimerResult } from '@/shared/hooks/timer/timer-types';
 import { processMilliseconds } from '@/shared/hooks/timer/timer-utils';
-import { useTimer } from '@/shared/hooks/timer/useTimer';
 
 interface StudyTimerProps {
-  /**
-   * trueの場合、タイマーの進行と共にバーが増えていきます（充填）。
-   * falseの場合、タイマーの進行と共にバーが減っていきます（空に）。
-   */
-  isFilling?: boolean;
+  timer: UseTimerResult;
+  sectionColor: string;
+  buttonColor: string;
 }
 
-export const StudyTimer: React.FC<StudyTimerProps> = ({ isFilling = false }) => {
-  const timerProvider = useMemo(() => new LocalStorageTimerPersistenceProvider(), []);
-  const {
-    progress,
-    remainingTime,
-    isRunning,
-    start,
-    stop,
-    reset,
-    setExpectedDuration,
-    switchState,
-  } = useTimer({
-    persistenceProvider: timerProvider,
-    timerEndAction: 'stop',
-    isDecreaseProgress: !isFilling,
-    onTimerEnd: () => console.log('END'),
-  });
+export const StudyTimer: React.FC<StudyTimerProps> = ({ timer, sectionColor, buttonColor }) => {
+  const { remainingTime, progress, isRunning, switchState } = timer;
 
   const time = processMilliseconds(Math.ceil(remainingTime / 1000) * 1000);
-
-  const [newExpectedDuration, setNewExpectedDuration] = useState(20);
 
   return (
     <Stack align="center">
@@ -41,34 +21,21 @@ export const StudyTimer: React.FC<StudyTimerProps> = ({ isFilling = false }) => 
         size={350}
         thickness={15}
         roundCaps
-        sections={[{ value: progress * 100, color: isFilling ? 'blue' : 'orange' }]}
+        sections={[{ value: progress * 100, color: sectionColor }]}
         label={
           <Stack align="center" justify="end" gap={10} w={'100%'} h={'100%'}>
             <Text size="xl">テストまで</Text>
             <Flex>
               {time.split.hours > 0 && <Text size={rem(50)}>{time.split.hours}：</Text>}
               <Text size={rem(50)}>{time.split.minutes}：</Text>
-              <Text size={rem(50)}>{time.split.seconds}</Text>
+              <Text size={rem(50)}>{String(time.split.seconds).padStart(2, '0')}</Text>
             </Flex>
-            <Button onClick={switchState} mt={20}>
+            <Button onClick={switchState} mt={20} style={{ backgroundColor: buttonColor }}>
               {isRunning ? <IconPlayerPause /> : <IconPlayerPlay />}
             </Button>
           </Stack>
         }
       />
-
-      {/* テスト用 */}
-      <Flex>
-        <Button onClick={start}>start</Button>
-        <Button onClick={stop}>stop</Button>
-        <Button onClick={reset}>reset</Button>
-        <TextInput
-          type="number"
-          value={newExpectedDuration}
-          onChange={(e) => setNewExpectedDuration(Number(e.target.value))}
-        />
-        <Button onClick={() => setExpectedDuration(newExpectedDuration * 1000)}>更新</Button>
-      </Flex>
     </Stack>
   );
 };
