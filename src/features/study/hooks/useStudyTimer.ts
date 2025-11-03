@@ -6,7 +6,8 @@ import { range } from '@/shared/utils/range';
 // --- 定数とユーティリティ ---
 
 // メインタイマーのIDと初期時間を定数化
-const MAIN_TIMER_ID = 'main';
+const STUDY_TIMER_ID = 'study';
+const TEST_TIMER_ID = 'test';
 // 25分をミリ秒で表現: 25 * 60 * 1000
 const INITIAL_MAIN_DURATION_MS = 25 * 60000;
 const PERSISTENCE_KEY = 'multiTimer';
@@ -50,7 +51,7 @@ const getProblemIndexFromTimerId = (timerId: string): number => {
 
 // --- カスタムフック ---
 
-export const useStudyTestPhase = (totalProblemsNumber: number) => {
+export const useStudyTimer = (totalProblemsNumber: number) => {
   // 1. Persistence Providerの初期化
   const timerProvider = useMemo(
     () => new LocalStorageMultiTimerPersistenceProvider(PERSISTENCE_KEY),
@@ -69,16 +70,21 @@ export const useStudyTestPhase = (totalProblemsNumber: number) => {
 
   // 3. useMultiTimer の初期化
   const timer = useMultiTimer({
-    initialDurationMap: { [MAIN_TIMER_ID]: INITIAL_MAIN_DURATION_MS, ...problemDurationMap },
+    initialDurationMap: {
+      [STUDY_TIMER_ID]: INITIAL_MAIN_DURATION_MS,
+      [TEST_TIMER_ID]: INITIAL_MAIN_DURATION_MS,
+      ...problemDurationMap,
+    },
     initialStateMap: {},
-    timerEndActionMap: { [MAIN_TIMER_ID]: 'stopAll' },
+    timerEndActionMap: { [STUDY_TIMER_ID]: 'stop', [TEST_TIMER_ID]: 'stopAll' },
     persistenceProvider: timerProvider,
   });
 
   // 4. SingleTimerの取得
   // timerオブジェクト全体に依存するのではなく、getSingleTimer関数に依存することで
   // timerオブジェクトが変更されない限り再生成されないようにする
-  const mainTimer = useMemo(() => timer.getSingleTimer(MAIN_TIMER_ID), [timer.getSingleTimer]);
+  const studyTimer = useMemo(() => timer.getSingleTimer(STUDY_TIMER_ID), [timer.getSingleTimer]);
+  const testTimer = useMemo(() => timer.getSingleTimer(TEST_TIMER_ID), [timer.getSingleTimer]);
 
   const [currentTestProblemIndex, setCurrentTestProblemIndex] = useState<number | null>(null);
 
@@ -106,7 +112,7 @@ export const useStudyTestPhase = (totalProblemsNumber: number) => {
       Object.fromEntries(
         Object.entries(timer.elapsedTimeMap)
           .map(([key, value]) => {
-            if (key === MAIN_TIMER_ID) return undefined;
+            if (key === TEST_TIMER_ID || key === STUDY_TIMER_ID) return undefined;
             const index = getProblemIndexFromTimerId(key);
             if (index !== -1) {
               return [index, value] as const;
@@ -123,7 +129,7 @@ export const useStudyTestPhase = (totalProblemsNumber: number) => {
       setCurrentTestProblemIndex((prevIndex) => {
         // インデックスのバリデーション
         let validatedIndex: number | null = null;
-        if (newIndex !== null && (prevIndex !== null || type === 'set')) {
+        if (newIndex !== null) {
           // prevIndexは存在するがエラー対策
           const index = type === 'set' ? newIndex : (prevIndex ?? 0) + newIndex;
           // 0から totalProblemsNumber - 1 の範囲に収める
@@ -134,7 +140,7 @@ export const useStudyTestPhase = (totalProblemsNumber: number) => {
         if (prevIndex === validatedIndex) return prevIndex;
 
         // メインタイマーが実行中かどうかをチェック (isMainTimerRunningを直接使用)
-        const isMainTimerRunning = mainTimer.isRunning;
+        const isMainTimerRunning = testTimer.isRunning;
 
         // 1. 既存のタイマー (prevIndex) があれば停止
         if (isMainTimerRunning && prevIndex !== null) {
@@ -152,32 +158,36 @@ export const useStudyTestPhase = (totalProblemsNumber: number) => {
       });
     },
     // 依存配列にタイマー操作関数と totalProblemsNumber、mainTimer.isRunningを入れる。
-    // mainTimer.isRunningはchangeProblemTimerが定義される際にキャプチャされる値なので、
+    // testTimer.isRunningはchangeProblemTimerが定義される際にキャプチャされる値なので、
     // useMultiTimerのAPIが変更されない限りtimer全体ではなく、timer.stopとtimer.startに依存するのが理想だが、
     // useMultiTimerのAPIが安定していると仮定し、依存関係を絞る。
-    [totalProblemsNumber, mainTimer.isRunning, timer.stop, timer.start]
+    [totalProblemsNumber, testTimer.isRunning, timer.stop, timer.start]
   );
+
+  const isFinishTestTimer = useMemo(() => testTimer.remainingTime < 0, [testTimer.remainingTime]);
 
   // 8. メインタイマーの実行/停止を切り替える関数
   const handleSwitchTimerRunning = useCallback(() => {
-    if (mainTimer.isRunning) {
+    if (testTimer.isRunning) {
       // 実行中であれば、全て停止
       timer.stopAll();
-    } else if (mainTimer.remainingTime > 0) {
+    } else if (!isFinishTestTimer) {
       // 実行中でなければ、開始
-      mainTimer.start();
+      testTimer.start();
       // アクティブな問題タイマーがあればそれも開始
       if (currentActiveProblemTimer) {
         currentActiveProblemTimer.start();
       }
     }
-  }, [mainTimer, currentActiveProblemTimer, timer]); // timer全体を依存に入れることで start/stopAll の安定性を担保
+  }, [testTimer, currentActiveProblemTimer, timer, isFinishTestTimer]); // timer全体を依存に入れることで start/stopAll の安定性を担保
 
   return {
-    mainTimer,
+    studyTimer,
+    testTimer,
     currentActiveProblemTimer,
     currentTestProblemIndex,
     elapsedTimeMap,
+    isFinishTestTimer,
     changeCurrentTestProblem,
     handleSwitchTimerRunning,
     resetAll: timer.resetAll,

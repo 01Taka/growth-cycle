@@ -11,6 +11,7 @@ interface TestProblemCardProps {
   selfEvaluation: TestSelfEvaluation;
   currentElapsedTime: number | null;
   totalProblemsNumber: number;
+  isAutoSlide: boolean;
   theme: SubjectColorMap;
   onSelectSelfEvaluation: (evaluation: TestSelfEvaluation) => void;
   onNextProblem: () => void;
@@ -22,6 +23,7 @@ export const TestProblemCard: React.FC<TestProblemCardProps> = ({
   selfEvaluation,
   currentElapsedTime,
   totalProblemsNumber,
+  isAutoSlide,
   theme,
   onSelectSelfEvaluation,
   onNextProblem,
@@ -61,14 +63,14 @@ export const TestProblemCard: React.FC<TestProblemCardProps> = ({
           onSelectSelfEvaluation={onSelectSelfEvaluation}
         />
         <Text size="sm" style={{ color: 'GrayText' }}>
-          自己評価をすると次の問題に移動
+          {isAutoSlide ? '自己評価をすると次の問題に移動' : '自己評価を選択'}
         </Text>
         <Flex justify="space-between" w={'100%'}>
           <Button variant="transparent" style={{ color: theme.accent }} onClick={onBackProblem}>
             ＜戻る
           </Button>
           <Button variant="transparent" style={{ color: theme.accent }} onClick={onNextProblem}>
-            パス＞
+            {isAutoSlide ? 'パス＞' : '次へ＞'}
           </Button>
         </Flex>
       </Stack>

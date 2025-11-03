@@ -1,9 +1,10 @@
 import React from 'react';
-import { Flex, Stack } from '@mantine/core';
+import { IconPencil } from '@tabler/icons-react';
+import { Button, Flex, Stack } from '@mantine/core';
 import { TestSelfEvaluation } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { SingleTimerData } from '@/shared/hooks/multi-timer/multi-timer-types';
+import { sharedStyle } from '@/shared/styles/shared-styles';
 import { SubjectColorMap } from '@/shared/theme/subjectColorType';
-import { ImportPlantsType } from '@/shared/types/plant-shared-types';
 import { Subject } from '@/shared/types/subject-types';
 import { StudyProblem } from '../../types/problem-types';
 import { StudyHeader } from '../studyPhase/StudyHeader';
@@ -20,11 +21,7 @@ interface TestPhaseProps {
     textbookName: string;
     units: string[];
   };
-  plant: {
-    subject: Subject;
-    type: ImportPlantsType;
-    imageIndex: number;
-  };
+  isFinishTestTimer: boolean;
   mainTimer: SingleTimerData;
   currentTimerElapsedTime: number | null;
   elapsedTimeMap: Record<number, number>;
@@ -39,6 +36,7 @@ interface TestPhaseProps {
 export const TestPhase: React.FC<TestPhaseProps> = ({
   problems,
   header,
+  isFinishTestTimer,
   mainTimer,
   currentTimerElapsedTime,
   elapsedTimeMap,
@@ -54,6 +52,8 @@ export const TestPhase: React.FC<TestPhaseProps> = ({
     (problem) => selfEvaluationMap[problem.problemIndex] ?? 'unrated'
   );
   const totalProblemsNumber = problems.length;
+  const isProblemUnrated =
+    (selfEvaluationMap[currentProblem.problemIndex] ?? 'unrated') === 'unrated';
 
   return (
     <Stack align="center" w={'100%'}>
@@ -69,15 +69,35 @@ export const TestPhase: React.FC<TestPhaseProps> = ({
         />
       </Flex>
       <Stack align="center" w={'90%'}>
+        {isFinishTestTimer && (
+          <Button
+            size="xl"
+            style={{
+              ...sharedStyle.button,
+              color: theme.text,
+              backgroundColor: theme.bgCard,
+              border: `2px solid ${theme.border}`,
+              width: '100%',
+              marginTop: 50,
+              marginBottom: 80,
+            }}
+          >
+            テストを採点する
+            <IconPencil />
+          </Button>
+        )}
         <TestProblemCard
           problem={currentProblem}
           selfEvaluation={selfEvaluationMap[currentProblem.problemIndex] ?? 'unrated'}
           currentElapsedTime={currentTimerElapsedTime}
           totalProblemsNumber={totalProblemsNumber}
+          isAutoSlide={isProblemUnrated}
           theme={theme}
           onSelectSelfEvaluation={(evaluation) => {
             onSelectSelfEvaluation(currentProblem.problemIndex, evaluation);
-            changeCurrentTestProblem(1, 'increment');
+            if (isProblemUnrated) {
+              changeCurrentTestProblem(1, 'increment');
+            }
           }}
           onNextProblem={() => changeCurrentTestProblem(1, 'increment')}
           onBackProblem={() => changeCurrentTestProblem(-1, 'increment')}

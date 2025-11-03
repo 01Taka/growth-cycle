@@ -1,6 +1,6 @@
 import React from 'react';
 import { Stack } from '@mantine/core';
-import { SingleTimer } from '@/shared/hooks/multi-timer/multi-timer-types';
+import { SingleTimerData } from '@/shared/hooks/multi-timer/multi-timer-types';
 import { SubjectColorMap } from '@/shared/theme/subjectColorType';
 import { ImportPlantsType } from '@/shared/types/plant-shared-types';
 import { Subject } from '@/shared/types/subject-types';
@@ -21,8 +21,9 @@ interface StudyPhaseProps {
     type: ImportPlantsType;
     imageIndex: number;
   };
-  timer: SingleTimer;
+  timer: SingleTimerData;
   theme: SubjectColorMap;
+  switchState: () => void;
 }
 
 export const StudyPhase: React.FC<StudyPhaseProps> = ({
@@ -31,11 +32,18 @@ export const StudyPhase: React.FC<StudyPhaseProps> = ({
   plant,
   timer,
   theme,
+  switchState,
 }) => {
   return (
     <Stack align="center">
       <StudyHeader {...header} />
-      <StudyTimer timer={timer} sectionColor={theme.border} buttonColor={theme.accent} />
+      <StudyTimer
+        title="テストまで"
+        timer={timer}
+        sectionColor={theme.border}
+        buttonColor={theme.accent}
+        switchState={switchState}
+      />
       <StudyActionButtons theme={theme} isReadyTest={isReadyTest} />
       <StudyPhasePlantDisplay {...plant} />
     </Stack>
