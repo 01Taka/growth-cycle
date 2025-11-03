@@ -115,10 +115,10 @@ export const useTimerState = (args: UseTimerStateArgs): UseTimerStateResult => {
     isRunning: fullState.isRunning,
     expectedDuration: fullState.expectedDuration,
 
+    isLoaded,
+
     onStateChange,
     setExpectedDuration,
-
-    isLoaded,
   };
 
   return useTimerArgs;

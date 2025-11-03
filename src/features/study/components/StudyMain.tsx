@@ -5,7 +5,9 @@ import { useTimer } from '@/shared/hooks/timer/useTimer';
 import { useSubjectColorMap } from '@/shared/hooks/useSubjectColor';
 import { Subject } from '@/shared/types/subject-types';
 import { ParticleOverlay } from './ParticleOverlay';
-import { StudyPhase } from './study/StudyPhase';
+import { StudyPhase } from './studyPhase/StudyPhase';
+import { dummyProblems } from './testPhase/dummy-problems';
+import { TestPhase } from './testPhase/TestPhase';
 
 interface StudyMainProps {}
 
@@ -25,9 +27,21 @@ export const StudyMain: React.FC<StudyMainProps> = ({}) => {
   return (
     <>
       <ParticleOverlay color={theme.accent} />
-      <Stack mt={16} style={{ backgroundColor: theme.bgScreen }}>
-        <StudyPhase
+      <Stack w={'100%'} mt={16} style={{ backgroundColor: theme.bgScreen }}>
+        {/* <StudyPhase
           isReadyTest={timer.remainingTime <= 0}
+          header={{ subject: subject, textbookName: '論読', units: ['unitA', 'unitB'] }}
+          plant={{
+            subject: subject,
+            type: 'adult',
+            imageIndex: Date.now() % 17,
+          }}
+          timer={timer}
+          theme={theme}
+        /> */}
+
+        <TestPhase
+          problems={dummyProblems}
           header={{ subject: subject, textbookName: '論読', units: ['unitA', 'unitB'] }}
           plant={{
             subject: subject,

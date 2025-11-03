@@ -113,9 +113,9 @@ export const useTimerLogic = (args: UseTimerLogicArgs) => {
     remainingTime,
     elapsedTime,
     isRunning,
+    remainingTimeRef,
     start,
     stop,
     reset,
-    remainingTimeRef,
   };
 };

@@ -46,7 +46,7 @@ export const SoundPermissionModal: React.FC = () => {
     <Modal
       opened={open}
       onClose={handleClose}
-      title={<Title order={3}>🎧 音声の許可をお願いします</Title>}
+      title="🎧 音声の許可をお願いします"
       // モバイル向けに全画面表示、またはサイズを大きく設定
       fullScreen={false} // 必要に応じてモバイルではtrueに
       size="md"

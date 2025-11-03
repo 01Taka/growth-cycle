@@ -2,7 +2,7 @@ import React from 'react';
 import { IconPlayerPause, IconPlayerPlay } from '@tabler/icons-react';
 import { Button, Flex, rem, RingProgress, Stack, Text } from '@mantine/core';
 import { UseTimerResult } from '@/shared/hooks/timer/timer-types';
-import { processMilliseconds } from '@/shared/hooks/timer/timer-utils';
+import { processMilliseconds } from '@/shared/utils/datetime/time-utils';
 
 interface StudyTimerProps {
   timer: UseTimerResult;

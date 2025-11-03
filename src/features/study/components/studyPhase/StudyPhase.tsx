@@ -37,7 +37,6 @@ export const StudyPhase: React.FC<StudyPhaseProps> = ({
     <Stack align="center">
       <StudyHeader {...header} />
       <StudyTimer timer={timer} sectionColor={theme.border} buttonColor={theme.accent} />
-
       <StudyActionButtons theme={theme} isReadyTest={isReadyTest} />
       <StudyPhasePlantDisplay {...plant} />
     </Stack>
