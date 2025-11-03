@@ -90,8 +90,6 @@ export const useMultiTimerState = (args: UseMultiTimerStateArgs): UseMultiTimerS
   // 4. onStateChange (個別タイマーの状態変更)
   const onStateChange = useCallback(
     (id: string, newState: Partial<TimerState>) => {
-      console.log(id, newState);
-
       setStateMap((prevMap) => {
         const prevState = prevMap[id] ?? defaultInitialTimerState;
         const newMap: TimerStateMap = {
@@ -120,6 +118,21 @@ export const useMultiTimerState = (args: UseMultiTimerStateArgs): UseMultiTimerS
     [durationMap, saveAll]
   );
 
+  const onDurationChange = useCallback(
+    (id: string, newDuration: number) => {
+      setDurationMap((prevDurationMap) => {
+        const newMap: Record<string, number> = {
+          ...prevDurationMap,
+          [id]: newDuration,
+        }; // 非同期保存
+        saveAll(stateMap, newMap);
+
+        return newMap;
+      });
+    },
+    [stateMap, saveAll] // stateMap は保存時に必要
+  );
+
   // 6. setDurationMap (期間マップ全体の更新)
   const setDurationMapHandler = useCallback(
     (newDurationMap: Record<string, number>) => {
@@ -138,6 +151,7 @@ export const useMultiTimerState = (args: UseMultiTimerStateArgs): UseMultiTimerS
       isLoaded,
       onStateChange,
       onAllStateChange,
+      onDurationChange,
       setDurationMap: setDurationMapHandler,
     }),
     [stateMap, durationMap, isLoaded, onStateChange, onAllStateChange, setDurationMapHandler]

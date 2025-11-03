@@ -6,6 +6,7 @@ import { TestProblemsItem } from './TestProblemsItem';
 
 interface TestProblemsListProps {
   problems: StudyProblem[];
+  elapsedTimeMap: Record<number, number>;
   currentProblemIndex: number;
   theme: SubjectColorMap;
   onClick: (problem: StudyProblem) => void;
@@ -13,6 +14,7 @@ interface TestProblemsListProps {
 
 export const TestProblemsList: React.FC<TestProblemsListProps> = ({
   problems,
+  elapsedTimeMap,
   currentProblemIndex,
   theme,
   onClick,
@@ -69,6 +71,7 @@ export const TestProblemsList: React.FC<TestProblemsListProps> = ({
           <TestProblemsItem
             key={index}
             problem={problem}
+            elapsedTimeMs={elapsedTimeMap[problem.problemIndex]}
             isCurrent={problem.problemIndex === currentProblemIndex}
             colSizes={colSizes}
             theme={theme}

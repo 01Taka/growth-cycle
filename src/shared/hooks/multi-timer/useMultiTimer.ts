@@ -99,6 +99,7 @@ export const useMultiTimer = (args: UseMultiTimerArgs): UseMultiTimerResult => {
       stop: () => timerLogic.stop(id),
       reset: () => timerLogic.reset(id),
       switchState: () => switchState(id),
+      onDurationChange: (duration: number) => timerState.onDurationChange(id, duration),
     }),
     [timerLogic.start, timerLogic.stop, timerLogic.reset, switchState]
   );

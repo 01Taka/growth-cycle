@@ -1,10 +1,8 @@
-import React, { useMemo } from 'react';
-import { Stack } from '@mantine/core';
-import { LocalStorageMultiTimerPersistenceProvider } from '@/shared/hooks/multi-timer/localStoragePersistenceProvider';
-import { useMultiTimer } from '@/shared/hooks/multi-timer/useMultiTimer';
+import React from 'react';
+import { Button, Flex, Stack } from '@mantine/core';
 import { useSubjectColorMap } from '@/shared/hooks/useSubjectColor';
 import { Subject } from '@/shared/types/subject-types';
-import { range } from '@/shared/utils/range';
+import { useStudyTimer } from '../hooks/useStudyTimer';
 import { ParticleOverlay } from './ParticleOverlay';
 import { dummyProblems } from './testPhase/dummy-problems';
 import { TestPhase } from './testPhase/TestPhase';
@@ -13,25 +11,17 @@ interface StudyMainProps {}
 
 export const StudyMain: React.FC<StudyMainProps> = ({}) => {
   const problems = dummyProblems;
-
-  const timerProvider = useMemo(
-    () => new LocalStorageMultiTimerPersistenceProvider('multiTimer'),
-    []
-  );
-  const durationMap = useMemo(() => {
-    const data = range(problems.length).map((index) => [`${index}`, Number.MAX_SAFE_INTEGER]);
-    return Object.fromEntries(data);
-  }, [problems.length]);
-
-  const timer = useMultiTimer({
-    initialDurationMap: { main: 25 * 60000, ...durationMap },
-    initialStateMap: {},
-    persistenceProvider: timerProvider,
-  });
-
   const subject: Subject = 'english';
-
   const theme = useSubjectColorMap(subject);
+  const {
+    mainTimer,
+    currentTestProblemIndex,
+    currentActiveProblemTimer,
+    elapsedTimeMap,
+    changeCurrentTestProblem,
+    handleSwitchTimerRunning,
+    resetAll,
+  } = useStudyTimer(problems.length);
 
   return (
     <>
@@ -57,22 +47,28 @@ export const StudyMain: React.FC<StudyMainProps> = ({}) => {
             type: 'adult',
             imageIndex: Date.now() % 17,
           }}
-          mainTimer={timer.getSingleTimer('main')}
+          mainTimer={mainTimer}
+          currentTimerElapsedTime={currentActiveProblemTimer?.elapsedTime ?? null}
+          elapsedTimeMap={elapsedTimeMap}
           theme={theme}
+          currentProblemIndex={currentTestProblemIndex ?? 0}
+          changeCurrentTestProblem={changeCurrentTestProblem}
+          switchTimerRunning={handleSwitchTimerRunning}
         />
 
         {/* テスト用 */}
-        {/* <Flex>
-          <Button onClick={timer.start}>start</Button>
-          <Button onClick={timer.stop}>stop</Button>
-          <Button onClick={timer.reset}>reset</Button>
-          <TextInput
+        <Flex>
+          <Button onClick={mainTimer.start}>start</Button>
+          <Button onClick={mainTimer.stop}>stop</Button>
+          <Button onClick={mainTimer.reset}>reset</Button>
+          <Button onClick={resetAll}>resetAll</Button>
+          {/* <TextInput
             type="number"
-            // value={newExpectedDuration}
-            // onChange={(e) => setNewExpectedDuration(Number(e.target.value))}
-          />
-          <Button onClick={() => timer.setExpectedDuration(25 * 60 * 1000)}>更新</Button>
-        </Flex> */}
+            value={newExpectedDuration}
+            onChange={(e) => setNewExpectedDuration(Number(e.target.value))}
+          /> */}
+          <Button onClick={() => mainTimer.onDurationChange(0.2 * 60 * 1000)}>更新</Button>
+        </Flex>
       </Stack>
     </>
   );

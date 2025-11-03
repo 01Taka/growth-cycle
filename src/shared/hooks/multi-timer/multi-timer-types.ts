@@ -11,6 +11,17 @@ export interface TimerState {
 /** 複数のタイマーの状態マップ */
 export type TimerStateMap = Record<string, TimerState>;
 
+export type TimerEndActionBase = 'stopAll' | 'resetAll' | 'startAll' | 'stop' | 'reset';
+
+export type TimerEndActionWithTarget = 'stopTargets' | 'resetTargets' | 'startTargets';
+
+export type TimerEndActionType = TimerEndActionBase | TimerEndActionWithTarget;
+
+export type TimerEndAction =
+  | TimerEndActionBase
+  | { action: TimerEndActionType; targets?: string[] }
+  | { action: TimerEndActionType; targets?: string[] }[];
+
 /** useMultiTimerLogicの引数 */
 export interface UseMultiTimerLogicArgs {
   /** タイマーIDをキーとし、各タイマーのステータス情報を含むマップ */
@@ -21,8 +32,8 @@ export interface UseMultiTimerLogicArgs {
   intervalMs?: number;
   /** 現在時刻を取得する関数 */
   getNow?: () => number;
-  /** タイマー終了時のアクション: 'stop' または 'reset' */
-  timerEndAction?: 'stop' | 'reset';
+  /** タイマー終了時のアクション */
+  timerEndActionMap?: Record<string, TimerEndAction>;
 
   /** 個々のタイマーの状態が変更されたときのコールバック */
   onStateChange: (id: string, newState: TimerState) => void;
@@ -87,6 +98,7 @@ export interface UseMultiTimerStateResult {
   onStateChange: (id: string, newState: Partial<TimerState>) => void;
   /** 全てのタイマーの状態が一度に変更されたときのコールバック */
   onAllStateChange: (newStateMap: TimerStateMap) => void;
+  onDurationChange: (id: string, newDuration: number) => void;
   /** 期間マップ全体を更新するセッター関数 */
   setDurationMap: (newDurationMap: Record<string, number>) => void;
 }
@@ -108,8 +120,8 @@ export interface UseMultiTimerArgs extends UseMultiTimerStateArgs {
   /** 現在時刻を取得する関数 */
   getNow?: () => number;
 
-  /** タイマー終了時のアクション: 'stop' または 'reset' */
-  timerEndAction?: 'stop' | 'reset';
+  /** タイマー終了時のアクション */
+  timerEndActionMap?: Record<string, TimerEndAction>;
 
   /** 進捗率を減少方向 (1から0) で計算するかどうかのフラグ */
   isDecreaseProgress?: boolean;
@@ -134,6 +146,7 @@ export interface SingleTimerActions {
   stop: () => void;
   reset: () => void;
   switchState: () => void;
+  onDurationChange: (duration: number) => void;
 }
 
 export type SingleTimer = SingleTimerData & SingleTimerActions;

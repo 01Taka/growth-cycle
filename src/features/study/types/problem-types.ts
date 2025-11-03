@@ -7,5 +7,4 @@ export type StudyProblem = {
   problemNumber: number;
   problemIndex: number;
   selfEvaluation: TestSelfEvaluation;
-  timeMs: number | null;
 };

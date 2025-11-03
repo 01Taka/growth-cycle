@@ -6,6 +6,7 @@ import {
   UseMultiTimerLogicResult,
 } from './multi-timer-types';
 import { useMultiRemainingTime } from './useMultiRemainingTime';
+import { useTimerEndActionHandler } from './useTimerEndActionHandler';
 
 /**
  * 複数のタイマーの状態を同時に管理し、外部から提供されたタイマー状態に基づいて計算を行い、
@@ -19,7 +20,7 @@ export const useMultiTimerLogic = (args: UseMultiTimerLogicArgs): UseMultiTimerL
     stateMap,
     durationMap,
     intervalMs,
-    timerEndAction = 'stop', // デフォルトは 'stop'
+    timerEndActionMap,
     onStateChange,
     onAllStateChange,
     onTimerEnd,
@@ -77,7 +78,7 @@ export const useMultiTimerLogic = (args: UseMultiTimerLogicArgs): UseMultiTimerL
       if (!state) return;
 
       // タイマーが既に停止している場合は状態変更を行わない
-      if (!state.isRunning && state.stoppedAt > 0) return;
+      if (!state.isRunning) return;
 
       onStateChange(id, {
         startTime: state.startTime,
@@ -147,6 +148,11 @@ export const useMultiTimerLogic = (args: UseMultiTimerLogicArgs): UseMultiTimerL
   const stopAll = useCallback(() => {
     const now = getNow();
     const newStateMap = Object.entries(stateMap).reduce((acc, [id, state]) => {
+      if (!state.isRunning) {
+        acc[id] = state;
+        return acc;
+      }
+
       // stopロジックを適用
       acc[id] = {
         startTime: state.startTime,
@@ -173,6 +179,16 @@ export const useMultiTimerLogic = (args: UseMultiTimerLogicArgs): UseMultiTimerL
     onAllStateChange(newStateMap);
   }, [stateMap, onAllStateChange]);
 
+  const { executeTimerEndAction } = useTimerEndActionHandler(stateMap, {
+    stop,
+    reset,
+    stopAll,
+    startAll,
+    resetAll,
+    onAllStateChange,
+    getNow,
+  });
+
   // --- タイマー終了時の自動停止/リセット処理 ---
   useEffect(() => {
     const nowRemainingMap = remainingTimeMapRef.current;
@@ -186,17 +202,20 @@ export const useMultiTimerLogic = (args: UseMultiTimerLogicArgs): UseMultiTimerL
         // onTimerEndはフックの外側で呼ばれるべき
         onTimerEnd?.(id);
 
-        if (timerEndAction === 'stop') {
-          // stop 関数は useCallback で定義されているため、stop(id) で実行可能
-          stop(id);
-        } else if (timerEndAction === 'reset') {
-          // reset 関数は useCallback で定義されているため、reset(id) で実行可能
-          reset(id);
-        }
+        if (!timerEndActionMap || !timerEndActionMap[id]) return;
+        const action = timerEndActionMap[id];
+        executeTimerEndAction(action, id);
       }
     });
     // 依存配列に remainingTimeMap を追加し、残り時間が変わるたびにチェックさせる
-  }, [remainingTimeMap, stateMap, durationMap, timerEndAction, onTimerEnd, stop, reset]);
+  }, [
+    remainingTimeMap,
+    stateMap,
+    durationMap,
+    timerEndActionMap,
+    onTimerEnd,
+    executeTimerEndAction,
+  ]);
 
   return {
     remainingTimeMap,

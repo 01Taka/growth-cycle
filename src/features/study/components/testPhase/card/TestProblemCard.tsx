@@ -1,15 +1,14 @@
 import React from 'react';
 import { Button, Card, Flex, Stack, Text } from '@mantine/core';
 import { TestSelfEvaluation } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
-import { sharedStyle } from '@/shared/styles/shared-styles';
 import { SubjectColorMap } from '@/shared/theme/subjectColorType';
 import { formatMilliseconds } from '@/shared/utils/datetime/time-utils';
-import { SELF_EVALUATIONS_CONFIGS } from '../../../constants/self-evaluations-configs';
 import { StudyProblem } from '../../../types/problem-types';
 import { TestSelfEvaluationButtons } from './TestSelfEvaluationButtons';
 
 interface TestProblemCardProps {
   problem: StudyProblem;
+  currentElapsedTime: number | null;
   totalProblemsNumber: number;
   theme: SubjectColorMap;
   onSelectSelfEvaluation: (evaluation: TestSelfEvaluation) => void;
@@ -19,15 +18,18 @@ interface TestProblemCardProps {
 
 export const TestProblemCard: React.FC<TestProblemCardProps> = ({
   problem,
+  currentElapsedTime,
   totalProblemsNumber,
   theme,
   onSelectSelfEvaluation,
   onNextProblem,
   onBackProblem,
 }) => {
-  const { unitName, categoryName, problemNumber, problemIndex, timeMs } = problem;
+  const { unitName, categoryName, problemNumber, problemIndex } = problem;
   const selfEvaluations: TestSelfEvaluation[] = ['notSure', 'imperfect', 'confident'];
-  const time = timeMs ? formatMilliseconds(timeMs, { minutesPads: 1 }) : null;
+  const time = currentElapsedTime
+    ? formatMilliseconds(currentElapsedTime, { minutesPads: 1 })
+    : null;
   const timeText = time ? `${time.conversion.minutes} : ${time.split.seconds}` : '0 : 00';
 
   return (
@@ -45,7 +47,7 @@ export const TestProblemCard: React.FC<TestProblemCardProps> = ({
             {unitName} {categoryName} {problemNumber}
           </Text>
           <Text>
-            {problemIndex} / {totalProblemsNumber}
+            {problemIndex + 1} / {totalProblemsNumber}
           </Text>
         </Flex>
         <Text size="xl" style={{ color: theme.text }}>
