@@ -5,14 +5,13 @@ import { useSubjectColorMap } from '@/shared/hooks/useSubjectColor';
 import { Subject } from '@/shared/types/subject-types';
 import { useStudyTimer } from '../hooks/useStudyTimer';
 import { ParticleOverlay } from './ParticleOverlay';
-import { StudyPhase } from './studyPhase/StudyPhase';
 import { dummyProblems } from './testPhase/dummy-problems';
 import { TestPhase } from './testPhase/TestPhase';
 
 interface StudyMainProps {}
 
 export const StudyMain: React.FC<StudyMainProps> = ({}) => {
-  const problems = dummyProblems;
+  const problems = [...dummyProblems, ...dummyProblems, ...dummyProblems];
   const subject: Subject = 'japanese';
   const theme = useSubjectColorMap(subject);
   const {
@@ -39,7 +38,7 @@ export const StudyMain: React.FC<StudyMainProps> = ({}) => {
     <>
       <ParticleOverlay color={theme.accent} />
       <Stack w={'100%'} mt={16} style={{ backgroundColor: theme.bgScreen }}>
-        <StudyPhase
+        {/* <StudyPhase
           isReadyTest={studyTimer.remainingTime <= 0}
           header={{ subject: subject, textbookName: '論読', units: ['unitA', 'unitB'] }}
           plant={{
@@ -50,10 +49,10 @@ export const StudyMain: React.FC<StudyMainProps> = ({}) => {
           timer={studyTimer}
           theme={theme}
           switchState={studyTimer.switchState}
-        />
+        /> */}
 
         <TestPhase
-          problems={dummyProblems}
+          problems={problems}
           header={{ subject: subject, textbookName: '論読', units: ['unitA', 'unitB'] }}
           isFinishTestTimer={isFinishTestTimer}
           mainTimer={testTimer}

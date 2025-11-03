@@ -1,6 +1,6 @@
 import React from 'react';
 import { IconPencil } from '@tabler/icons-react';
-import { Button, Flex, Stack } from '@mantine/core';
+import { Box, Button, Card, Divider, Flex, Stack, Text } from '@mantine/core';
 import { TestSelfEvaluation } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { SingleTimerData } from '@/shared/hooks/multi-timer/multi-timer-types';
 import { sharedStyle } from '@/shared/styles/shared-styles';
@@ -10,7 +10,6 @@ import { StudyProblem } from '../../types/problem-types';
 import { StudyHeader } from '../studyPhase/StudyHeader';
 import { StudyTimer } from '../studyPhase/StudyTimer';
 import { TestProblemCard } from './card/TestProblemCard';
-import { dummyProblems } from './dummy-problems';
 import { TestStateGrid } from './grid/TestStateGrid';
 import { TestProblemsList } from './list/TestProblemsList';
 
@@ -102,20 +101,55 @@ export const TestPhase: React.FC<TestPhaseProps> = ({
           onNextProblem={() => changeCurrentTestProblem(1, 'increment')}
           onBackProblem={() => changeCurrentTestProblem(-1, 'increment')}
         />
-        <TestStateGrid
-          selfEvaluations={selfEvaluations}
-          totalProblemsNumber={totalProblemsNumber}
-          currentProblemIndex={currentProblemIndex}
-          onClick={(index) => changeCurrentTestProblem(index, 'set')}
-        />
-        <TestProblemsList
-          problems={dummyProblems}
-          elapsedTimeMap={elapsedTimeMap}
-          selfEvaluationMap={selfEvaluationMap}
-          currentProblemIndex={currentProblemIndex}
-          theme={theme}
-          onClick={(problem) => changeCurrentTestProblem(problem.problemIndex, 'set')}
-        />
+        <Card
+          w={'100%'}
+          shadow="md"
+          style={{
+            border: `1px solid ${theme.border}`,
+            backgroundColor: theme.bgCard,
+            borderRadius: 16,
+          }}
+        >
+          <Stack gap={5}>
+            <Text style={{ color: theme.text }}>進行状況</Text>
+            <Divider mb={5} color={theme.border} />
+            <TestStateGrid
+              selfEvaluations={selfEvaluations}
+              totalProblemsNumber={totalProblemsNumber}
+              currentProblemIndex={currentProblemIndex}
+              onClick={(index) => changeCurrentTestProblem(index, 'set')}
+            />
+          </Stack>
+        </Card>
+
+        <Card
+          w={'100%'}
+          shadow="md"
+          style={{
+            border: `1px solid ${theme.border}`,
+            backgroundColor: theme.bgCard,
+            borderRadius: 16,
+          }}
+        >
+          <Stack gap={5}>
+            <Text style={{ color: theme.text }}>問題リスト {`(タップして移動)`}</Text>
+            <Divider mb={5} color={theme.border} />
+            <Box
+              w={'100%'}
+              mah={500}
+              style={{ borderColor: theme.bgChip, overflowY: 'auto', overflowX: 'hidden' }}
+            >
+              <TestProblemsList
+                problems={problems}
+                elapsedTimeMap={elapsedTimeMap}
+                selfEvaluationMap={selfEvaluationMap}
+                currentProblemIndex={currentProblemIndex}
+                theme={theme}
+                onClick={(problem) => changeCurrentTestProblem(problem.problemIndex, 'set')}
+              />
+            </Box>
+          </Stack>
+        </Card>
       </Stack>
     </Stack>
   );

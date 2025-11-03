@@ -39,6 +39,7 @@ export const TestProblemCard: React.FC<TestProblemCardProps> = ({
   return (
     <Card
       w={'100%'}
+      shadow="md"
       style={{
         backgroundColor: theme.bgCard,
         border: `2px solid ${theme.border}`,
