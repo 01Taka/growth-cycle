@@ -8,6 +8,7 @@ import { TestSelfEvaluationButtons } from './TestSelfEvaluationButtons';
 
 interface TestProblemCardProps {
   problem: StudyProblem;
+  selfEvaluation: TestSelfEvaluation;
   currentElapsedTime: number | null;
   totalProblemsNumber: number;
   theme: SubjectColorMap;
@@ -18,6 +19,7 @@ interface TestProblemCardProps {
 
 export const TestProblemCard: React.FC<TestProblemCardProps> = ({
   problem,
+  selfEvaluation,
   currentElapsedTime,
   totalProblemsNumber,
   theme,
@@ -54,7 +56,7 @@ export const TestProblemCard: React.FC<TestProblemCardProps> = ({
           Time: {timeText}
         </Text>
         <TestSelfEvaluationButtons
-          selectedSelfEvaluation={problem.selfEvaluation}
+          selectedSelfEvaluation={selfEvaluation}
           selfEvaluations={selfEvaluations}
           onSelectSelfEvaluation={onSelectSelfEvaluation}
         />

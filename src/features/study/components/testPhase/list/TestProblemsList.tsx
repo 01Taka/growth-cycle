@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, Grid, Stack, Text } from '@mantine/core';
+import { TestSelfEvaluation } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { SubjectColorMap } from '@/shared/theme/subjectColorType';
 import { StudyProblem } from '../../../types/problem-types';
 import { TestProblemsItem } from './TestProblemsItem';
@@ -7,6 +8,7 @@ import { TestProblemsItem } from './TestProblemsItem';
 interface TestProblemsListProps {
   problems: StudyProblem[];
   elapsedTimeMap: Record<number, number>;
+  selfEvaluationMap: Record<number, TestSelfEvaluation>;
   currentProblemIndex: number;
   theme: SubjectColorMap;
   onClick: (problem: StudyProblem) => void;
@@ -15,6 +17,7 @@ interface TestProblemsListProps {
 export const TestProblemsList: React.FC<TestProblemsListProps> = ({
   problems,
   elapsedTimeMap,
+  selfEvaluationMap,
   currentProblemIndex,
   theme,
   onClick,
@@ -72,6 +75,7 @@ export const TestProblemsList: React.FC<TestProblemsListProps> = ({
             key={index}
             problem={problem}
             elapsedTimeMs={elapsedTimeMap[problem.problemIndex]}
+            selfEvaluation={selfEvaluationMap[problem.problemIndex] ?? 'unrated'}
             isCurrent={problem.problemIndex === currentProblemIndex}
             colSizes={colSizes}
             theme={theme}

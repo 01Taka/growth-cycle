@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button, Flex, Stack } from '@mantine/core';
+import { TestSelfEvaluation } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { useSubjectColorMap } from '@/shared/hooks/useSubjectColor';
 import { Subject } from '@/shared/types/subject-types';
-import { useStudyTimer } from '../hooks/useStudyTimer';
+import { useStudyTestPhase } from '../hooks/useStudyTestPhase';
 import { ParticleOverlay } from './ParticleOverlay';
 import { dummyProblems } from './testPhase/dummy-problems';
 import { TestPhase } from './testPhase/TestPhase';
@@ -21,7 +22,15 @@ export const StudyMain: React.FC<StudyMainProps> = ({}) => {
     changeCurrentTestProblem,
     handleSwitchTimerRunning,
     resetAll,
-  } = useStudyTimer(problems.length);
+  } = useStudyTestPhase(problems.length);
+
+  const [selfEvaluationMap, setSelfEvaluationMap] = useState<Record<number, TestSelfEvaluation>>(
+    {}
+  );
+
+  const handleSelfEvaluationMap = (index: number, evaluation: TestSelfEvaluation) => {
+    setSelfEvaluationMap((prev) => ({ ...prev, [index]: evaluation }));
+  };
 
   return (
     <>
@@ -52,6 +61,8 @@ export const StudyMain: React.FC<StudyMainProps> = ({}) => {
           elapsedTimeMap={elapsedTimeMap}
           theme={theme}
           currentProblemIndex={currentTestProblemIndex ?? 0}
+          selfEvaluationMap={selfEvaluationMap}
+          onSelectSelfEvaluation={handleSelfEvaluationMap}
           changeCurrentTestProblem={changeCurrentTestProblem}
           switchTimerRunning={handleSwitchTimerRunning}
         />

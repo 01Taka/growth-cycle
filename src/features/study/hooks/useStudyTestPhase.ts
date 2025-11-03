@@ -50,7 +50,7 @@ const getProblemIndexFromTimerId = (timerId: string): number => {
 
 // --- カスタムフック ---
 
-export const useStudyTimer = (totalProblemsNumber: number) => {
+export const useStudyTestPhase = (totalProblemsNumber: number) => {
   // 1. Persistence Providerの初期化
   const timerProvider = useMemo(
     () => new LocalStorageMultiTimerPersistenceProvider(PERSISTENCE_KEY),

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Flex, Stack } from '@mantine/core';
+import { TestSelfEvaluation } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { SingleTimerData } from '@/shared/hooks/multi-timer/multi-timer-types';
 import { SubjectColorMap } from '@/shared/theme/subjectColorType';
 import { ImportPlantsType } from '@/shared/types/plant-shared-types';
@@ -27,10 +28,12 @@ interface TestPhaseProps {
   mainTimer: SingleTimerData;
   currentTimerElapsedTime: number | null;
   elapsedTimeMap: Record<number, number>;
+  selfEvaluationMap: Record<number, TestSelfEvaluation>;
   theme: SubjectColorMap;
   currentProblemIndex: number;
   switchTimerRunning: () => void;
   changeCurrentTestProblem: (newIndex: number | null, type: 'set' | 'increment') => void;
+  onSelectSelfEvaluation: (index: number, evaluation: TestSelfEvaluation) => void;
 }
 
 export const TestPhase: React.FC<TestPhaseProps> = ({
@@ -39,13 +42,17 @@ export const TestPhase: React.FC<TestPhaseProps> = ({
   mainTimer,
   currentTimerElapsedTime,
   elapsedTimeMap,
+  selfEvaluationMap,
   theme,
   currentProblemIndex,
   changeCurrentTestProblem,
   switchTimerRunning,
+  onSelectSelfEvaluation,
 }) => {
   const currentProblem = problems[currentProblemIndex];
-  const selfEvaluations = problems.map((problem) => problem.selfEvaluation);
+  const selfEvaluations = problems.map(
+    (problem) => selfEvaluationMap[problem.problemIndex] ?? 'unrated'
+  );
   const totalProblemsNumber = problems.length;
 
   return (
@@ -64,12 +71,16 @@ export const TestPhase: React.FC<TestPhaseProps> = ({
       <Stack align="center" w={'90%'}>
         <TestProblemCard
           problem={currentProblem}
+          selfEvaluation={selfEvaluationMap[currentProblem.problemIndex] ?? 'unrated'}
           currentElapsedTime={currentTimerElapsedTime}
           totalProblemsNumber={totalProblemsNumber}
           theme={theme}
-          onSelectSelfEvaluation={() => {}}
+          onSelectSelfEvaluation={(evaluation) => {
+            onSelectSelfEvaluation(currentProblem.problemIndex, evaluation);
+            changeCurrentTestProblem(1, 'increment');
+          }}
           onNextProblem={() => changeCurrentTestProblem(1, 'increment')}
-          onBackProblem={() => changeCurrentTestProblem(1, 'increment')}
+          onBackProblem={() => changeCurrentTestProblem(-1, 'increment')}
         />
         <TestStateGrid
           selfEvaluations={selfEvaluations}
@@ -80,6 +91,7 @@ export const TestPhase: React.FC<TestPhaseProps> = ({
         <TestProblemsList
           problems={dummyProblems}
           elapsedTimeMap={elapsedTimeMap}
+          selfEvaluationMap={selfEvaluationMap}
           currentProblemIndex={currentProblemIndex}
           theme={theme}
           onClick={(problem) => changeCurrentTestProblem(problem.problemIndex, 'set')}
