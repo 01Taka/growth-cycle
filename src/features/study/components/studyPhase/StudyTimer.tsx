@@ -1,16 +1,24 @@
 import React from 'react';
 import { IconPlayerPause, IconPlayerPlay } from '@tabler/icons-react';
 import { Button, Flex, rem, RingProgress, Stack, Text } from '@mantine/core';
-import { UseTimerResult } from '@/shared/hooks/timer/timer-types';
+import { SingleTimer } from '@/shared/hooks/multi-timer/multi-timer-types';
 import { processMilliseconds } from '@/shared/utils/datetime/time-utils';
 
 interface StudyTimerProps {
-  timer: UseTimerResult;
+  timer: SingleTimer;
   sectionColor: string;
   buttonColor: string;
+  size?: number;
+  thickness?: number;
 }
 
-export const StudyTimer: React.FC<StudyTimerProps> = ({ timer, sectionColor, buttonColor }) => {
+export const StudyTimer: React.FC<StudyTimerProps> = ({
+  timer,
+  sectionColor,
+  buttonColor,
+  size = 350,
+  thickness = 15,
+}) => {
   const { remainingTime, progress, isRunning, switchState } = timer;
 
   const time = processMilliseconds(Math.ceil(remainingTime / 1000) * 1000);

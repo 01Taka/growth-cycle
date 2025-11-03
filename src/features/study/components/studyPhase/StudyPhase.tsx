@@ -1,7 +1,6 @@
 import React from 'react';
-import { Button, Stack } from '@mantine/core';
-import { UseTimerResult } from '@/shared/hooks/timer/timer-types';
-import { sharedStyle } from '@/shared/styles/shared-styles';
+import { Stack } from '@mantine/core';
+import { SingleTimer } from '@/shared/hooks/multi-timer/multi-timer-types';
 import { SubjectColorMap } from '@/shared/theme/subjectColorType';
 import { ImportPlantsType } from '@/shared/types/plant-shared-types';
 import { Subject } from '@/shared/types/subject-types';
@@ -22,7 +21,7 @@ interface StudyPhaseProps {
     type: ImportPlantsType;
     imageIndex: number;
   };
-  timer: UseTimerResult;
+  timer: SingleTimer;
   theme: SubjectColorMap;
 }
 

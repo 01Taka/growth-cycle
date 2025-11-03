@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Stack } from '@mantine/core';
-import { UseTimerResult } from '@/shared/hooks/timer/timer-types';
+import { SingleTimer } from '@/shared/hooks/multi-timer/multi-timer-types';
 import { SubjectColorMap } from '@/shared/theme/subjectColorType';
 import { ImportPlantsType } from '@/shared/types/plant-shared-types';
 import { Subject } from '@/shared/types/subject-types';
@@ -24,11 +24,11 @@ interface TestPhaseProps {
     type: ImportPlantsType;
     imageIndex: number;
   };
-  timer: UseTimerResult;
+  mainTimer: SingleTimer;
   theme: SubjectColorMap;
 }
 
-export const TestPhase: React.FC<TestPhaseProps> = ({ problems, header, timer, theme }) => {
+export const TestPhase: React.FC<TestPhaseProps> = ({ problems, header, mainTimer, theme }) => {
   const [currentProblemIndex, setCurrentProblemIndex] = useState(0);
 
   const currentProblem = problems[currentProblemIndex];
@@ -38,7 +38,7 @@ export const TestPhase: React.FC<TestPhaseProps> = ({ problems, header, timer, t
   return (
     <Stack align="center" w={'100%'}>
       <StudyHeader {...header} />
-      <StudyTimer timer={timer} sectionColor={theme.border} buttonColor={theme.accent} />
+      <StudyTimer timer={mainTimer} sectionColor={theme.border} buttonColor={theme.accent} />
       <Stack align="center" w={'90%'}>
         <TestProblemCard
           problem={currentProblem}

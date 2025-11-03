@@ -27,8 +27,13 @@ export const useMultiTimerState = (args: UseMultiTimerStateArgs): UseMultiTimerS
 
   // 1. ロード状態と内部状態の管理
   const [isLoaded, setIsLoaded] = useState(false);
-  const [stateMap, setStateMap] = useState<TimerStateMap>(initialStateMap);
   const [durationMap, setDurationMap] = useState<Record<string, number>>(initialDurationMap);
+  const [stateMap, setStateMap] = useState<TimerStateMap>({
+    ...Object.fromEntries(
+      Object.keys(initialDurationMap).map((key) => [key, defaultInitialTimerState])
+    ),
+    ...initialStateMap,
+  });
 
   // 2. 永続化プロバイダーへの保存処理をラップ
   const saveAll = useCallback(
@@ -85,6 +90,8 @@ export const useMultiTimerState = (args: UseMultiTimerStateArgs): UseMultiTimerS
   // 4. onStateChange (個別タイマーの状態変更)
   const onStateChange = useCallback(
     (id: string, newState: Partial<TimerState>) => {
+      console.log(id, newState);
+
       setStateMap((prevMap) => {
         const prevState = prevMap[id] ?? defaultInitialTimerState;
         const newMap: TimerStateMap = {

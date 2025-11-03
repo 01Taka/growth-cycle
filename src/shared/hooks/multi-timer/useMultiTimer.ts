@@ -1,5 +1,11 @@
 import { useCallback, useMemo } from 'react';
-import { UseMultiTimerArgs, UseMultiTimerResult } from './multi-timer-types';
+import {
+  SingleTimerActions,
+  SingleTimerData,
+  TimerState,
+  UseMultiTimerArgs,
+  UseMultiTimerResult,
+} from './multi-timer-types';
 import { useMultiTimerLogic } from './useMultiTimerLogic'; // 複数のタイマーロジック
 import { useMultiTimerState } from './useMultiTimerState'; // 複数のタイマー状態管理
 
@@ -57,11 +63,59 @@ export const useMultiTimer = (args: UseMultiTimerArgs): UseMultiTimerResult => {
     return map;
   }, [timerLogic.elapsedTimeMap, timerState.durationMap, args.isDecreaseProgress]);
 
+  const getTimerData = useCallback(
+    (id: string): SingleTimerData => {
+      const defaultState: TimerState = { startTime: 0, stoppedAt: 0, isRunning: false };
+
+      const state = timerState.stateMap[id] ?? defaultState;
+      const duration = timerState.durationMap[id] ?? 0;
+      const remainingTime = timerLogic.remainingTimeMap[id] ?? 0;
+      const elapsedTime = timerLogic.elapsedTimeMap[id] ?? 0;
+      const progress = progressMap[id] ?? (args.isDecreaseProgress ? 1 : 0);
+
+      return {
+        id,
+        ...state, // startTime, stoppedAt, isRunning
+        duration,
+        remainingTime,
+        elapsedTime,
+        progress,
+      };
+    },
+    [
+      timerState.stateMap,
+      timerState.durationMap,
+      timerLogic.remainingTimeMap,
+      timerLogic.elapsedTimeMap,
+      progressMap,
+      args.isDecreaseProgress,
+    ]
+  );
+
+  const getActionsFor = useCallback(
+    (id: string): SingleTimerActions => ({
+      // 各アクション関数をラップし、idを内部で渡す
+      start: () => timerLogic.start(id),
+      stop: () => timerLogic.stop(id),
+      reset: () => timerLogic.reset(id),
+      switchState: () => switchState(id),
+    }),
+    [timerLogic.start, timerLogic.stop, timerLogic.reset, switchState]
+  );
+
+  const getSingleTimer = useCallback(
+    (id: string) => ({ ...getActionsFor(id), ...getTimerData(id) }),
+    [getActionsFor, getTimerData]
+  );
+
   // 5. 必要な結果を結合して返す
   return {
     ...timerState,
     ...timerLogic,
     progressMap,
     switchState,
+    getTimerData,
+    getActionsFor,
+    getSingleTimer,
   };
 };

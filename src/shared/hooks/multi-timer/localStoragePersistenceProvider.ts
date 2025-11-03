@@ -4,7 +4,7 @@ import { PersistedData, PersistenceProvider } from './multi-timer-types';
  * ローカルストレージを使用してタイマーの状態を永続化するプロバイダー。
  * load/save メソッドは非同期処理 (Promise) を返すように実装されています。
  */
-export class LocalStoragePersistenceProvider implements PersistenceProvider {
+export class LocalStorageMultiTimerPersistenceProvider implements PersistenceProvider {
   private readonly storageKey: string;
   private readonly delayMs: number; // 非同期処理を模倣するための遅延
 
@@ -12,7 +12,7 @@ export class LocalStoragePersistenceProvider implements PersistenceProvider {
    * @param key ローカルストレージに保存する際のキー
    * @param delayMs load/save 実行時の遅延時間 (非同期処理を模倣するため)
    */
-  constructor(key: string, delayMs: number = 50) {
+  constructor(key: string, delayMs: number = 0) {
     this.storageKey = key;
     this.delayMs = delayMs;
   }

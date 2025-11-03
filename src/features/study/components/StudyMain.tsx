@@ -1,23 +1,32 @@
 import React, { useMemo } from 'react';
-import { Button, Flex, Stack, TextInput } from '@mantine/core';
-import { LocalStorageTimerPersistenceProvider } from '@/shared/hooks/timer/localStoragePersistenceProvider';
-import { useTimer } from '@/shared/hooks/timer/useTimer';
+import { Stack } from '@mantine/core';
+import { LocalStorageMultiTimerPersistenceProvider } from '@/shared/hooks/multi-timer/localStoragePersistenceProvider';
+import { useMultiTimer } from '@/shared/hooks/multi-timer/useMultiTimer';
 import { useSubjectColorMap } from '@/shared/hooks/useSubjectColor';
 import { Subject } from '@/shared/types/subject-types';
+import { range } from '@/shared/utils/range';
 import { ParticleOverlay } from './ParticleOverlay';
-import { StudyPhase } from './studyPhase/StudyPhase';
 import { dummyProblems } from './testPhase/dummy-problems';
 import { TestPhase } from './testPhase/TestPhase';
 
 interface StudyMainProps {}
 
 export const StudyMain: React.FC<StudyMainProps> = ({}) => {
-  const timerProvider = useMemo(() => new LocalStorageTimerPersistenceProvider(), []);
-  const timer = useTimer({
+  const problems = dummyProblems;
+
+  const timerProvider = useMemo(
+    () => new LocalStorageMultiTimerPersistenceProvider('multiTimer'),
+    []
+  );
+  const durationMap = useMemo(() => {
+    const data = range(problems.length).map((index) => [`${index}`, Number.MAX_SAFE_INTEGER]);
+    return Object.fromEntries(data);
+  }, [problems.length]);
+
+  const timer = useMultiTimer({
+    initialDurationMap: { main: 25 * 60000, ...durationMap },
+    initialStateMap: {},
     persistenceProvider: timerProvider,
-    timerEndAction: 'stop',
-    isDecreaseProgress: true,
-    onTimerEnd: () => console.log('END'),
   });
 
   const subject: Subject = 'english';
@@ -48,7 +57,7 @@ export const StudyMain: React.FC<StudyMainProps> = ({}) => {
             type: 'adult',
             imageIndex: Date.now() % 17,
           }}
-          timer={timer}
+          mainTimer={timer.getSingleTimer('main')}
           theme={theme}
         />
 

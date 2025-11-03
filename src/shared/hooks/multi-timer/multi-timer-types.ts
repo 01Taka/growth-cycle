@@ -66,10 +66,10 @@ export interface PersistenceProvider {
 
 /** useMultiTimerStateの引数 */
 export interface UseMultiTimerStateArgs {
-  /** 初期状態のマップ (キーはタイマーID) */
-  initialStateMap: TimerStateMap;
   /** 初期期間のマップ (キーはタイマーID) */
   initialDurationMap: Record<string, number>;
+  /** 初期状態のマップ (キーはタイマーID) */
+  initialStateMap?: TimerStateMap;
   /** 永続化プロバイダー */
   persistenceProvider?: PersistenceProvider;
 }
@@ -116,6 +116,29 @@ export interface UseMultiTimerArgs extends UseMultiTimerStateArgs {
 }
 
 /**
+ * 特定のタイマーIDに関連する全てのデータをまとめた単一のオブジェクト
+ */
+export interface SingleTimerData extends TimerState {
+  id: string; // タイマーID
+  duration: number; // 予定継続時間 (ミリ秒)
+  remainingTime: number; // 現在の残り時間 (ミリ秒)
+  elapsedTime: number; // 現在の経過時間 (ミリ秒)
+  progress: number; // 現在の進捗率 (0から1)
+}
+
+/**
+ * 特定のタイマーIDにバインドされた引数なしの操作関数セット
+ */
+export interface SingleTimerActions {
+  start: () => void;
+  stop: () => void;
+  reset: () => void;
+  switchState: () => void;
+}
+
+export type SingleTimer = SingleTimerData & SingleTimerActions;
+
+/**
  * useMultiTimer フックの戻り値
  * 状態、ロジックの計算結果、および操作関数を全て含みます。
  */
@@ -125,4 +148,16 @@ export interface UseMultiTimerResult extends UseMultiTimerStateResult, UseMultiT
 
   /** 個別のタイマーの実行状態を切り替える関数 (実行中なら停止、停止中なら開始) */
   switchState: (id: string) => void;
+  /**
+   * 特定のタイマーIDに関連する全てのデータを単一のオブジェクトとして返す関数
+   * @param id - データを取得したいタイマーのID
+   */
+  getTimerData: (id: string) => SingleTimerData;
+  /**
+   * 特定のタイマーIDに関連する操作関数を、引数なしのコールバックとして返す関数。
+   * @param id - データを取得したいタイマーのID
+   */
+  getActionsFor: (id: string) => SingleTimerActions;
+
+  getSingleTimer: (id: string) => SingleTimer;
 }
