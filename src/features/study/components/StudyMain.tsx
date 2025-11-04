@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { Button, Flex, Stack } from '@mantine/core';
+import { Button, Flex, Stack, TextInput } from '@mantine/core';
 import { TestSelfEvaluation } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { useSubjectColorMap } from '@/shared/hooks/useSubjectColor';
 import { Subject } from '@/shared/types/subject-types';
 import { useStudyTimer } from '../hooks/useStudyTimer';
+import { dummyProblems } from './dummy-problems';
 import { ParticleOverlay } from './ParticleOverlay';
-import { dummyProblems } from './testPhase/dummy-problems';
+import { ScoringPhase } from './scoringPhase/ScoringPhase';
+import { StudyPhase } from './studyPhase/StudyPhase';
 import { TestPhase } from './testPhase/TestPhase';
 
 interface StudyMainProps {}
@@ -34,13 +36,21 @@ export const StudyMain: React.FC<StudyMainProps> = ({}) => {
     setSelfEvaluationMap((prev) => ({ ...prev, [index]: evaluation }));
   };
 
+  const header = {
+    subject: subject,
+    textbookName: '論読',
+    units: ['unitA', 'unitB'],
+  };
+
+  const [newExpectedDuration, setNewExpectedDuration] = useState(1);
+
   return (
     <>
       <ParticleOverlay color={theme.accent} />
-      <Stack w={'100%'} mt={16} style={{ backgroundColor: theme.bgScreen }}>
-        {/* <StudyPhase
+      <Stack w={'100%'} mt={16} gap={50} style={{ backgroundColor: theme.bgScreen }}>
+        <StudyPhase
           isReadyTest={studyTimer.remainingTime <= 0}
-          header={{ subject: subject, textbookName: '論読', units: ['unitA', 'unitB'] }}
+          header={header}
           plant={{
             subject: subject,
             type: 'adult',
@@ -49,11 +59,11 @@ export const StudyMain: React.FC<StudyMainProps> = ({}) => {
           timer={studyTimer}
           theme={theme}
           switchState={studyTimer.switchState}
-        /> */}
+        />
 
         <TestPhase
           problems={problems}
-          header={{ subject: subject, textbookName: '論読', units: ['unitA', 'unitB'] }}
+          header={header}
           isFinishTestTimer={isFinishTestTimer}
           mainTimer={testTimer}
           currentTimerElapsedTime={currentActiveProblemTimer?.elapsedTime ?? null}
@@ -66,18 +76,33 @@ export const StudyMain: React.FC<StudyMainProps> = ({}) => {
           switchTimerRunning={handleSwitchTimerRunning}
         />
 
+        <ScoringPhase header={header} theme={theme} />
+
         {/* テスト用 */}
         <Flex>
-          <Button onClick={testTimer.start}>start</Button>
-          <Button onClick={testTimer.stop}>stop</Button>
-          <Button onClick={testTimer.reset}>reset</Button>
-          <Button onClick={resetAll}>resetAll</Button>
-          {/* <TextInput
+          <Button variant="transparent" onClick={testTimer.start}>
+            start
+          </Button>
+          <Button variant="transparent" onClick={testTimer.stop}>
+            stop
+          </Button>
+          <Button variant="transparent" onClick={testTimer.reset}>
+            reset
+          </Button>
+          <Button variant="transparent" onClick={resetAll}>
+            resetAll
+          </Button>
+          <TextInput
             type="number"
             value={newExpectedDuration}
             onChange={(e) => setNewExpectedDuration(Number(e.target.value))}
-          /> */}
-          <Button onClick={() => testTimer.onDurationChange(0.2 * 60 * 1000)}>更新</Button>
+          />
+          <Button
+            variant="transparent"
+            onClick={() => testTimer.onDurationChange(newExpectedDuration * 60 * 1000)}
+          >
+            更新
+          </Button>
         </Flex>
       </Stack>
     </>
