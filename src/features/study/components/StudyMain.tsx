@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Button, Flex, Stack, TextInput } from '@mantine/core';
 import { TestSelfEvaluation } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { useSubjectColorMap } from '@/shared/hooks/useSubjectColor';
 import { Subject } from '@/shared/types/subject-types';
+import { range } from '@/shared/utils/range';
 import { useStudyTimer } from '../hooks/useStudyTimer';
-import { dummyProblems } from './dummy-problems';
+import { generateDummyTestResults } from './dummy-problems';
 import { ParticleOverlay } from './ParticleOverlay';
 import { ScoringPhase } from './scoringPhase/ScoringPhase';
 import { StudyPhase } from './studyPhase/StudyPhase';
@@ -13,8 +14,10 @@ import { TestPhase } from './testPhase/TestPhase';
 interface StudyMainProps {}
 
 export const StudyMain: React.FC<StudyMainProps> = ({}) => {
-  const problems = [...dummyProblems, ...dummyProblems, ...dummyProblems];
-  const subject: Subject = 'japanese';
+  const problems = useMemo(() => generateDummyTestResults(10), []);
+
+  const [subject, setSubject] = useState<Subject>('japanese');
+
   const theme = useSubjectColorMap(subject);
   const {
     studyTimer,
@@ -47,14 +50,14 @@ export const StudyMain: React.FC<StudyMainProps> = ({}) => {
   return (
     <>
       <ParticleOverlay color={theme.accent} />
-      <Stack w={'100%'} mt={16} gap={50} style={{ backgroundColor: theme.bgScreen }}>
+      <Stack w={'100%'} mt={16} gap={500} style={{ backgroundColor: theme.bgScreen }}>
         <StudyPhase
           isReadyTest={studyTimer.remainingTime <= 0}
           header={header}
           plant={{
             subject: subject,
             type: 'adult',
-            imageIndex: Date.now() % 17,
+            imageIndex: 2,
           }}
           timer={studyTimer}
           theme={theme}
@@ -76,19 +79,10 @@ export const StudyMain: React.FC<StudyMainProps> = ({}) => {
           switchTimerRunning={handleSwitchTimerRunning}
         />
 
-        <ScoringPhase header={header} theme={theme} />
+        <ScoringPhase problems={problems} header={header} theme={theme} />
 
         {/* テスト用 */}
-        <Flex>
-          <Button variant="transparent" onClick={testTimer.start}>
-            start
-          </Button>
-          <Button variant="transparent" onClick={testTimer.stop}>
-            stop
-          </Button>
-          <Button variant="transparent" onClick={testTimer.reset}>
-            reset
-          </Button>
+        <Stack>
           <Button variant="transparent" onClick={resetAll}>
             resetAll
           </Button>
@@ -103,7 +97,19 @@ export const StudyMain: React.FC<StudyMainProps> = ({}) => {
           >
             更新
           </Button>
-        </Flex>
+          <Flex>
+            {range(5).map((index) => {
+              const subjects: Subject[] = [
+                'japanese',
+                'english',
+                'math',
+                'science',
+                'socialStudies',
+              ];
+              return <Button onClick={() => setSubject(subjects[index])}>{subjects[index]}</Button>;
+            })}
+          </Flex>
+        </Stack>
       </Stack>
     </>
   );

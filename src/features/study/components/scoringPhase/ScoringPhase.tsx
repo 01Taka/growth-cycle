@@ -9,12 +9,12 @@ import { ScoringList } from './ScoringList';
 import { ScoringSummary } from './ScoringSummary';
 
 interface ScoringPhaseProps {
+  problems: TestProblemAttemptResult[];
   header: { subject: Subject; textbookName: string; units: string[] };
   theme: SubjectColorMap;
 }
 
-export const ScoringPhase: React.FC<ScoringPhaseProps> = ({ header, theme }) => {
-  const problems = useMemo(() => generateDummyTestResults(10), []);
+export const ScoringPhase: React.FC<ScoringPhaseProps> = ({ problems, header, theme }) => {
   const [scoringStatusMap, setScoringStatusMap] = useState<Record<number, ScoringStatus>>({});
   const handleScoreChange = (problem: TestProblemAttemptResult, scoringStatus: ScoringStatus) => {
     setScoringStatusMap((prev) => ({ ...prev, [problem.problemIndex]: scoringStatus }));
