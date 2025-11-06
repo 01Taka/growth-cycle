@@ -37,7 +37,7 @@ export const convertLearningCyclesToReviewItemMap = (
       isCompleted: differenceFromLastAttempted === 0,
       plantIndex,
       subject: cycle.subject,
-      unitNames,
+      unitNames: unitNames as string[],
       testDurationMin: Math.floor(learningSettings.testDurationMs / MILLISECONDS_PER_MINUTE),
       // cycleStartAtをアイテムに追加（二次ソートに使用）
       cycleStartAt: cycle.cycleStartAt,

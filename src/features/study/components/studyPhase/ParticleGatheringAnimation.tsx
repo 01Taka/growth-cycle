@@ -1,7 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { css } from '@emotion/css';
-import Particles from 'react-tsparticles';
-import type { Engine, IOptions } from 'tsparticles-engine';
+import type { Engine } from 'tsparticles-engine';
 import { loadSlim } from 'tsparticles-slim';
 
 // 目的地座標 (画面中央)
@@ -129,13 +128,6 @@ const ParticleGatheringAnimation = () => {
 
   return (
     <div className={containerStyle}>
-      <Particles
-        id="tsparticles"
-        init={particlesInit}
-        // options={particleOptions}
-        className={particlesBlurStyle} // ぼかし効果を適用
-      />
-
       {/* 目的地となるエリア (インタラクティブモードのターゲット) */}
       <div
         id="target-area"

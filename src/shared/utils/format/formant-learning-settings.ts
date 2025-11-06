@@ -1,5 +1,38 @@
-import { LearningSettings } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
-import { FormatLearningSettings } from '@/shared/data/format-documents/format-learning-cycle-types';
+interface IdNamePair {
+  id: string;
+  name: string;
+}
+
+interface Problem {
+  id: string;
+  unitId: string;
+  categoryId: string;
+  // 他の既存のプロパティ
+}
+
+interface FormattedProblem extends Problem {
+  unitName: string;
+  categoryName: string;
+}
+
+/**
+ * 元のLearningSettingsオブジェクトの型（関数の入力）
+ */
+export interface LearningSettings {
+  units: IdNamePair[];
+  categories: IdNamePair[];
+  problems: Problem[];
+  [key: string]: any; // その他の設定プロパティを許容
+}
+
+/**
+ * formatLearningSettings関数によって拡張されたLearningSettingsの型（関数の出力）
+ */
+export interface FormatLearningSettings extends LearningSettings {
+  unitMap: Record<string, string>;
+  categoryMap: Record<string, string>;
+  problems: FormattedProblem[]; // problemsの型が上書きされる
+}
 
 /**
  * LearningSettingsを拡張し、unitMap, categoryMap、
@@ -45,6 +78,6 @@ export function formatLearningSettings(
     ...settings,
     unitMap,
     categoryMap,
-    problems: newProblems,
+    problems: newProblems as any,
   };
 }

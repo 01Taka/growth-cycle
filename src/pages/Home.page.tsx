@@ -11,9 +11,9 @@ export function HomePage() {
       {/* <TopNavigationBar> */}
       <Stack gap={500}>
         <HomeMain />
-        <TextBookPage />
+        {/* <TextBookPage />
         <StartStudyPage />
-        <StudyPage />
+        <StudyPage /> */}
       </Stack>
       {/* </TopNavigationBar> */}
     </>

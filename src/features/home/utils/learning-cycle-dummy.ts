@@ -10,8 +10,8 @@ const createMockTimestamp = (offsetMs: number = 0): Timestamp => {
 };
 
 const oneDay = 86400000;
-
-export const dummyLearningCycle: LearningCycle = {
+//
+export const dummyLearningCycle: any = {
   textbookId: 'math_textbook_001',
   subject: 'math',
   settings: {

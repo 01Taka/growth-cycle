@@ -4,9 +4,11 @@ import { TestSelfEvaluation } from '@/shared/data/documents/learning-cycle/learn
 import { useSubjectColorMap } from '@/shared/hooks/useSubjectColor';
 import { Subject } from '@/shared/types/subject-types';
 import { range } from '@/shared/utils/range';
+import { generateDummyRecords } from '../functions/generate-dummy';
 import { useStudyTimer } from '../hooks/useStudyTimer';
 import { generateDummyTestResults } from './dummy-problems';
 import { ParticleOverlay } from './ParticleOverlay';
+import { ReviewPhase } from './reviewPhase/ReviewPhase';
 import { ScoringPhase } from './scoringPhase/ScoringPhase';
 import { StudyPhase } from './studyPhase/StudyPhase';
 import { TestPhase } from './testPhase/TestPhase';
@@ -15,6 +17,7 @@ interface StudyMainProps {}
 
 export const StudyMain: React.FC<StudyMainProps> = ({}) => {
   const problems = useMemo(() => generateDummyTestResults(10), []);
+  const records = useMemo(() => generateDummyRecords(10), []);
 
   const [subject, setSubject] = useState<Subject>('japanese');
 
@@ -80,6 +83,8 @@ export const StudyMain: React.FC<StudyMainProps> = ({}) => {
         />
 
         <ScoringPhase problems={problems} header={header} theme={theme} />
+
+        <ReviewPhase records={records} theme={theme} />
 
         {/* テスト用 */}
         <Stack>

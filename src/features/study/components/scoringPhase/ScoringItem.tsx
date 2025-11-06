@@ -1,12 +1,12 @@
 import React from 'react';
 import { IconCheck, IconX } from '@tabler/icons-react'; // アイコンを追加
 import { Button, Card, Flex, Group, Stack, Text } from '@mantine/core';
-import { ScoringStatus, TestProblemAttemptResult } from '../../types/problem-types';
+import { ProblemAttemptDetail, ProblemScoringStatus } from '../../types/problem-types';
 
 interface ScoringItemProps {
-  problem: TestProblemAttemptResult;
-  scoringStatus: ScoringStatus;
-  onScoreChange: (scoringStatus: ScoringStatus) => void;
+  problem: ProblemAttemptDetail;
+  scoringStatus: ProblemScoringStatus;
+  onScoreChange: (scoringStatus: ProblemScoringStatus) => void;
 }
 
 export const ScoringItem: React.FC<ScoringItemProps> = ({

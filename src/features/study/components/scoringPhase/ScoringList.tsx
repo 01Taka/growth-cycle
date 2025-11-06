@@ -1,17 +1,19 @@
 import React from 'react';
-import { Stack } from '@mantine/core';
-import { ScoringStatus, TestProblemAttemptResult } from '../../types/problem-types';
+import { Box, Stack } from '@mantine/core';
+import { ProblemAttemptDetail, ProblemScoringStatus } from '../../types/problem-types';
 import { ScoringItem } from './ScoringItem';
 
 interface ScoringListProps {
-  problems: TestProblemAttemptResult[];
-  scoringStatusMap: Record<number, ScoringStatus>;
-  onScoreChange: (problem: TestProblemAttemptResult, scoringStatus: ScoringStatus) => void;
+  problems: ProblemAttemptDetail[];
+  scoringStatusMap: Record<number, ProblemScoringStatus>;
+  bottomMargin?: number | string;
+  onScoreChange: (problem: ProblemAttemptDetail, scoringStatus: ProblemScoringStatus) => void;
 }
 
 export const ScoringList: React.FC<ScoringListProps> = ({
   problems,
   scoringStatusMap,
+  bottomMargin,
   onScoreChange,
 }) => {
   return (
@@ -24,6 +26,7 @@ export const ScoringList: React.FC<ScoringListProps> = ({
           onScoreChange={(scoringStatus) => onScoreChange(problem, scoringStatus)}
         />
       ))}
+      <Box m={bottomMargin} />
     </Stack>
   );
 };
