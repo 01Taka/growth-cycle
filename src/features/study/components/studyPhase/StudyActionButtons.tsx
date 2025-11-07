@@ -8,9 +8,16 @@ import { toRGBA } from '@/shared/utils/color/color-convert-utils';
 interface StudyActionButtonsProps {
   theme: SubjectColorMap;
   isReadyTest: boolean;
+  onStartTest: () => void;
+  onShowTextRange: () => void;
 }
 
-export const StudyActionButtons: React.FC<StudyActionButtonsProps> = ({ theme, isReadyTest }) => {
+export const StudyActionButtons: React.FC<StudyActionButtonsProps> = ({
+  theme,
+  isReadyTest,
+  onStartTest,
+  onShowTextRange,
+}) => {
   return (
     <Stack w={'100%'} align="center">
       {isReadyTest && (
@@ -23,6 +30,7 @@ export const StudyActionButtons: React.FC<StudyActionButtonsProps> = ({ theme, i
             border: `2px solid ${theme.border}`,
             width: '70%',
           }}
+          onClick={onStartTest}
         >
           テストを始める
         </Button>
@@ -44,6 +52,7 @@ export const StudyActionButtons: React.FC<StudyActionButtonsProps> = ({ theme, i
             border: isReadyTest ? undefined : `2px solid ${theme.border}`,
           },
         }}
+        onClick={onShowTextRange}
       >
         テスト範囲を表示
         <IconArrowRight />

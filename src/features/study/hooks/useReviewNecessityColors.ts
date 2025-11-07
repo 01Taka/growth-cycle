@@ -1,5 +1,7 @@
 import { MantineColorScheme, useComputedColorScheme } from '@mantine/core';
-import { NecessityColorSet, ReviewNecessityColors } from '../constants/review-necessity-constants';
+import { ReviewNecessityColors } from '../constants/review-necessity-constants';
+import { calculateReviewNecessityFromLatestAttempt } from '../functions/calculate-review-necessity';
+import { AttemptLog, FinalReviewNecessityResult, NecessityColorSet } from '../types/problem-types';
 
 export interface ReviewNecessityScores {
   reviewNecessity: number;
@@ -14,6 +16,7 @@ export interface NecessityColors {
   reviewNecessity: NecessityColorSet;
   latestAttemptNecessity: NecessityColorSet;
   recentWeightedNecessity: NecessityColorSet;
+  getNecessityColor: (attempt: AttemptLog | null) => NecessityColorSet;
 }
 
 /**
@@ -22,7 +25,7 @@ export interface NecessityColors {
  * @param {ReviewNecessityScores} scores 確認必要度の計算結果
  * @returns {NecessityColors} 各スコアレベルに対応する色とラベルのセット
  */
-export const useReviewNecessityColors = (scores: ReviewNecessityScores): NecessityColors => {
+export const useReviewNecessityColors = (scores: FinalReviewNecessityResult): NecessityColors => {
   const colorScheme: MantineColorScheme = useComputedColorScheme();
   const colorsByTheme = ReviewNecessityColors[colorScheme];
 
@@ -44,10 +47,19 @@ export const useReviewNecessityColors = (scores: ReviewNecessityScores): Necessi
     return colorsByTheme[0];
   };
 
+  const getNecessityColor = (attempt: AttemptLog | null) => {
+    const colNecessity = attempt
+      ? calculateReviewNecessityFromLatestAttempt(attempt)
+      : { level: 0 };
+    const necessityColor = ReviewNecessityColors[colorScheme][colNecessity.level];
+    return necessityColor;
+  };
+
   // すべてのキーの色情報を取得して返す
   return {
     reviewNecessity: getColorsForLevel(scores.reviewNecessity),
-    latestAttemptNecessity: getColorsForLevel(scores.latestAttemptNecessity),
-    recentWeightedNecessity: getColorsForLevel(scores.recentWeightedNecessity),
+    latestAttemptNecessity: getColorsForLevel(scores.latestAttemptNecessity.level),
+    recentWeightedNecessity: getColorsForLevel(scores.recentWeightedNecessity.level),
+    getNecessityColor,
   };
 };

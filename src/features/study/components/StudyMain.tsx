@@ -15,11 +15,22 @@ import { TestPhase } from './testPhase/TestPhase';
 
 interface StudyMainProps {}
 
+type Phase = 'study' | 'test' | 'scoring' | 'review';
+
 export const StudyMain: React.FC<StudyMainProps> = ({}) => {
+  const [subject, setSubject] = useState<Subject>('japanese');
+
+  // 🚀 現在のフェーズを管理する state を追加
+  const [phase, setPhase] = useState<Phase>('study'); // 初期フェーズは 'study'
+
+  // ダミーデータ
   const problems = useMemo(() => generateDummyTestResults(10), []);
   const records = useMemo(() => generateDummyRecords(10), []);
-
-  const [subject, setSubject] = useState<Subject>('japanese');
+  const header = {
+    subject: subject,
+    textbookName: '論読',
+    units: ['unitA', 'unitB'],
+  };
 
   const theme = useSubjectColorMap(subject);
   const {
@@ -42,52 +53,84 @@ export const StudyMain: React.FC<StudyMainProps> = ({}) => {
     setSelfEvaluationMap((prev) => ({ ...prev, [index]: evaluation }));
   };
 
-  const header = {
-    subject: subject,
-    textbookName: '論読',
-    units: ['unitA', 'unitB'],
-  };
-
   const [newExpectedDuration, setNewExpectedDuration] = useState(1);
+
+  // 🔧 フェーズに基づいてレンダリングするコンポーネントを決定する関数
+  const renderPhase = () => {
+    switch (phase) {
+      case 'study':
+        return (
+          <StudyPhase
+            isReadyTest={studyTimer.remainingTime <= 0}
+            header={header}
+            plant={{
+              subject: subject,
+              type: 'adult',
+              imageIndex: 2,
+            }}
+            timer={studyTimer}
+            theme={theme}
+            switchState={studyTimer.switchState}
+            onStartTest={() => setPhase('test')}
+            onShowTextRange={() => {}}
+          />
+        );
+      case 'test':
+        return (
+          <TestPhase
+            problems={problems}
+            header={header}
+            isFinishTestTimer={isFinishTestTimer}
+            mainTimer={testTimer}
+            currentTimerElapsedTime={currentActiveProblemTimer?.elapsedTime ?? null}
+            elapsedTimeMap={elapsedTimeMap}
+            theme={theme}
+            currentProblemIndex={currentTestProblemIndex ?? 0}
+            selfEvaluationMap={selfEvaluationMap}
+            onSelectSelfEvaluation={handleSelfEvaluationMap}
+            changeCurrentTestProblem={changeCurrentTestProblem}
+            switchTimerRunning={handleSwitchTimerRunning}
+            onStartScoring={() => setPhase('scoring')}
+          />
+        );
+      case 'scoring':
+        return (
+          <ScoringPhase
+            problems={problems}
+            header={header}
+            theme={theme}
+            onStartReview={() => setPhase('review')}
+          />
+        );
+      case 'review':
+        return <ReviewPhase records={records} theme={theme} />;
+      default:
+        return null;
+    }
+  };
 
   return (
     <>
       <ParticleOverlay color={theme.accent} />
       <Stack w={'100%'} mt={16} gap={500} style={{ backgroundColor: theme.bgScreen }}>
-        <StudyPhase
-          isReadyTest={studyTimer.remainingTime <= 0}
-          header={header}
-          plant={{
-            subject: subject,
-            type: 'adult',
-            imageIndex: 2,
-          }}
-          timer={studyTimer}
-          theme={theme}
-          switchState={studyTimer.switchState}
-        />
+        {/* 🎨 フェーズごとのレンダリングを実行 */}
+        {renderPhase()}
 
-        <TestPhase
-          problems={problems}
-          header={header}
-          isFinishTestTimer={isFinishTestTimer}
-          mainTimer={testTimer}
-          currentTimerElapsedTime={currentActiveProblemTimer?.elapsedTime ?? null}
-          elapsedTimeMap={elapsedTimeMap}
-          theme={theme}
-          currentProblemIndex={currentTestProblemIndex ?? 0}
-          selfEvaluationMap={selfEvaluationMap}
-          onSelectSelfEvaluation={handleSelfEvaluationMap}
-          changeCurrentTestProblem={changeCurrentTestProblem}
-          switchTimerRunning={handleSwitchTimerRunning}
-        />
+        {/* --- テスト用 --- */}
+        <Stack mt={50}>
+          <Button variant="filled" color="blue" onClick={() => setPhase('study')}>
+            Go to Study Phase
+          </Button>
+          <Button variant="filled" color="blue" onClick={() => setPhase('test')}>
+            Go to Test Phase
+          </Button>
+          <Button variant="filled" color="blue" onClick={() => setPhase('scoring')}>
+            Go to Scoring Phase
+          </Button>
+          <Button variant="filled" color="blue" onClick={() => setPhase('review')}>
+            Go to Review Phase
+          </Button>
 
-        <ScoringPhase problems={problems} header={header} theme={theme} />
-
-        <ReviewPhase records={records} theme={theme} />
-
-        {/* テスト用 */}
-        <Stack>
           <Button variant="transparent" onClick={resetAll}>
             resetAll
           </Button>
@@ -111,7 +154,11 @@ export const StudyMain: React.FC<StudyMainProps> = ({}) => {
                 'science',
                 'socialStudies',
               ];
-              return <Button onClick={() => setSubject(subjects[index])}>{subjects[index]}</Button>;
+              return (
+                <Button key={subjects[index]} onClick={() => setSubject(subjects[index])}>
+                  {subjects[index]}
+                </Button>
+              );
             })}
           </Flex>
         </Stack>

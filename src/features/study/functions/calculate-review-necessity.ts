@@ -1,52 +1,62 @@
-import { AttemptLog, ProblemLearningRecord } from '../types/problem-types';
-
-// 型定義の補足 (仮定)
-// type ScoringStatus = 'correct' | 'incorrect' | 'unrated';
-// type SelfEvaluation = 'confident' | 'imperfect' | 'notSure' | 'unrated';
+import {
+  AttemptLog,
+  FinalReviewNecessityResult,
+  LatestAttemptNecessityReason,
+  LatestAttemptNecessityResult,
+  RecentWeightedNecessityReason,
+  RecentWeightedNecessityResult,
+} from '../types/problem-types';
 
 /**
  * 💡 ロジック 1: 直近の一つの自己評価と正誤による確認必要度 (0-3) を算出
  * @param {AttemptLog | null} latestAttempt 最新の試行ログ
- * @param {number} defaultNecessity ログがない場合のデフォルト値
- * @returns {number} 算出された確認必要度 (0から3の整数)
+ * @param {number} defaultNecessity ログがない場合のデフォルト値 (未使用だが引数としては残す)
+ * @returns {LatestAttemptNecessityResult} 算出された確認必要度と理由
  */
 export function calculateReviewNecessityFromLatestAttempt(
-  latestAttempt: AttemptLog | null,
-  defaultNecessity: number = 0
-): number {
+  latestAttempt: AttemptLog | null
+): LatestAttemptNecessityResult {
   if (!latestAttempt) {
-    return defaultNecessity;
+    // 試行ログがない場合
+    return { level: 0, reason: 'noAttempt' };
   }
 
   const { selfEvaluation, scoringStatus } = latestAttempt;
-  let necessity = 0; // 初期値は0
+  let level: number = 0;
+  let reason: LatestAttemptNecessityReason = 'noNeed'; // scoringStatusが 'unrated' の場合のデフォルト
 
   if (scoringStatus === 'correct') {
     // ✅ 正解のとき:
     switch (selfEvaluation) {
       case 'unrated':
       case 'confident':
-        necessity = 0; // 確信あり/未評価なら不要
+        level = 0;
+        reason = 'noNeed'; // 確信あり/未評価なら不要
         break;
       case 'imperfect':
-        necessity = 1; // 不完全なら少し必要
+        level = 1;
+        reason = 'imperfectCorrect'; // 不完全なら少し必要
         break;
       case 'notSure':
-        necessity = 2; // 不安なら復習推奨
+        level = 2;
+        reason = 'uncertainCorrect'; // 不安なら復習推奨
         break;
     }
   } else if (scoringStatus === 'incorrect') {
     // ❌ 間違いのとき:
-    // 確信があれば3 (なぜ間違えたかの確認推奨), それ以外は2
-    necessity = selfEvaluation === 'confident' ? 3 : 2;
+    if (selfEvaluation === 'confident') {
+      level = 3;
+      reason = 'overconfidenceError'; // 確信があったのに間違い（最優先確認）
+    } else {
+      level = 2;
+      reason = 'definiteMistake'; // 間違い（復習推奨）
+    }
   }
 
-  // scoringStatusが 'unrated' の場合は、初期値 0 のまま
+  // scoringStatusが 'unrated' の場合は、初期値の level=0, reason='noNeed' のまま
 
-  return necessity;
+  return { level, reason };
 }
-
-// ----------------------------------------------------------------------
 /**
  * 💡 ロジック 2 (改善版): 直近2回の試行における「自己評価に基づく確認必要度」が
  * 「2以上（復習必要性が高い）」であったかどうかに重みを付けて算出 (最大 3)
@@ -54,9 +64,9 @@ export function calculateReviewNecessityFromLatestAttempt(
  * @param {AttemptLog | null} latestAttempt 最新の試行
  * @param {AttemptLog | null} secondLatestAttempt 2番目に新しい試行
  * @param {object} options オプション
- * @returns {number} 算出された重み付きの確認必要度 (0から3の整数)
+ * @returns {RecentWeightedNecessityResult} 算出された重み付きの確認必要度と理由
  */
-function calculateWeightedReviewNecessity( // 関数名を変更
+function calculateWeightedReviewNecessity(
   latestAttempt: AttemptLog | null,
   secondLatestAttempt: AttemptLog | null,
   options?: {
@@ -64,51 +74,60 @@ function calculateWeightedReviewNecessity( // 関数名を変更
     latestAttemptWeight?: number;
     secondAttemptWeight?: number;
   }
-): number {
+): RecentWeightedNecessityResult {
   const opt = {
     // デフォルト値
     defaultNecessity: 0,
-    latestAttemptWeight: 2, // 従来の firstNecessityWeight
-    secondAttemptWeight: 1, // 従来の secondNecessityWeight
+    latestAttemptWeight: 2,
+    secondAttemptWeight: 1,
     ...(options || {}),
   };
 
   // 判定基準: ロジック1の結果が 2以上（復習必要性が高い）であったかどうか
   const HIGH_NECESSITY_THRESHOLD = 2;
 
-  // 1. 最新の試行: 必要度が2以上なら重み latestAttemptWeight (2) を加算
-  const isLatestHighNecessity = latestAttempt
-    ? calculateReviewNecessityFromLatestAttempt(latestAttempt) >= HIGH_NECESSITY_THRESHOLD
-    : false;
+  // 1. 最新の試行の確認必要度を算出
+  const latestResult = calculateReviewNecessityFromLatestAttempt(latestAttempt);
+  const isLatestHighNecessity = latestResult.level >= HIGH_NECESSITY_THRESHOLD;
+
+  // 2. 2番目の試行の確認必要度を算出
+  const secondResult = calculateReviewNecessityFromLatestAttempt(secondLatestAttempt);
+  const isSecondHighNecessity = secondResult.level >= HIGH_NECESSITY_THRESHOLD;
+
+  // スコア計算
   const latestNecessityScore = isLatestHighNecessity
     ? opt.latestAttemptWeight
     : opt.defaultNecessity;
-
-  // 2. 2番目の試行: 必要度が2以上なら重み secondAttemptWeight (1) を加算
-  const isSecondHighNecessity = secondLatestAttempt
-    ? calculateReviewNecessityFromLatestAttempt(secondLatestAttempt) >= HIGH_NECESSITY_THRESHOLD
-    : false;
   const secondNecessityScore = isSecondHighNecessity
     ? opt.secondAttemptWeight
     : opt.defaultNecessity;
 
   // 合計値は最大 3 (2 + 1)
-  const totalNecessity = latestNecessityScore + secondNecessityScore;
-  return totalNecessity;
+  const level = latestNecessityScore + secondNecessityScore;
+
+  // 理由の決定
+  let reason: RecentWeightedNecessityReason;
+  if (isLatestHighNecessity && isSecondHighNecessity) {
+    reason = 'consecutiveMistake'; // 3: 連続で復習必要性が高い
+  } else if (isLatestHighNecessity) {
+    reason = 'latestHighNecessity'; // 2: 最新の試行で復習必要性が高い
+  } else if (isSecondHighNecessity) {
+    reason = 'previousHighNecessity'; // 1: 2番目の試行で復習必要性が高い
+  } else {
+    reason = 'none'; // 0: どちらも復習必要性が高くない、または試行なし
+  }
+
+  return { level, reason };
 }
-// ----------------------------------------------------------------------
 
 /**
  * 🎯 メイン関数: 2つのロジックで算出された値のうち、大きい方を使用して最終的な確認必要度を決定
  * @param {AttemptLog[]} attempts 試行履歴のリスト (末尾が最新)
- * @returns {{ reviewNecessity: number; ... }} 最終的な確認必要度を含むオブジェクト
+ * @returns {FinalReviewNecessityResult} 最終的な確認必要度を含むオブジェクト
  */
-export function determineFinalReviewNecessity(attempts: (AttemptLog | null)[]): {
-  // 関数名を変更
-  reviewNecessity: number;
-  latestAttemptNecessity: number;
-  recentWeightedNecessity: number;
-} {
+export function determineFinalReviewNecessity(
+  attempts: (AttemptLog | null)[]
+): FinalReviewNecessityResult {
   // 最新の試行を取得 (配列の末尾が最新)
   const latestAttempt = attempts.length > 0 ? attempts[attempts.length - 1] : null;
 
@@ -117,9 +136,7 @@ export function determineFinalReviewNecessity(attempts: (AttemptLog | null)[]): 
 
   // --- 1. ロジック1で算出 ---
   // 直近の一つの自己評価と正誤による算出 (最大3)
-  const latestAttemptNecessity = latestAttempt
-    ? calculateReviewNecessityFromLatestAttempt(latestAttempt)
-    : 0;
+  const latestAttemptNecessity = calculateReviewNecessityFromLatestAttempt(latestAttempt);
 
   // --- 2. ロジック2で算出 ---
   // 直近の二つの自己評価と正誤による重み付き算出 (最大3)
@@ -129,31 +146,13 @@ export function determineFinalReviewNecessity(attempts: (AttemptLog | null)[]): 
   );
 
   // より値が大きい方を使用して最終的な確認必要度を決定
-  const reviewNecessity = Math.max(latestAttemptNecessity, recentWeightedNecessity);
+  // 結果は 0-3 の範囲であることが保証される (各ロジックの最大値が3のため)
+  const reviewNecessity = Math.max(latestAttemptNecessity.level, recentWeightedNecessity.level);
 
-  // 結果を返す (0-3の範囲であることを保証)
+  // 結果を返す
   return {
-    reviewNecessity: Math.min(reviewNecessity, 3),
+    reviewNecessity: Math.min(reviewNecessity, 3), // 念のため最大値を3に制限
     latestAttemptNecessity,
     recentWeightedNecessity,
   };
-}
-
-type RecentWeightedNecessityReason =
-  | 'consecutiveMistake' //
-  | 'mistake' //
-  | 'previousMiss'; //
-
-type LatestAttemptNecessityReason =
-  | 'overconfidenceError'
-  | 'mistake'
-  | 'luckyGuess'
-  | 'uncertainCorrect';
-
-type NecessityReasonLabel = RecentWeightedNecessityReason | LatestAttemptNecessityReason;
-
-interface NecessityReason {
-  source: 'latestAttempt' | 'recentWeighted';
-  reason: NecessityReasonLabel | null;
-  level: number;
 }

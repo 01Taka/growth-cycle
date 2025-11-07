@@ -24,6 +24,8 @@ interface StudyPhaseProps {
   timer: SingleTimerData;
   theme: SubjectColorMap;
   switchState: () => void;
+  onStartTest: () => void;
+  onShowTextRange: () => void;
 }
 
 export const StudyPhase: React.FC<StudyPhaseProps> = ({
@@ -33,6 +35,8 @@ export const StudyPhase: React.FC<StudyPhaseProps> = ({
   timer,
   theme,
   switchState,
+  onStartTest,
+  onShowTextRange,
 }) => {
   return (
     <Stack align="center">
@@ -44,7 +48,12 @@ export const StudyPhase: React.FC<StudyPhaseProps> = ({
         buttonColor={theme.accent}
         switchState={switchState}
       />
-      <StudyActionButtons theme={theme} isReadyTest={isReadyTest} />
+      <StudyActionButtons
+        theme={theme}
+        isReadyTest={isReadyTest}
+        onStartTest={onStartTest}
+        onShowTextRange={onShowTextRange}
+      />
       <StudyPhasePlantDisplay {...plant} />
     </Stack>
   );

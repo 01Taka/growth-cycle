@@ -222,3 +222,18 @@ export function formatMilliseconds(
     isPositive: result.isPositive,
   };
 }
+
+export function formatMillisecondsToMSS(ms: number) {
+  // 1. ミリ秒を秒に変換
+  const totalSeconds = Math.floor(ms / 1000);
+
+  // 2. 秒数から分と秒を計算
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60; // 60で割った余りが秒数
+
+  // 3. 2桁表示にしてコロンで結合
+  const formattedMinutes = String(minutes).padStart(1, '0');
+  const formattedSeconds = String(seconds).padStart(2, '0');
+
+  return `${formattedMinutes}:${formattedSeconds}`;
+}

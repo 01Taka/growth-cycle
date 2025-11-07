@@ -42,3 +42,73 @@ export interface EmptyAttemptLog {
 export interface ProblemLearningRecord extends LearningProblemKey {
   attempts: AttemptLog[];
 }
+
+// カラーセットの型定義
+export interface NecessityColorSet {
+  backgroundColor: string;
+  textColor: string;
+  borderColor: string;
+  accentColor: string;
+  reverseTextColor: string;
+  label: string;
+}
+
+/**
+ * 確認必要度の理由（ロジック2：直近2回の試行による重み付け）
+ */
+export type RecentWeightedNecessityReason =
+  | 'consecutiveMistake' // 3: 直近2回とも高必要性（2以上）
+  | 'latestHighNecessity' // 2: 最新の試行のみ高必要性（2以上）
+  | 'previousHighNecessity' // 1: 2番目の試行のみ高必要性（2以上）
+  | 'none'; // 0: どちらも低必要性（1以下）またはデータなし
+
+/**
+ * 確認必要度の理由（ロジック1：最新の試行による算出）
+ */
+export type LatestAttemptNecessityReason =
+  | 'overconfidenceError' // 3: 間違い + 確信あり
+  | 'definiteMistake' // 2: 間違い + 確信なし/未評価
+  | 'uncertainCorrect' // 2: 正解 + 不安
+  | 'imperfectCorrect' // 1: 正解 + 不完全
+  | 'noNeed' // 0: 正解 + 確信あり/未評価 または未評価
+  | 'noAttempt'; // 0: 試行ログなし
+
+/**
+ * ロジック1の算出結果オブジェクト
+ */
+export type LatestAttemptNecessityResult = {
+  level: number; // 0-3
+  reason: LatestAttemptNecessityReason;
+};
+
+/**
+ * ロジック2の算出結果オブジェクト
+ */
+export type RecentWeightedNecessityResult = {
+  level: number; // 0-3
+  reason: RecentWeightedNecessityReason;
+};
+
+/**
+ * 最終的な確認必要度を決定する関数の返却オブジェクト
+ */
+export type FinalReviewNecessityResult = {
+  reviewNecessity: number; // 0-3 (最終結果)
+  latestAttemptNecessity: LatestAttemptNecessityResult;
+  recentWeightedNecessity: RecentWeightedNecessityResult;
+};
+
+export interface ReviewNecessityResult {
+  reviewNecessity: { level: number; theme: NecessityColorSet; label: string };
+  latestAttemptNecessity: LatestAttemptNecessityResult & {
+    theme: NecessityColorSet;
+    reasonLabel: string;
+    label: string;
+  };
+  recentWeightedNecessity: RecentWeightedNecessityResult & {
+    theme: NecessityColorSet;
+    reasonLabel: string;
+    label: string;
+  };
+  getNecessityColor: (attempt: AttemptLog | null) => NecessityColorSet;
+}

@@ -9,21 +9,25 @@ interface ScoringItemProps {
   onScoreChange: (scoringStatus: ProblemScoringStatus) => void;
 }
 
+const COLORS: Record<ProblemScoringStatus, { text: string; background: string }> = {
+  correct: { text: 'green', background: '#A6FA8F' },
+  incorrect: { text: 'red', background: '#FA988F' },
+  unrated: { text: 'black', background: '' },
+};
+
 export const ScoringItem: React.FC<ScoringItemProps> = ({
   problem,
   scoringStatus,
   onScoreChange,
 }) => {
-  // Mantineの組み込みカラー（green, red）を例として使用します。
-  // 実際のTEST_RESULT_COLORの定義に合わせて調整してください。
-  const CORRECT_COLOR = 'green'; // 例: 正解は緑色
-  const INCORRECT_COLOR = 'red'; // 例: 間違いは赤色
+  const theme = COLORS[scoringStatus];
 
   return (
     <Card
       shadow="sm" // カードに影を追加して浮き上がらせる
       padding="lg"
       radius="md" // 角を丸くする
+      style={{ backgroundColor: theme.background }}
     >
       <Flex
         justify="space-between" // 両端に要素を配置
@@ -63,7 +67,7 @@ export const ScoringItem: React.FC<ScoringItemProps> = ({
           <Button
             size="md" // コンパクトなサイズ
             variant={scoringStatus === 'correct' ? 'filled' : 'outline'}
-            color={CORRECT_COLOR} // 正解の色
+            color={scoringStatus === 'unrated' ? COLORS['correct'].text : theme.text} // 正解の色
             style={{ width: 88, height: 64, borderRadius: 8, padding: '8px 2px' }}
             onClick={() => onScoreChange('correct')}
           >
@@ -73,8 +77,13 @@ export const ScoringItem: React.FC<ScoringItemProps> = ({
           <Button
             size="md"
             variant={scoringStatus === 'incorrect' ? 'filled' : 'outline'}
-            color={INCORRECT_COLOR} // 間違いの色
-            style={{ width: 88, height: 64, borderRadius: 8, padding: '8px 2px' }}
+            color={scoringStatus === 'unrated' ? COLORS['incorrect'].text : theme.text} // 間違いの色
+            style={{
+              width: 88,
+              height: 64,
+              borderRadius: 8,
+              padding: '8px 2px',
+            }}
             onClick={() => onScoreChange('incorrect')}
           >
             {scoringStatus === 'incorrect' && <IconX size={20} />}

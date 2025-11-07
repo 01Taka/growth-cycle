@@ -1,9 +1,9 @@
 import React from 'react';
 import { Flex, Grid, Text } from '@mantine/core';
+import { LearningProblemKey } from '@/features/study/types/problem-types';
 import { TestSelfEvaluation } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { SubjectColorMap } from '@/shared/theme/subjectColorType';
 import { SELF_EVALUATIONS_CONFIGS } from '../../../constants/self-evaluations-configs';
-import { StudyProblem } from '../../../types/problem-types';
 
 // MantineのBreakpoints型を定義 (実際にはMantineからインポートできますが、ここでは手動で定義)
 type ResponsiveSpan =
@@ -18,7 +18,7 @@ type ResponsiveSpan =
   | number;
 
 interface TestProblemsItemProps {
-  problem: StudyProblem;
+  problem: LearningProblemKey;
   elapsedTimeMs: number | null;
   selfEvaluation: TestSelfEvaluation;
   isCurrent: boolean;

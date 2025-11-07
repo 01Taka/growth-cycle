@@ -1,23 +1,9 @@
 import React from 'react';
-import {
-  Box,
-  Card,
-  Flex,
-  MantineColorScheme,
-  Pill,
-  Stack,
-  Table,
-  Text,
-  useComputedColorScheme,
-} from '@mantine/core';
+import { Box, Card, Flex, Pill, Stack, Table, Text } from '@mantine/core';
 import { TestSelfEvaluation } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
-import { ReviewNecessityColors } from '../../constants/review-necessity-constants';
-import {
-  calculateReviewNecessityFromLatestAttempt,
-  determineFinalReviewNecessity,
-} from '../../functions/calculate-review-necessity';
+import { formatMillisecondsToMSS } from '@/shared/utils/datetime/time-utils';
 import { formatTimestampToDaysAgo, getJustBeforeLogs } from '../../functions/review-phase-utils';
-import { useReviewNecessityColors } from '../../hooks/useReviewNecessityColors';
+import { useReviewNecessity } from '../../hooks/useReviewNecessity';
 import { ProblemLearningRecord } from '../../types/problem-types';
 import { getScoringStatusIcon, getSelfEvaluationIcon } from './icons';
 
@@ -29,18 +15,17 @@ interface RecordReviewCardProps {
 
 export const RecordReviewCard: React.FC<RecordReviewCardProps> = ({ record }) => {
   const logs = getJustBeforeLogs(record);
-  const colorScheme: MantineColorScheme = useComputedColorScheme();
-  const scores = determineFinalReviewNecessity(logs);
-  const isTwoMoreNecessity = scores.latestAttemptNecessity < scores.recentWeightedNecessity;
-  const theme = useReviewNecessityColors(scores);
+  const necessity = useReviewNecessity(logs);
+  const isTwoMoreNecessity =
+    necessity.latestAttemptNecessity.level < necessity.recentWeightedNecessity.level;
 
   return (
     <Card
       shadow="md"
       style={{
         borderRadius: 16,
-        backgroundColor: theme.reviewNecessity.backgroundColor,
-        border: `2px solid ${theme.reviewNecessity.borderColor}`,
+        backgroundColor: necessity.reviewNecessity.theme.backgroundColor,
+        border: `2px solid ${necessity.reviewNecessity.theme.borderColor}`,
       }}
     >
       <Flex align="center" gap={10}>
@@ -60,12 +45,12 @@ export const RecordReviewCard: React.FC<RecordReviewCardProps> = ({ record }) =>
             size="lg"
             styles={{
               label: {
-                color: theme.reviewNecessity.reverseTextColor,
+                color: necessity.reviewNecessity.theme.reverseTextColor,
               },
-              root: { backgroundColor: theme.reviewNecessity.accentColor },
+              root: { backgroundColor: necessity.reviewNecessity.theme.accentColor },
             }}
           >
-            {theme.reviewNecessity.label}
+            {necessity.reviewNecessity.label}
           </Pill>
         </Box>
       </Flex>
@@ -77,8 +62,8 @@ export const RecordReviewCard: React.FC<RecordReviewCardProps> = ({ record }) =>
         styles={{
           table: isTwoMoreNecessity
             ? {
-                border: `2px solid ${theme.recentWeightedNecessity.borderColor}`,
-                backgroundColor: theme.recentWeightedNecessity.backgroundColor,
+                border: `2px solid ${necessity.recentWeightedNecessity.theme.borderColor}`,
+                backgroundColor: necessity.recentWeightedNecessity.theme.backgroundColor,
               }
             : {},
         }}
@@ -88,8 +73,7 @@ export const RecordReviewCard: React.FC<RecordReviewCardProps> = ({ record }) =>
           <Table.Tr>
             <Table.Th style={{ width: '80px' }}>日付</Table.Th>
             {logs.map((log, index) => {
-              const colNecessity = log ? calculateReviewNecessityFromLatestAttempt(log) : 0;
-              const necessityColor = ReviewNecessityColors[colorScheme][colNecessity];
+              const necessityColor = necessity.getNecessityColor(log);
               return (
                 <Table.Td
                   key={`date-${index}`}
@@ -108,9 +92,7 @@ export const RecordReviewCard: React.FC<RecordReviewCardProps> = ({ record }) =>
               // 'unrated' ではない場合にアイコンを取得
               const status = log?.scoringStatus || 'unrated';
               const { icon: Icon, color } = getScoringStatusIcon(status);
-              const colNecessity = log ? calculateReviewNecessityFromLatestAttempt(log) : 0;
-              const necessityColor = ReviewNecessityColors[colorScheme][colNecessity];
-
+              const necessityColor = necessity.getNecessityColor(log);
               return (
                 <Table.Td
                   key={`score-${index}`}
@@ -138,8 +120,7 @@ export const RecordReviewCard: React.FC<RecordReviewCardProps> = ({ record }) =>
                   ? (log.selfEvaluation as TestSelfEvaluation)
                   : 'unrated';
 
-              const colNecessity = log ? calculateReviewNecessityFromLatestAttempt(log) : 0;
-              const necessityColor = ReviewNecessityColors[colorScheme][colNecessity];
+              const necessityColor = necessity.getNecessityColor(log);
 
               // unrated は log が null の場合や scoringStatus が unrated の場合にも適用される
               const { icon: Icon, color } = getSelfEvaluationIcon(evaluation);
@@ -162,8 +143,40 @@ export const RecordReviewCard: React.FC<RecordReviewCardProps> = ({ record }) =>
               );
             })}
           </Table.Tr>
+
+          <Table.Tr>
+            <Table.Th>時間</Table.Th>
+            {logs.map((log, index) => {
+              return (
+                <Table.Td key={`eval-${index}`} style={{ textAlign: 'center' }}>
+                  {/* log が null の場合は表示しない。それ以外はアイコンを表示。 */}
+                  {log ? (
+                    <Text>
+                      {/* scoringStatus が 'unrated' の場合は空文字を表示する、という元のロジックを尊重する場合: */}
+                      {`${formatMillisecondsToMSS(log.timeSpentMs)}`}
+                    </Text>
+                  ) : (
+                    ''
+                  )}
+                </Table.Td>
+              );
+            })}
+          </Table.Tr>
         </Table.Tbody>
       </Table>
+      <Flex gap={5} mt={5}>
+        {necessity.latestAttemptNecessity.level > 0 && (
+          <Text style={{ color: necessity.latestAttemptNecessity.theme.textColor }}>
+            ・{necessity.latestAttemptNecessity.reasonLabel}
+          </Text>
+        )}
+        {necessity.recentWeightedNecessity.level > 0 &&
+          necessity.recentWeightedNecessity.reason !== 'latestHighNecessity' && (
+            <Text style={{ color: necessity.recentWeightedNecessity.theme.textColor }}>
+              ・{necessity.recentWeightedNecessity.reasonLabel}
+            </Text>
+          )}
+      </Flex>
     </Card>
   );
 };

@@ -1,39 +1,39 @@
 import { TestSelfEvaluation } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
-import { StudyProblem, TestProblemAttemptResult } from '../types/problem-types';
+import { ProblemAttemptDetail } from '../types/problem-types';
 
 // --- ダミーデータ ---
-export const dummyProblems: StudyProblem[] = [
-  {
-    unitName: '線形代数I',
-    categoryName: '行列式',
-    problemNumber: 15,
-    problemIndex: 0,
-  },
-  {
-    unitName: '微分積分II',
-    categoryName: '偏微分',
-    problemNumber: 3,
-    problemIndex: 1,
-  },
-  {
-    unitName: '統計学基礎',
-    categoryName: '確率分布',
-    problemNumber: 8,
-    problemIndex: 2,
-  },
-  {
-    unitName: '離散数学',
-    categoryName: 'グラフ理論',
-    problemNumber: 22,
-    problemIndex: 3,
-  },
-  {
-    unitName: '情報科学入門',
-    categoryName: 'アルゴリズム',
-    problemNumber: 1,
-    problemIndex: 4,
-  },
-];
+// export const dummyProblems: ProblemAttemptDetail[] = [
+//   {
+//     unitName: '線形代数I',
+//     categoryName: '行列式',
+//     problemNumber: 15,
+//     problemIndex: 0,
+//   },
+//   {
+//     unitName: '微分積分II',
+//     categoryName: '偏微分',
+//     problemNumber: 3,
+//     problemIndex: 1,
+//   },
+//   {
+//     unitName: '統計学基礎',
+//     categoryName: '確率分布',
+//     problemNumber: 8,
+//     problemIndex: 2,
+//   },
+//   {
+//     unitName: '離散数学',
+//     categoryName: 'グラフ理論',
+//     problemNumber: 22,
+//     problemIndex: 3,
+//   },
+//   {
+//     unitName: '情報科学入門',
+//     categoryName: 'アルゴリズム',
+//     problemNumber: 1,
+//     problemIndex: 4,
+//   },
+// ];
 
 // TestSelfEvaluation の取りうる値の配列
 const evaluationOptions: TestSelfEvaluation[] = ['notSure', 'imperfect', 'confident', 'unrated'];
@@ -56,12 +56,12 @@ const getRandomSelfEvaluation = (): TestSelfEvaluation => {
 };
 
 /**
- * 任意の数の TestProblemAttemptResult のダミーデータを生成する関数
+ * 任意の数の ProblemAttemptDetail のダミーデータを生成する関数
  * @param count 生成したいデータの数
- * @returns TestProblemAttemptResult の配列
+ * @returns ProblemAttemptDetail の配列
  */
-export const generateDummyTestResults = (count: number): TestProblemAttemptResult[] => {
-  const results: TestProblemAttemptResult[] = [];
+export const generateDummyTestResults = (count: number): ProblemAttemptDetail[] => {
+  const results: ProblemAttemptDetail[] = [];
   const unitNames = ['Unit A', 'Unit B', 'Unit C', 'Unit D'];
   const categoryNames = ['Algebra', 'Geometry', 'Calculus', 'Statistics', 'Trigonometry'];
 

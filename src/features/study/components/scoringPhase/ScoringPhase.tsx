@@ -15,9 +15,15 @@ interface ScoringPhaseProps {
   problems: ProblemAttemptDetail[];
   header: { subject: Subject; textbookName: string; units: string[] };
   theme: SubjectColorMap;
+  onStartReview: () => void;
 }
 
-export const ScoringPhase: React.FC<ScoringPhaseProps> = ({ problems, header, theme }) => {
+export const ScoringPhase: React.FC<ScoringPhaseProps> = ({
+  problems,
+  header,
+  theme,
+  onStartReview,
+}) => {
   const [scoringStatusMap, setScoringStatusMap] = useState<Record<number, ProblemScoringStatus>>(
     {}
   );
@@ -98,6 +104,7 @@ export const ScoringPhase: React.FC<ScoringPhaseProps> = ({ problems, header, th
             ...(isFilled ? sharedStyle.button : sharedStyle.disabledButton),
             color: isFilled ? theme.text : theme.disabledText,
           }}
+          onClick={onStartReview}
         >
           採点完了
           <IconCircleCheck />

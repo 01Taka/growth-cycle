@@ -6,7 +6,7 @@ import { SingleTimerData } from '@/shared/hooks/multi-timer/multi-timer-types';
 import { sharedStyle } from '@/shared/styles/shared-styles';
 import { SubjectColorMap } from '@/shared/theme/subjectColorType';
 import { Subject } from '@/shared/types/subject-types';
-import { StudyProblem } from '../../types/problem-types';
+import { LearningProblemKey } from '../../types/problem-types';
 import { StudyHeader } from '../StudyHeader';
 import { StudyTimer } from '../studyPhase/StudyTimer';
 import { TestProblemCard } from './card/TestProblemCard';
@@ -14,7 +14,7 @@ import { TestStateGrid } from './grid/TestStateGrid';
 import { TestProblemsList } from './list/TestProblemsList';
 
 interface TestPhaseProps {
-  problems: StudyProblem[];
+  problems: LearningProblemKey[];
   header: {
     subject: Subject;
     textbookName: string;
@@ -30,6 +30,7 @@ interface TestPhaseProps {
   switchTimerRunning: () => void;
   changeCurrentTestProblem: (newIndex: number | null, type: 'set' | 'increment') => void;
   onSelectSelfEvaluation: (index: number, evaluation: TestSelfEvaluation) => void;
+  onStartScoring: () => void;
 }
 
 export const TestPhase: React.FC<TestPhaseProps> = ({
@@ -45,6 +46,7 @@ export const TestPhase: React.FC<TestPhaseProps> = ({
   changeCurrentTestProblem,
   switchTimerRunning,
   onSelectSelfEvaluation,
+  onStartScoring,
 }) => {
   const currentProblem = problems[currentProblemIndex];
   const selfEvaluations = problems.map(
@@ -80,6 +82,7 @@ export const TestPhase: React.FC<TestPhaseProps> = ({
               marginTop: 50,
               marginBottom: 80,
             }}
+            onClick={onStartScoring}
           >
             テストを採点する
             <IconPencil />
