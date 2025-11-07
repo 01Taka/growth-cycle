@@ -1,11 +1,11 @@
 import { REVIEW_NECESSITY_REASON_LABELS } from '../constants/review-necessity-constants';
 import { determineFinalReviewNecessity } from '../functions/calculate-review-necessity';
 import { AttemptLog, ReviewNecessityResult } from '../types/problem-types';
-import { useReviewNecessityColors } from './useReviewNecessityColors';
+import { useReviewNecessityColorsByScores } from './useReviewNecessityColorsByScores';
 
 export const useReviewNecessity = (logs: (AttemptLog | null)[]): ReviewNecessityResult => {
   const scores = determineFinalReviewNecessity(logs);
-  const theme = useReviewNecessityColors(scores);
+  const theme = useReviewNecessityColorsByScores(scores);
   return {
     reviewNecessity: {
       level: scores.reviewNecessity,

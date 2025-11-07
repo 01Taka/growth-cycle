@@ -1,7 +1,6 @@
 import { Timestamp } from 'firebase/firestore';
 import { TestSelfEvaluation } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 
-// 学習問題の識別情報（問題の特定に使うキー）
 export interface LearningProblemKey {
   unitName: string;
   categoryName: string;
@@ -9,8 +8,13 @@ export interface LearningProblemKey {
   problemIndex: number;
 }
 
+// 学習問題の識別情報（問題の特定に使うキー）
+export interface LearningProblemBase extends LearningProblemKey {
+  attemptAt: Timestamp;
+}
+
 // 問題に対する一回の試行の詳細情報（自己評価と所要時間を含む）
-export interface ProblemAttemptDetail extends LearningProblemKey {
+export interface ProblemAttemptDetail extends LearningProblemBase {
   selfEvaluation: TestSelfEvaluation;
   timeSpentMs: number;
 }
@@ -45,11 +49,11 @@ export interface ProblemLearningRecord extends LearningProblemKey {
 
 // カラーセットの型定義
 export interface NecessityColorSet {
-  backgroundColor: string;
-  textColor: string;
-  borderColor: string;
-  accentColor: string;
-  reverseTextColor: string;
+  background: string;
+  text: string;
+  border: string;
+  accent: string;
+  reverseText: string;
   label: string;
 }
 

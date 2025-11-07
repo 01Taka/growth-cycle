@@ -1,5 +1,5 @@
 import { MantineColorScheme, useComputedColorScheme } from '@mantine/core';
-import { ReviewNecessityColors } from '../constants/review-necessity-constants';
+import { REVIEW_NECESSITY_COLORS } from '../constants/review-necessity-constants';
 import { calculateReviewNecessityFromLatestAttempt } from '../functions/calculate-review-necessity';
 import { AttemptLog, FinalReviewNecessityResult, NecessityColorSet } from '../types/problem-types';
 
@@ -25,9 +25,11 @@ export interface NecessityColors {
  * @param {ReviewNecessityScores} scores 確認必要度の計算結果
  * @returns {NecessityColors} 各スコアレベルに対応する色とラベルのセット
  */
-export const useReviewNecessityColors = (scores: FinalReviewNecessityResult): NecessityColors => {
+export const useReviewNecessityColorsByScores = (
+  scores: FinalReviewNecessityResult
+): NecessityColors => {
   const colorScheme: MantineColorScheme = useComputedColorScheme();
-  const colorsByTheme = ReviewNecessityColors[colorScheme];
+  const colorsByTheme = REVIEW_NECESSITY_COLORS[colorScheme];
 
   /**
    * スコアレベルに基づいた色情報を安全に取得するヘルパー関数
@@ -51,7 +53,7 @@ export const useReviewNecessityColors = (scores: FinalReviewNecessityResult): Ne
     const colNecessity = attempt
       ? calculateReviewNecessityFromLatestAttempt(attempt)
       : { level: 0 };
-    const necessityColor = ReviewNecessityColors[colorScheme][colNecessity.level];
+    const necessityColor = REVIEW_NECESSITY_COLORS[colorScheme][colNecessity.level];
     return necessityColor;
   };
 

@@ -33,8 +33,8 @@ export const ScoringSummary: React.FC<ScoringSummaryProps> = ({
       >
         <Flex justify="space-around" style={{ color: theme.text }}>
           <Stack align="center" justify="center" gap={5}>
-            <Text size={rem(15)}>採点状況</Text>
-            <Text size={rem(24)} fw={700}>
+            <Text size={rem(18)}>採点状況</Text>
+            <Text size={rem(26)} fw={700}>
               {scoringCount} / {totalScoringNumber}
             </Text>
           </Stack>
@@ -45,8 +45,8 @@ export const ScoringSummary: React.FC<ScoringSummaryProps> = ({
               gap={5}
               style={{ color: TEST_RESULT_COLOR.correct.color }}
             >
-              <Text size={rem(15)}>正解</Text>
-              <Text size={rem(20)} fw={500}>
+              <Text size={rem(18)}>正解</Text>
+              <Text size={rem(24)} fw={500}>
                 {correctCount}
               </Text>
             </Stack>
@@ -56,8 +56,8 @@ export const ScoringSummary: React.FC<ScoringSummaryProps> = ({
               gap={5}
               style={{ color: TEST_RESULT_COLOR.incorrect.color }}
             >
-              <Text size={rem(15)}>間違い</Text>
-              <Text size={rem(20)} fw={500}>
+              <Text size={rem(18)}>間違い</Text>
+              <Text size={rem(24)} fw={500}>
                 {wrongCount}
               </Text>
             </Stack>

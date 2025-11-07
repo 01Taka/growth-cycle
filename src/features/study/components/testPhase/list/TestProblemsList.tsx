@@ -1,17 +1,17 @@
 import React from 'react';
 import { Box, Grid, Stack, Text } from '@mantine/core';
-import { LearningProblemKey } from '@/features/study/types/problem-types';
+import { LearningProblemBase } from '@/features/study/types/problem-types';
 import { TestSelfEvaluation } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { SubjectColorMap } from '@/shared/theme/subjectColorType';
 import { TestProblemsItem } from './TestProblemsItem';
 
 interface TestProblemsListProps {
-  problems: LearningProblemKey[];
+  problems: LearningProblemBase[];
   elapsedTimeMap: Record<number, number>;
   selfEvaluationMap: Record<number, TestSelfEvaluation>;
   currentProblemIndex: number;
   theme: SubjectColorMap;
-  onClick: (problem: LearningProblemKey) => void;
+  onClick: (problem: LearningProblemBase) => void;
 }
 
 export const TestProblemsList: React.FC<TestProblemsListProps> = ({

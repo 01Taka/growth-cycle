@@ -19,8 +19,8 @@ export const ReviewPhase: React.FC<ReviewPhaseProps> = ({ records, theme }) => {
     <Box style={{ position: 'relative' }}>
       <Stack w={'100%'} align="center" justify="center">
         {sortedRecords.map((record, index) => (
-          <Box w={'95%'}>
-            <RecordReviewCard key={index} record={record} />
+          <Box key={index} w={'95%'}>
+            <RecordReviewCard record={record} />
           </Box>
         ))}
       </Stack>

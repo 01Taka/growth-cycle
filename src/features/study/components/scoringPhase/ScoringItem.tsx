@@ -1,7 +1,9 @@
 import React from 'react';
 import { IconCheck, IconX } from '@tabler/icons-react'; // アイコンを追加
 import { Button, Card, Flex, Group, Stack, Text } from '@mantine/core';
+import { useSelfEvaluationColors } from '../../hooks/useSelfEvaluationColors';
 import { ProblemAttemptDetail, ProblemScoringStatus } from '../../types/problem-types';
+import { getSelfEvaluationIcon } from '../reviewPhase/icons';
 
 interface ScoringItemProps {
   problem: ProblemAttemptDetail;
@@ -10,9 +12,9 @@ interface ScoringItemProps {
 }
 
 const COLORS: Record<ProblemScoringStatus, { text: string; background: string }> = {
-  correct: { text: 'green', background: '#A6FA8F' },
-  incorrect: { text: 'red', background: '#FA988F' },
-  unrated: { text: 'black', background: '' },
+  correct: { text: '#166534', background: '#dcfce7' },
+  incorrect: { text: '#991b1b', background: '#fee2e2' },
+  unrated: { text: '#374151', background: '#f3f4f6' },
 };
 
 export const ScoringItem: React.FC<ScoringItemProps> = ({
@@ -21,11 +23,14 @@ export const ScoringItem: React.FC<ScoringItemProps> = ({
   onScoreChange,
 }) => {
   const theme = COLORS[scoringStatus];
+  const getColor = useSelfEvaluationColors();
+
+  const { icon: SelfEvaluationIcon } = getSelfEvaluationIcon(problem.selfEvaluation);
 
   return (
     <Card
       shadow="sm" // カードに影を追加して浮き上がらせる
-      padding="lg"
+      padding="xs"
       radius="md" // 角を丸くする
       style={{ backgroundColor: theme.background }}
     >
@@ -44,30 +49,35 @@ export const ScoringItem: React.FC<ScoringItemProps> = ({
         </Text>
 
         {/* 2. 問題の詳細情報と自己評価 */}
-        <Stack gap={4} style={{ flexGrow: 1 }}>
-          {' '}
+        <Stack gap={0} style={{ flexGrow: 1 }}>
           {/* flexGrowで中央の要素にスペースを割く */}
           <Text size="md" fw={600}>
-            {problem.unitName} {problem.categoryName} {problem.problemNumber}
+            {problem.unitName}
           </Text>
-          <Text
-            size="sm"
-            c="dimmed"
-            style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-          >
-            {/* 自己評価のテキストが長い場合に備えて、折り返しを防ぎ、省略記号を追加 */}
-            {problem.selfEvaluation}
+          <Text size="md" fw={600}>
+            {problem.categoryName} {problem.problemNumber}
           </Text>
+          <Flex gap={2} mt={5}>
+            <SelfEvaluationIcon />
+            <Text
+              size="sm"
+              style={{
+                textAlign: 'center',
+                color: getColor(problem.selfEvaluation).text,
+              }}
+            >
+              {getColor(problem.selfEvaluation).label}
+            </Text>
+          </Flex>
         </Stack>
 
         {/* 3. 採点ボタン */}
         <Group gap="xs" wrap="nowrap">
-          {' '}
           {/* ボタンをグループ化し、折り返しを防ぐ */}
           <Button
             size="md" // コンパクトなサイズ
             variant={scoringStatus === 'correct' ? 'filled' : 'outline'}
-            color={scoringStatus === 'unrated' ? COLORS['correct'].text : theme.text} // 正解の色
+            color={COLORS['correct'].text} // 正解の色
             style={{ width: 88, height: 64, borderRadius: 8, padding: '8px 2px' }}
             onClick={() => onScoreChange('correct')}
           >
@@ -77,7 +87,7 @@ export const ScoringItem: React.FC<ScoringItemProps> = ({
           <Button
             size="md"
             variant={scoringStatus === 'incorrect' ? 'filled' : 'outline'}
-            color={scoringStatus === 'unrated' ? COLORS['incorrect'].text : theme.text} // 間違いの色
+            color={COLORS['incorrect'].text} // 間違いの色
             style={{
               width: 88,
               height: 64,

@@ -4,9 +4,16 @@ import { TestSelfEvaluation } from '@/shared/data/documents/learning-cycle/learn
 import { useSubjectColorMap } from '@/shared/hooks/useSubjectColor';
 import { Subject } from '@/shared/types/subject-types';
 import { range } from '@/shared/utils/range';
-import { generateDummyRecords } from '../functions/generate-dummy';
+import {
+  createDummyLearningProblemBases,
+  generateDummyTestResults,
+} from '../functions/generate-dummy';
+import {
+  convertResultsToLearningRecordsByIndex,
+  createProblemAttemptResults,
+} from '../functions/study-utils';
 import { useStudyTimer } from '../hooks/useStudyTimer';
-import { generateDummyTestResults } from './dummy-problems';
+import { ProblemAttemptDetail, ProblemScoringStatus } from '../types/problem-types';
 import { ParticleOverlay } from './ParticleOverlay';
 import { ReviewPhase } from './reviewPhase/ReviewPhase';
 import { ScoringPhase } from './scoringPhase/ScoringPhase';
@@ -24,8 +31,8 @@ export const StudyMain: React.FC<StudyMainProps> = ({}) => {
   const [phase, setPhase] = useState<Phase>('study'); // 初期フェーズは 'study'
 
   // ダミーデータ
-  const problems = useMemo(() => generateDummyTestResults(10), []);
-  const records = useMemo(() => generateDummyRecords(10), []);
+  const problemBases = createDummyLearningProblemBases(10);
+
   const header = {
     subject: subject,
     textbookName: '論読',
@@ -43,7 +50,7 @@ export const StudyMain: React.FC<StudyMainProps> = ({}) => {
     changeCurrentTestProblem,
     handleSwitchTimerRunning,
     resetAll,
-  } = useStudyTimer(problems.length);
+  } = useStudyTimer(problemBases.length);
 
   const [selfEvaluationMap, setSelfEvaluationMap] = useState<Record<number, TestSelfEvaluation>>(
     {}
@@ -53,7 +60,35 @@ export const StudyMain: React.FC<StudyMainProps> = ({}) => {
     setSelfEvaluationMap((prev) => ({ ...prev, [index]: evaluation }));
   };
 
-  const [newExpectedDuration, setNewExpectedDuration] = useState(1);
+  const [scoringStatusMap, setScoringStatusMap] = useState<Record<number, ProblemScoringStatus>>(
+    {}
+  );
+
+  const handleScoreChange = (
+    problem: ProblemAttemptDetail,
+    scoringStatus: ProblemScoringStatus
+  ) => {
+    setScoringStatusMap((prev) => ({
+      ...prev,
+      [problem.problemIndex]:
+        prev[problem.problemIndex] === scoringStatus ? 'unrated' : scoringStatus,
+    }));
+  };
+
+  const problems = createProblemAttemptResults(
+    problemBases,
+    selfEvaluationMap,
+    scoringStatusMap,
+    elapsedTimeMap
+  );
+  const problems01 = useMemo(() => generateDummyTestResults(10), []);
+  const problems02 = useMemo(() => generateDummyTestResults(10), []);
+
+  const dummyProblems = [...problems, ...problems01, ...problems02];
+
+  const records = convertResultsToLearningRecordsByIndex(dummyProblems); // useMemo(() => generateDummyRecords(10), []);
+
+  const [newExpectedDuration, setNewExpectedDuration] = useState(0.1);
 
   // 🔧 フェーズに基づいてレンダリングするコンポーネントを決定する関数
   const renderPhase = () => {
@@ -96,9 +131,11 @@ export const StudyMain: React.FC<StudyMainProps> = ({}) => {
       case 'scoring':
         return (
           <ScoringPhase
+            scoringStatusMap={scoringStatusMap}
             problems={problems}
             header={header}
             theme={theme}
+            handleScoreChange={handleScoreChange}
             onStartReview={() => setPhase('review')}
           />
         );
@@ -141,7 +178,10 @@ export const StudyMain: React.FC<StudyMainProps> = ({}) => {
           />
           <Button
             variant="transparent"
-            onClick={() => testTimer.onDurationChange(newExpectedDuration * 60 * 1000)}
+            onClick={() => {
+              testTimer.onDurationChange(newExpectedDuration * 60 * 1000);
+              studyTimer.onDurationChange(newExpectedDuration * 60 * 1000);
+            }}
           >
             更新
           </Button>

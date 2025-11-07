@@ -1,11 +1,10 @@
 import React from 'react';
-import { Flex, Grid, Text } from '@mantine/core';
-import { LearningProblemKey } from '@/features/study/types/problem-types';
+import { Flex, Grid, rem, Text } from '@mantine/core';
+import { useSelfEvaluationColors } from '@/features/study/hooks/useSelfEvaluationColors';
+import { LearningProblemBase } from '@/features/study/types/problem-types';
 import { TestSelfEvaluation } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { SubjectColorMap } from '@/shared/theme/subjectColorType';
-import { SELF_EVALUATIONS_CONFIGS } from '../../../constants/self-evaluations-configs';
 
-// MantineのBreakpoints型を定義 (実際にはMantineからインポートできますが、ここでは手動で定義)
 type ResponsiveSpan =
   | {
       base?: number;
@@ -18,7 +17,7 @@ type ResponsiveSpan =
   | number;
 
 interface TestProblemsItemProps {
-  problem: LearningProblemKey;
+  problem: LearningProblemBase;
   elapsedTimeMs: number | null;
   selfEvaluation: TestSelfEvaluation;
   isCurrent: boolean;
@@ -46,7 +45,8 @@ export const TestProblemsItem: React.FC<TestProblemsItemProps> = ({
   onClick,
 }) => {
   const { unitName, categoryName, problemNumber, problemIndex } = problem;
-  const selfEvaluationConfig = SELF_EVALUATIONS_CONFIGS[selfEvaluation];
+  const getColor = useSelfEvaluationColors();
+  const selfEvaluationTheme = getColor(selfEvaluation);
   const timeText = elapsedTimeMs ? `${Math.floor(elapsedTimeMs / 60000)}m` : '--';
 
   return (
@@ -94,11 +94,11 @@ export const TestProblemsItem: React.FC<TestProblemsItemProps> = ({
 
       {/* 6. 自己評価 */}
       <Grid.Col span={colSizes.eval}>
-        <Flex w={'100%'} justify="center">
+        <Flex miw={rem(84)} w={'100%'} justify="center">
           <Text
             size="sm"
             style={{
-              backgroundColor: selfEvaluationConfig.bgColor,
+              backgroundColor: selfEvaluationTheme.background,
               borderRadius: 15,
               width: '100%',
               margin: '0px 8px',
@@ -108,7 +108,7 @@ export const TestProblemsItem: React.FC<TestProblemsItemProps> = ({
               whiteSpace: 'nowrap',
             }}
           >
-            {selfEvaluationConfig.text}
+            {selfEvaluationTheme.label}
           </Text>
         </Flex>
       </Grid.Col>

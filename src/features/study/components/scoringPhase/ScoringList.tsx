@@ -17,7 +17,7 @@ export const ScoringList: React.FC<ScoringListProps> = ({
   onScoreChange,
 }) => {
   return (
-    <Stack>
+    <Stack gap={4}>
       {problems.map((problem, index) => (
         <ScoringItem
           key={index}

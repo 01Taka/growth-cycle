@@ -6,7 +6,7 @@ import { SingleTimerData } from '@/shared/hooks/multi-timer/multi-timer-types';
 import { sharedStyle } from '@/shared/styles/shared-styles';
 import { SubjectColorMap } from '@/shared/theme/subjectColorType';
 import { Subject } from '@/shared/types/subject-types';
-import { LearningProblemKey } from '../../types/problem-types';
+import { LearningProblemBase } from '../../types/problem-types';
 import { StudyHeader } from '../StudyHeader';
 import { StudyTimer } from '../studyPhase/StudyTimer';
 import { TestProblemCard } from './card/TestProblemCard';
@@ -14,7 +14,7 @@ import { TestStateGrid } from './grid/TestStateGrid';
 import { TestProblemsList } from './list/TestProblemsList';
 
 interface TestPhaseProps {
-  problems: LearningProblemKey[];
+  problems: LearningProblemBase[];
   header: {
     subject: Subject;
     textbookName: string;

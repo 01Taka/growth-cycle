@@ -24,8 +24,8 @@ export const RecordReviewCard: React.FC<RecordReviewCardProps> = ({ record }) =>
       shadow="md"
       style={{
         borderRadius: 16,
-        backgroundColor: necessity.reviewNecessity.theme.backgroundColor,
-        border: `2px solid ${necessity.reviewNecessity.theme.borderColor}`,
+        backgroundColor: necessity.reviewNecessity.theme.background,
+        border: `2px solid ${necessity.reviewNecessity.theme.border}`,
       }}
     >
       <Flex align="center" gap={10}>
@@ -45,9 +45,9 @@ export const RecordReviewCard: React.FC<RecordReviewCardProps> = ({ record }) =>
             size="lg"
             styles={{
               label: {
-                color: necessity.reviewNecessity.theme.reverseTextColor,
+                color: necessity.reviewNecessity.theme.reverseText,
               },
-              root: { backgroundColor: necessity.reviewNecessity.theme.accentColor },
+              root: { backgroundColor: necessity.reviewNecessity.theme.accent },
             }}
           >
             {necessity.reviewNecessity.label}
@@ -62,8 +62,8 @@ export const RecordReviewCard: React.FC<RecordReviewCardProps> = ({ record }) =>
         styles={{
           table: isTwoMoreNecessity
             ? {
-                border: `2px solid ${necessity.recentWeightedNecessity.theme.borderColor}`,
-                backgroundColor: necessity.recentWeightedNecessity.theme.backgroundColor,
+                border: `2px solid ${necessity.recentWeightedNecessity.theme.border}`,
+                backgroundColor: necessity.recentWeightedNecessity.theme.background,
               }
             : {},
         }}
@@ -77,7 +77,7 @@ export const RecordReviewCard: React.FC<RecordReviewCardProps> = ({ record }) =>
               return (
                 <Table.Td
                   key={`date-${index}`}
-                  style={{ textAlign: 'center', backgroundColor: necessityColor.backgroundColor }}
+                  style={{ textAlign: 'center', backgroundColor: necessityColor.background }}
                 >
                   {log ? formatTimestampToDaysAgo(log.attemptAt) : ''}
                 </Table.Td>
@@ -96,7 +96,7 @@ export const RecordReviewCard: React.FC<RecordReviewCardProps> = ({ record }) =>
               return (
                 <Table.Td
                   key={`score-${index}`}
-                  style={{ textAlign: 'center', backgroundColor: necessityColor?.backgroundColor }}
+                  style={{ textAlign: 'center', backgroundColor: necessityColor?.background }}
                 >
                   {log ? (
                     <Text style={{ color }}>
@@ -128,7 +128,7 @@ export const RecordReviewCard: React.FC<RecordReviewCardProps> = ({ record }) =>
               return (
                 <Table.Td
                   key={`eval-${index}`}
-                  style={{ textAlign: 'center', backgroundColor: necessityColor?.backgroundColor }}
+                  style={{ textAlign: 'center', backgroundColor: necessityColor?.background }}
                 >
                   {/* log が null の場合は表示しない。それ以外はアイコンを表示。 */}
                   {log ? (
@@ -166,13 +166,13 @@ export const RecordReviewCard: React.FC<RecordReviewCardProps> = ({ record }) =>
       </Table>
       <Flex gap={5} mt={5}>
         {necessity.latestAttemptNecessity.level > 0 && (
-          <Text style={{ color: necessity.latestAttemptNecessity.theme.textColor }}>
+          <Text style={{ color: necessity.latestAttemptNecessity.theme.text }}>
             ・{necessity.latestAttemptNecessity.reasonLabel}
           </Text>
         )}
         {necessity.recentWeightedNecessity.level > 0 &&
           necessity.recentWeightedNecessity.reason !== 'latestHighNecessity' && (
-            <Text style={{ color: necessity.recentWeightedNecessity.theme.textColor }}>
+            <Text style={{ color: necessity.recentWeightedNecessity.theme.text }}>
               ・{necessity.recentWeightedNecessity.reasonLabel}
             </Text>
           )}

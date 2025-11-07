@@ -1,8 +1,8 @@
 import React from 'react';
 import { Button, Flex } from '@mantine/core';
+import { useSelfEvaluationColors } from '@/features/study/hooks/useSelfEvaluationColors';
 import { TestSelfEvaluation } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { sharedStyle } from '@/shared/styles/shared-styles';
-import { SELF_EVALUATIONS_CONFIGS } from '../../../constants/self-evaluations-configs';
 
 interface TestSelfEvaluationButtonsProps {
   selectedSelfEvaluation: TestSelfEvaluation;
@@ -15,18 +15,19 @@ export const TestSelfEvaluationButtons: React.FC<TestSelfEvaluationButtonsProps>
   selfEvaluations,
   onSelectSelfEvaluation,
 }) => {
+  const getColor = useSelfEvaluationColors();
   return (
     <Flex gap={5}>
       {selfEvaluations.map((key) => {
         const isActive = selectedSelfEvaluation === 'unrated' || key === selectedSelfEvaluation;
-        const targetConfig = SELF_EVALUATIONS_CONFIGS[key];
+        const targetConfig = getColor(key);
 
         const config = isActive
           ? targetConfig
           : {
-              ...SELF_EVALUATIONS_CONFIGS['unrated'],
+              ...getColor('unrated'),
               type: targetConfig.type,
-              text: targetConfig.text,
+              label: targetConfig.label,
             };
 
         return (
@@ -34,13 +35,13 @@ export const TestSelfEvaluationButtons: React.FC<TestSelfEvaluationButtonsProps>
             key={key}
             style={{
               ...sharedStyle.button,
-              color: config.color,
-              backgroundColor: config.bgColor,
-              border: `2px solid ${config.borderColor}`,
+              color: config.text,
+              backgroundColor: config.background,
+              border: `2px solid ${config.border}`,
             }}
             onClick={() => onSelectSelfEvaluation(config.type)}
           >
-            {config.text}
+            {config.label}
           </Button>
         );
       })}

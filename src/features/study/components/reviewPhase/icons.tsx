@@ -1,8 +1,7 @@
 import { IconCheck, IconCircle, IconCircleDotted, IconTriangle, IconX } from '@tabler/icons-react';
 import { IconType } from 'react-icons';
-
-export type ProblemScoringStatus = 'correct' | 'incorrect' | 'unrated';
-export type TestSelfEvaluation = 'unrated' | 'notSure' | 'imperfect' | 'confident';
+import { TestSelfEvaluation } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
+import { ProblemScoringStatus } from '../../types/problem-types';
 
 /**
  * 💡 Scoring Status に対応するアイコンと色のマップ

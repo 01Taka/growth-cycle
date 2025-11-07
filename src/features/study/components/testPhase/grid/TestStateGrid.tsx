@@ -1,11 +1,9 @@
 import React from 'react';
 import { ActionIcon, Box, Group } from '@mantine/core'; // SimpleGrid を Group に変更
+
+import { useSelfEvaluationColors } from '@/features/study/hooks/useSelfEvaluationColors';
 import { TestSelfEvaluation } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { toRGBA } from '@/shared/utils/color/color-convert-utils';
-import {
-  SELF_EVALUATIONS_CONFIGS,
-  SelfEvaluationConfig,
-} from '../../../constants/self-evaluations-configs';
 
 /**
  * 配列の長さが targetLength に満たない場合、'unrated' でフィルする関数。
@@ -47,6 +45,7 @@ export const TestStateGrid: React.FC<TestStateGridProps> = ({
 }) => {
   const evaluations = fillUnrated(selfEvaluations, totalProblemsNumber);
   const BUTTON_SIZE = 36; // 正方形のボタンのサイズ (px)
+  const getColor = useSelfEvaluationColors();
 
   return (
     <Box w={'100%'}>
@@ -57,7 +56,7 @@ export const TestStateGrid: React.FC<TestStateGridProps> = ({
       <Group maw={'100%'} gap={'xs'} wrap="wrap">
         {evaluations.map((evaluation, index) => {
           // 対応する設定を取得
-          const config: SelfEvaluationConfig = SELF_EVALUATIONS_CONFIGS[evaluation];
+          const theme = getColor(evaluation);
 
           // 現在の問題かどうかを判定
           const isCurrent = index === currentProblemIndex;
@@ -66,17 +65,17 @@ export const TestStateGrid: React.FC<TestStateGridProps> = ({
           // ボタンのスタイル
           const buttonStyle: React.CSSProperties = {
             backgroundColor: isCurrent
-              ? config.bgColor
+              ? theme.background
               : isUnrated
-                ? toRGBA(config.bgColor, 0.1)
-                : toRGBA(config.bgColor, 0.5),
-            color: config.color,
+                ? toRGBA(theme.background, 0.1)
+                : toRGBA(theme.background, 0.5),
+            color: theme.text,
             fontSize: '12px',
             fontWeight: 'bold',
             width: BUTTON_SIZE,
             height: BUTTON_SIZE,
             border: isCurrent
-              ? `3px solid ${config.borderColor}` // 現在の問題は太いボーダー
+              ? `3px solid ${theme.border}` // 現在の問題は太いボーダー
               : undefined,
             boxSizing: 'border-box', // paddingとborderをwidth/heightに含める
             display: 'flex',
@@ -92,7 +91,7 @@ export const TestStateGrid: React.FC<TestStateGridProps> = ({
               radius={0}
               style={buttonStyle}
               onClick={() => onClick(index, evaluation)} // クリックイベント
-              title={`問題 ${index + 1}: ${config.text}`}
+              title={`問題 ${index + 1}: ${theme.label}`}
             >
               {/* 問題番号を表示 */}
               {index + 1}

@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-import { IconCircleCheck } from '@tabler/icons-react';
-import { Box, Button, Flex, rem, Stack } from '@mantine/core'; // Boxコンポーネントを追加
-
+import React from 'react';
+import { IconCircleCheck, IconSearch } from '@tabler/icons-react';
+import { Box, Button, Flex, rem, Stack, Text } from '@mantine/core'; // Boxコンポーネントを追加
 import { sharedStyle } from '@/shared/styles/shared-styles';
 import { SubjectColorMap } from '@/shared/theme/subjectColorType';
 import { Subject } from '@/shared/types/subject-types';
@@ -12,32 +11,22 @@ import { ScoringList } from './ScoringList';
 import { ScoringSummary } from './ScoringSummary';
 
 interface ScoringPhaseProps {
+  scoringStatusMap: Record<number, ProblemScoringStatus>;
   problems: ProblemAttemptDetail[];
   header: { subject: Subject; textbookName: string; units: string[] };
   theme: SubjectColorMap;
+  handleScoreChange: (problem: ProblemAttemptDetail, scoringStatus: ProblemScoringStatus) => void;
   onStartReview: () => void;
 }
 
 export const ScoringPhase: React.FC<ScoringPhaseProps> = ({
+  scoringStatusMap,
   problems,
   header,
   theme,
+  handleScoreChange,
   onStartReview,
 }) => {
-  const [scoringStatusMap, setScoringStatusMap] = useState<Record<number, ProblemScoringStatus>>(
-    {}
-  );
-  const handleScoreChange = (
-    problem: ProblemAttemptDetail,
-    scoringStatus: ProblemScoringStatus
-  ) => {
-    setScoringStatusMap((prev) => ({
-      ...prev,
-      [problem.problemIndex]:
-        prev[problem.problemIndex] === scoringStatus ? 'unrated' : scoringStatus,
-    }));
-  };
-
   const correctCount = Object.values(scoringStatusMap).filter(
     (status) => status === 'correct'
   ).length;
@@ -84,32 +73,30 @@ export const ScoringPhase: React.FC<ScoringPhaseProps> = ({
           onScoreChange={handleScoreChange}
         />
       </Box>
-      <Flex
+      <Button
+        w={'100%'}
         h={64}
-        justify="center"
-        align="center"
+        color={isFilled ? theme.accent : toRGBA(theme.disabled, 0.95)}
+        size={rem(20)}
         style={{
+          ...(isFilled ? sharedStyle.button : sharedStyle.disabledButton),
           position: 'fixed',
           bottom: 0,
           right: 0,
           left: 0,
+          color: theme.text,
         }}
+        onClick={onStartReview}
       >
-        <Button
-          w={'100%'}
-          h={'90%'}
-          color={isFilled ? theme.accent : toRGBA(theme.disabled, 0.8)}
-          size={rem(20)}
-          style={{
-            ...(isFilled ? sharedStyle.button : sharedStyle.disabledButton),
-            color: isFilled ? theme.text : theme.disabledText,
-          }}
-          onClick={onStartReview}
-        >
-          採点完了
-          <IconCircleCheck />
-        </Button>
-      </Flex>
+        {isFilled ? (
+          <Flex gap={2} align="center">
+            見直しを始める
+            <IconSearch />
+          </Flex>
+        ) : (
+          <Text size={rem(18)}>{`採点中... (残り${problems.length - scoringCount}つ)`}</Text>
+        )}
+      </Button>
     </Stack>
   );
 };
