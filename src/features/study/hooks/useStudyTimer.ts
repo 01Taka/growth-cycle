@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import { LocalStorageMultiTimerPersistenceProvider } from '@/shared/hooks/multi-timer/localStoragePersistenceProvider';
+import { MultiTimerPersistenceProvider } from '@/shared/hooks/multi-timer/multi-timer-types';
 import { useMultiTimer } from '@/shared/hooks/multi-timer/useMultiTimer';
 import { range } from '@/shared/utils/range';
 
@@ -10,7 +10,6 @@ const STUDY_TIMER_ID = 'study';
 const TEST_TIMER_ID = 'test';
 // 25分をミリ秒で表現: 25 * 60 * 1000
 const INITIAL_MAIN_DURATION_MS = 25 * 60000;
-const PERSISTENCE_KEY = 'multiTimer';
 
 /**
  * 特定のインデックスの問題タイマーIDを生成する
@@ -51,13 +50,10 @@ const getProblemIndexFromTimerId = (timerId: string): number => {
 
 // --- カスタムフック ---
 
-export const useStudyTimer = (totalProblemsNumber: number) => {
-  // 1. Persistence Providerの初期化
-  const timerProvider = useMemo(
-    () => new LocalStorageMultiTimerPersistenceProvider(PERSISTENCE_KEY),
-    [] // 依存配列は空でOK
-  );
-
+export const useStudyTimer = (
+  totalProblemsNumber: number,
+  timerProvider?: MultiTimerPersistenceProvider
+) => {
   // 2. 問題タイマーの初期DurationMapを生成
   const problemDurationMap = useMemo(() => {
     // 問題タイマーのDurationは、全てのタイマーで Number.MAX_SAFE_INTEGER とする

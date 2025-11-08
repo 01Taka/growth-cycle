@@ -1,5 +1,5 @@
 import React from 'react';
-import { IconCircleCheck, IconSearch } from '@tabler/icons-react';
+import { IconSearch } from '@tabler/icons-react';
 import { Box, Button, Flex, rem, Stack, Text } from '@mantine/core'; // Boxコンポーネントを追加
 import { sharedStyle } from '@/shared/styles/shared-styles';
 import { SubjectColorMap } from '@/shared/theme/subjectColorType';

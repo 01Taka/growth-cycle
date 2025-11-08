@@ -70,7 +70,7 @@ export interface PersistedData {
 }
 
 /** 永続化プロバイダーのインターフェース */
-export interface PersistenceProvider {
+export interface MultiTimerPersistenceProvider {
   load: () => Promise<PersistedData | null>;
   save: (data: PersistedData) => Promise<void>;
 }
@@ -82,7 +82,7 @@ export interface UseMultiTimerStateArgs {
   /** 初期状態のマップ (キーはタイマーID) */
   initialStateMap?: TimerStateMap;
   /** 永続化プロバイダー */
-  persistenceProvider?: PersistenceProvider;
+  persistenceProvider?: MultiTimerPersistenceProvider;
 }
 
 /** useMultiTimerStateの戻り値 */

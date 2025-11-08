@@ -1,96 +1,66 @@
 import React, { useMemo, useState } from 'react';
 import { Button, Flex, Stack, TextInput } from '@mantine/core';
-import { TestSelfEvaluation } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
-import { useSubjectColorMap } from '@/shared/hooks/useSubjectColor';
+import { LocalStorageMultiTimerPersistenceProvider } from '@/shared/hooks/multi-timer/localStoragePersistenceProvider';
 import { Subject } from '@/shared/types/subject-types';
 import { range } from '@/shared/utils/range';
 import {
   createDummyLearningProblemBases,
   generateDummyTestResults,
 } from '../functions/generate-dummy';
-import {
-  convertResultsToLearningRecordsByIndex,
-  createProblemAttemptResults,
-} from '../functions/study-utils';
-import { useStudyTimer } from '../hooks/useStudyTimer';
-import { ProblemAttemptDetail, ProblemScoringStatus } from '../types/problem-types';
+import { useStudyLogic } from '../hooks/useStudyLogic';
 import { ParticleOverlay } from './ParticleOverlay';
 import { ReviewPhase } from './reviewPhase/ReviewPhase';
 import { ScoringPhase } from './scoringPhase/ScoringPhase';
 import { StudyPhase } from './studyPhase/StudyPhase';
 import { TestPhase } from './testPhase/TestPhase';
 
+const PERSISTENCE_KEY = 'multiTimer';
+
 interface StudyMainProps {}
 
-type Phase = 'study' | 'test' | 'scoring' | 'review';
-
 export const StudyMain: React.FC<StudyMainProps> = ({}) => {
-  const [subject, setSubject] = useState<Subject>('japanese');
-
-  // 🚀 現在のフェーズを管理する state を追加
-  const [phase, setPhase] = useState<Phase>('study'); // 初期フェーズは 'study'
-
-  // ダミーデータ
-  const problemBases = createDummyLearningProblemBases(10);
-
-  const header = {
-    subject: subject,
-    textbookName: '論読',
-    units: ['unitA', 'unitB'],
-  };
-
-  const theme = useSubjectColorMap(subject);
+  // ダミーデータ生成ロジックは、フックの独立性を保つために残す（データ層と仮定）
+  const attemptingProblems = useMemo(() => createDummyLearningProblemBases(10), []);
+  const problems01 = useMemo(() => generateDummyTestResults(10), []);
+  const problems02 = useMemo(() => generateDummyTestResults(10), []);
+  const [newExpectedDuration, setNewExpectedDuration] = useState(0.1);
+  const timerProvider = useMemo(
+    () => new LocalStorageMultiTimerPersistenceProvider(PERSISTENCE_KEY),
+    [] // 依存配列は空でOK
+  );
   const {
+    subject,
+    phase,
+    header,
+    theme,
+    problems,
+    records,
+    selfEvaluationMap,
+    scoringStatusMap,
     studyTimer,
     testTimer,
     currentTestProblemIndex,
     currentActiveProblemTimer,
     elapsedTimeMap,
     isFinishTestTimer,
+    handleScoreChange,
+    handleSelfEvaluationMap,
+    setPhase,
+    resetAll,
     changeCurrentTestProblem,
     handleSwitchTimerRunning,
-    resetAll,
-  } = useStudyTimer(problemBases.length);
+  } = useStudyLogic({
+    attemptingProblems,
+    pastAttemptedResults: [...problems01, ...problems02],
+    header: {
+      textbookName: 'TEXT_A',
+      units: ['UNIT_A'],
+      subject: 'english',
+    },
+    initialPhase: 'study',
+    setPhase: () => {},
+  });
 
-  const [selfEvaluationMap, setSelfEvaluationMap] = useState<Record<number, TestSelfEvaluation>>(
-    {}
-  );
-
-  const handleSelfEvaluationMap = (index: number, evaluation: TestSelfEvaluation) => {
-    setSelfEvaluationMap((prev) => ({ ...prev, [index]: evaluation }));
-  };
-
-  const [scoringStatusMap, setScoringStatusMap] = useState<Record<number, ProblemScoringStatus>>(
-    {}
-  );
-
-  const handleScoreChange = (
-    problem: ProblemAttemptDetail,
-    scoringStatus: ProblemScoringStatus
-  ) => {
-    setScoringStatusMap((prev) => ({
-      ...prev,
-      [problem.problemIndex]:
-        prev[problem.problemIndex] === scoringStatus ? 'unrated' : scoringStatus,
-    }));
-  };
-
-  const problems = createProblemAttemptResults(
-    problemBases,
-    selfEvaluationMap,
-    scoringStatusMap,
-    elapsedTimeMap
-  );
-  const problems01 = useMemo(() => generateDummyTestResults(10), []);
-  const problems02 = useMemo(() => generateDummyTestResults(10), []);
-
-  const dummyProblems = [...problems, ...problems01, ...problems02];
-
-  const records = convertResultsToLearningRecordsByIndex(dummyProblems); // useMemo(() => generateDummyRecords(10), []);
-
-  const [newExpectedDuration, setNewExpectedDuration] = useState(0.1);
-
-  // 🔧 フェーズに基づいてレンダリングするコンポーネントを決定する関数
   const renderPhase = () => {
     switch (phase) {
       case 'study':
@@ -150,7 +120,6 @@ export const StudyMain: React.FC<StudyMainProps> = ({}) => {
     <>
       <ParticleOverlay color={theme.accent} />
       <Stack w={'100%'} mt={16} gap={500} style={{ backgroundColor: theme.bgScreen }}>
-        {/* 🎨 フェーズごとのレンダリングを実行 */}
         {renderPhase()}
 
         {/* --- テスト用 --- */}
@@ -185,7 +154,7 @@ export const StudyMain: React.FC<StudyMainProps> = ({}) => {
           >
             更新
           </Button>
-          <Flex>
+          {/* <Flex>
             {range(5).map((index) => {
               const subjects: Subject[] = [
                 'japanese',
@@ -200,7 +169,7 @@ export const StudyMain: React.FC<StudyMainProps> = ({}) => {
                 </Button>
               );
             })}
-          </Flex>
+          </Flex> */}
         </Stack>
       </Stack>
     </>
