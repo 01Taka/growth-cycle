@@ -1,6 +1,5 @@
 import { LearningCycle } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 import { getDaysDifference } from '@/shared/utils/datetime/datetime-compare-utils';
-import { formatLearningSettings } from '@/shared/utils/format/formant-learning-settings';
 import { ReviewLearningCycleItemProps } from '../components/review/shared-types';
 import { getDeterministicRandom } from './deterministic-random';
 
@@ -27,8 +26,8 @@ export const convertLearningCyclesToReviewItemMap = (
     const random = getDeterministicRandom(cycle.textbookId);
     const plantIndex = Math.floor(random * MAX_PLANT_INDEX);
 
-    const learningSettings = formatLearningSettings(cycle.settings);
-    const unitNames = Object.values(learningSettings.unitMap);
+    const learningSettings = cycle;
+    const unitNames = cycle.units.map((unit) => unit.name);
 
     // 最後に学習を試みた日時との差分を計算。0日差なら完了済みとみなす。
     const differenceFromLastAttempted = getDaysDifference(cycle.latestAttemptedAt.toMillis());

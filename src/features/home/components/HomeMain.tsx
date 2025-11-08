@@ -5,19 +5,21 @@ import {
   createReviewItemGetter,
   filterTodayLearningCycles,
 } from '../functions/convert-learning-cycle';
-import { dummyLearningCycles } from '../utils/learning-cycle-dummy';
+import { generateMultipleLearningCycles } from '../utils/learning-cycle-dummy';
 import { HomeReviewCard } from './review/HomeReviewCard';
 import { GrowthPresentation } from './startStudy/GrowthPresentation';
 
 interface HomeMainProps {}
 
 export const HomeMain: React.FC<HomeMainProps> = ({}) => {
+  const dummyCycles = useMemo(() => generateMultipleLearningCycles(10), []);
+
   const reviewPropsMap = useMemo(
-    () => convertLearningCyclesToReviewItemMap(dummyLearningCycles),
-    [dummyLearningCycles]
+    () => convertLearningCyclesToReviewItemMap(dummyCycles),
+    [dummyCycles]
   );
 
-  const todayCycles = filterTodayLearningCycles(dummyLearningCycles);
+  const todayCycles = filterTodayLearningCycles(dummyCycles);
   const learnings = todayCycles.map((cycle) => ({ subject: cycle.subject }));
   const getItem = createReviewItemGetter(reviewPropsMap);
   const getCount = createReviewCountGetter(reviewPropsMap);

@@ -1,13 +1,13 @@
 import React from 'react';
 import { Button, Card, Flex, Stack, Text } from '@mantine/core';
+import { LearningProblemBase } from '@/features/study/types/problem-types';
 import { TestSelfEvaluation } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { SubjectColorMap } from '@/shared/theme/subjectColorType';
 import { formatMilliseconds } from '@/shared/utils/datetime/time-utils';
-import { StudyProblem } from '../../../types/problem-types';
 import { TestSelfEvaluationButtons } from './TestSelfEvaluationButtons';
 
 interface TestProblemCardProps {
-  problem: StudyProblem;
+  problem: LearningProblemBase;
   selfEvaluation: TestSelfEvaluation;
   currentElapsedTime: number | null;
   totalProblemsNumber: number;

@@ -1,3 +1,4 @@
+import { Timestamp } from 'firebase/firestore';
 import z from 'zod';
 import { SubjectSchema } from '@/shared/types/subject-types';
 import {
@@ -7,6 +8,8 @@ import {
   TestSessionSchema,
   UnitDetailSchema,
 } from './learning-cycle-support';
+
+export const firestoreTimestampSchema = z.instanceof(Timestamp);
 
 export const LearningCycleSchema = z
   .object({
@@ -19,7 +22,7 @@ export const LearningCycleSchema = z
     isReviewTarget: z.boolean().describe('i18n:cycle.is_review_target'),
 
     // --- サーバーが初期設定/管理するデータ ---
-    cycleStartAt: z.any().describe('i18n:cycle.cycle_start_at'),
+    cycleStartAt: firestoreTimestampSchema.describe('i18n:cycle.cycle_start_at'),
     subject: SubjectSchema.describe('i18n:cycle.subject'),
     textbookName: z.string().min(1).describe('i18n:cycle.textbook_name'),
     units: z.array(UnitDetailSchema).min(1).describe('i18n:cycle.units'),
@@ -27,8 +30,8 @@ export const LearningCycleSchema = z
 
     // --- 使用するごとに更新されるデータ ---
     sessions: z.array(TestSessionSchema).describe('i18n:cycle.sessions'),
-    nextReviewAt: z.any().describe('i18n:cycle.next_review_at'),
-    latestAttemptedAt: z.any().describe('i18n:cycle.latest_attempted_at'),
+    nextReviewAt: firestoreTimestampSchema.describe('i18n:cycle.next_review_at'),
+    latestAttemptedAt: firestoreTimestampSchema.describe('i18n:cycle.latest_attempted_at'),
   })
   .describe('i18n:cycle.full_document_schema');
 
