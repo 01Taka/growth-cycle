@@ -50,7 +50,7 @@ export const TextbookMain: React.FC<TextbookMainProps> = () => {
   }, []);
 
   const onSelectTextbook = (item: TextbookItemProps) => {
-    navigate('/study');
+    navigate('/start-study');
   };
 
   return (

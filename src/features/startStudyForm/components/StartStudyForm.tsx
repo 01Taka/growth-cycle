@@ -1,19 +1,18 @@
-import React, { ReactNode, useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Box, Button, Stack, Text } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useCreatableFormItems } from '@/shared/hooks/useCreatableFormItems';
 import { Creations } from '@/shared/types/creatable-form-items-types';
 import { FormInputProps } from '@/shared/types/mantine-form-types';
-import { useIndividualRangeFormItems } from '../hooks/useIndividualRangeFormItems';
 import { STUDY_TIME_BUTTON_CONFIGS } from '../shared/constants/study-time-buttons-config';
 import {
   StartStudyFormComponent,
   StartStudyFormCreatableItems,
   StartStudyFormValues,
 } from '../types/form-types';
+import { TestRangeForm } from './rangeForm/TestRangeForm';
 import { StudyTimeForm } from './studyTimeForm/StudyTimeForm';
 import { TestModeForm } from './testModeForm/TestModeForm';
-import { TestRangeForm } from './testRangeForm/TestRangeForm';
 import { TestTimeForm } from './testTimeForm/TestTimeForm';
 import { UnitForm } from './unitForm/UnitForm';
 
@@ -52,8 +51,6 @@ export const StartStudyForm: React.FC<StartStudyFormProps> = ({
     useCreatableFormItems<StartStudyFormCreatableItems>({
       initialExistingItems: { units: existUnits, categories: existCategories },
     });
-
-  const formItemsHook = useIndividualRangeFormItems();
 
   // 依存配列を form.values.studyTimeMin に限定
   const selectedTimeType = useMemo(() => {
@@ -113,15 +110,7 @@ export const StartStudyForm: React.FC<StartStudyFormProps> = ({
       },
       {
         label: 'テスト範囲',
-        form: (
-          <TestRangeForm
-            formItemsHook={formItemsHook}
-            units={combinedItems.units?.map((unit) => unit.label) ?? []}
-            categories={combinedItems.categories?.map((category) => category.label) ?? []}
-            onCreateNewUnit={handleCreateNewUnit}
-            onCreateNewCategories={handleCreateNewCategory}
-          />
-        ),
+        form: <TestRangeForm form={form} />,
       },
       {
         label: 'テスト時間',
@@ -131,7 +120,6 @@ export const StartStudyForm: React.FC<StartStudyFormProps> = ({
     [
       form, // form のメソッド（getInputProps, setFieldValueなど）のために残す
       combinedItems,
-      formItemsHook,
       selectedTimeType,
       handleCreateNewUnit,
       handleCreateNewCategory,
@@ -143,7 +131,7 @@ export const StartStudyForm: React.FC<StartStudyFormProps> = ({
     <Box
       component="form"
       onSubmit={form.onSubmit((data) => {
-        handleSubmit({ ...data, testRange: formItemsHook.formItemValues }, creations);
+        handleSubmit({ ...data }, creations);
       })}
     >
       <Stack gap={30}>

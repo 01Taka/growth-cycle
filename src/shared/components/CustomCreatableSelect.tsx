@@ -5,8 +5,6 @@ import {
   ComboboxItem,
   CSSProperties,
   Group,
-  Input,
-  Pill,
   TextInput,
   useCombobox,
 } from '@mantine/core';
@@ -15,17 +13,18 @@ import {
 const CREATE_NEW_VALUE = 'mantine-create-new-option';
 
 /**
- * カスタムTagsInputコンポーネントのProps
+ * カスタムSelectコンポーネントのProps
+ * CustomTagsInputPropsから単一値用に変更
  */
-export interface CustomTagsInputProps {
+export interface CustomSelectProps {
   /** 選択肢データ。ComboboxItem[] または string[] 形式。 */
   data: ComboboxItem[] | string[];
-  /** 選択されている値（タグ）の配列。 */
-  value: string[];
+  /** 選択されている値（単一）。 */
+  value: string; // string[] から string に変更
   /** エラーメッセージ。 */
   error?: ReactNode;
   /** 値が変更されたときに呼び出されるコールバック。 */
-  onChange: (value: string[]) => void;
+  onChange: (value: string) => void; // (value: string[]) から (value: string) に変更
   /** フォームのラベル。 */
   label?: string;
   /** インプットのプレースホルダー。 */
@@ -53,36 +52,46 @@ export interface CustomTagsInputProps {
 }
 
 /**
- * 独自の検索・新規作成ロジックを持つクリエータブルなTagsInputコンポーネント。
+ * 独自の検索・新規作成ロジックを持つクリエータブルなSelectコンポーネント（単一値）。
  */
-export const CustomCreatableTagsInput = forwardRef<HTMLInputElement, CustomTagsInputProps>(
+export const CustomCreatableSelect = forwardRef<HTMLInputElement, CustomSelectProps>(
   (
     {
       data,
-      value,
+      value, // 単一値
       error,
-      onChange,
+      onChange, // 単一値を返す
       label,
       placeholder,
       createNewOptionStyle,
       emptyOptionMessage = '検索結果がありません',
-      hideSelectedOptions,
+      hideSelectedOptions, // Selectではあまり意味がないが、互換性のために残す
       filterOptions,
       onCreate,
       createNewLabel = (search) => `+ 新しい "${search}" を作成`,
       disableCreation = false,
       creationDisabledMessage = '新規作成は無効化されています',
-      shouldCloseOnOptionSubmit = false,
+      shouldCloseOnOptionSubmit = true, // Selectなので基本的に閉じる
       ...others
     },
     ref
   ) => {
     const [search, setSearch] = useState('');
+    // 💡 修正点 1: ドロップダウンの開閉状態をトラックする状態を追加
+    const [isDropdownOpened, setIsDropdownOpened] = useState(false);
 
     // ComboboxのUI状態を管理するフック
     const combobox = useCombobox({
+      // 💡 修正点 2: ドロップダウンが開いたら状態を更新し、検索ボックスに現在のラベルをセット
+      onDropdownOpen: () => {
+        setIsDropdownOpened(true);
+        // ドロップダウンが開くときに、現在のラベルを検索ボックスにセット
+        setSearch(selectedOptionLabel);
+      },
+      // 💡 修正点 3: ドロップダウンが閉じたら状態を更新
       onDropdownClose: () => {
-        setSearch('');
+        setIsDropdownOpened(false);
+        setSearch(''); // ドロップダウンが閉じたら検索状態をリセット
         combobox.resetSelectedOption();
       },
     });
@@ -94,6 +103,11 @@ export const CustomCreatableTagsInput = forwardRef<HTMLInputElement, CustomTagsI
       }
       return data as ComboboxItem[];
     }, [data]);
+
+    // 選択された値のラベル
+    const selectedOptionLabel = useMemo(() => {
+      return normalizedData.find((item) => item.value === value)?.label ?? value;
+    }, [normalizedData, value]);
 
     // デフォルトのフィルタリングロジック
     const defaultFilter = (data: ComboboxItem[], search: string) => {
@@ -115,13 +129,6 @@ export const CustomCreatableTagsInput = forwardRef<HTMLInputElement, CustomTagsI
     );
 
     /**
-     * 選択されているタグを削除するハンドラー
-     */
-    const handleValueRemove = (itemValue: string) => {
-      onChange(value.filter((v) => v !== itemValue));
-    };
-
-    /**
      * オプションの確定（選択または作成）ハンドラー
      */
     const handleOptionSubmit = (submittedValue: string) => {
@@ -131,32 +138,27 @@ export const CustomCreatableTagsInput = forwardRef<HTMLInputElement, CustomTagsI
           onCreate(search);
         }
       } else {
-        const newValue = value.includes(submittedValue)
-          ? value.filter((v) => v !== submittedValue) // 解除
-          : [...value, submittedValue]; // 選択
-
-        onChange(newValue);
+        // 通常のオプション選択
+        onChange(submittedValue); // 単一値をセット
       }
 
-      setSearch('');
-
-      if (shouldCloseOnOptionSubmit) {
-        combobox.closeDropdown();
-      }
+      setSearch(''); // 検索をリセット
+      combobox.closeDropdown(); // Selectなのでオプション確定で閉じる
     };
 
     // ドロップダウンオプションのレンダリング
     let options = filtered
-      .filter((item) => !hideSelectedOptions || !value.includes(item.value))
+      // Selectの場合、hideSelectedOptionsは基本的に考慮しないか、TagsInputと互換性を持たせるため
+      .filter((item) => !hideSelectedOptions || item.value !== value)
       .map((item) => (
         <Combobox.Option
           value={item.value}
           key={item.value}
-          active={value.includes(item.value)}
+          active={item.value === value} // 現在の値がアクティブ
           onMouseDown={(event) => event.preventDefault()}
         >
           <Group gap="sm">
-            {value.includes(item.value) && <CheckIcon size={12} />}
+            {item.value === value && <CheckIcon size={12} />} {/* 選択された値にチェックマーク */}
             <span>{item.label}</span>
           </Group>
         </Combobox.Option>
@@ -198,12 +200,9 @@ export const CustomCreatableTagsInput = forwardRef<HTMLInputElement, CustomTagsI
       }
     }
 
-    // 選択済みのタグ（Pill）の表示
-    const tags = value.map((itemValue) => (
-      <Pill key={itemValue} withRemoveButton onRemove={() => handleValueRemove(itemValue)}>
-        {normalizedData.find((d) => d.value === itemValue)?.label || itemValue}
-      </Pill>
-    ));
+    // TextInputに表示する値
+    // 💡 修正点 4: isDropdownOpenedがtrueの場合は、search（空文字列も含む）をそのまま表示
+    const displayValue = isDropdownOpened ? search : selectedOptionLabel;
 
     return (
       <Combobox
@@ -213,32 +212,32 @@ export const CustomCreatableTagsInput = forwardRef<HTMLInputElement, CustomTagsI
         width={'100%'}
       >
         <Combobox.Target>
-          <Input.Wrapper w={'100%'} label={label} error={error} {...others}>
-            <Group gap="sm" wrap="wrap" w={'100%'}>
-              {tags}
-              <Combobox.EventsTarget>
-                <TextInput
-                  ref={ref}
-                  value={search}
-                  onBlur={() => combobox.closeDropdown()}
-                  onFocus={() => combobox.openDropdown()}
-                  onClick={() => combobox.openDropdown()}
-                  onChange={(event) => {
-                    combobox.openDropdown();
-                    setSearch(event.currentTarget.value);
-                  }}
-                  placeholder={placeholder}
-                  style={{ minWidth: 70, flexGrow: 1 }}
-                  onKeyDown={(event) => {
-                    if (event.key === 'Backspace' && search.length === 0 && value.length > 0) {
-                      event.preventDefault();
-                      handleValueRemove(value[value.length - 1]);
-                    }
-                  }}
-                />
-              </Combobox.EventsTarget>
-            </Group>
-          </Input.Wrapper>
+          <TextInput
+            ref={ref}
+            label={label}
+            placeholder={placeholder}
+            error={error}
+            value={displayValue} // 💡 修正後のdisplayValueを使用
+            onChange={(event) => {
+              combobox.openDropdown();
+              setSearch(event.currentTarget.value);
+            }}
+            onClick={() => {
+              // onClickとonFocusは、onDropdownOpenでsearchをセットするようにしたため、openDropdownのみ
+              combobox.openDropdown();
+            }}
+            onFocus={() => {
+              // onClickとonFocusは、onDropdownOpenでsearchをセットするようにしたため、openDropdownのみ
+              combobox.openDropdown();
+            }}
+            onBlur={() => {
+              // ComboboxのonDropdownCloseでsearchがリセットされる
+              combobox.closeDropdown();
+            }}
+            rightSection={<Combobox.Chevron />} // Selectらしい右側のシェブロン
+            readOnly={false} // 編集可能（検索可能）
+            {...others}
+          />
         </Combobox.Target>
 
         <Combobox.Dropdown>

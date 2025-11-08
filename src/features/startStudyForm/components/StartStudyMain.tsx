@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Creations } from '@/shared/types/creatable-form-items-types';
-import { createEmptyLearningCycle } from '../functions/create-learning-cycle-client-data';
 import {
-  getAllCategoryMasterData, // 追加
+  getAllCategoryMasterData,
   getAllUnitMasterData,
-  runLearningCycleScenario,
 } from '../functions/createLearningCycleInPseudoServer';
 import { StartStudyFormCreatableItems, StartStudyFormValues } from '../types/form-types';
 import { StartStudyForm } from './StartStudyForm';
@@ -15,6 +14,7 @@ interface StartStudyMainProps {}
 
 export const StartStudyMain: React.FC<StartStudyMainProps> = ({}) => {
   // 1. 取得したデータを保持するためのstate
+  const navigate = useNavigate();
   const [existUnits, setExistUnits] = useState<string[]>([]);
   const [existCategories, setExistCategories] = useState<string[]>([]);
 
@@ -53,11 +53,11 @@ export const StartStudyMain: React.FC<StartStudyMainProps> = ({}) => {
     value: StartStudyFormValues,
     creations: Creations<StartStudyFormCreatableItems>
   ) => {
-    const data = createEmptyLearningCycle('eng-textbook-002', value);
-    const { units, categories } = getLabelList(creations);
-    await runLearningCycleScenario(data, units, categories);
+    // const data = createEmptyLearningCycle('eng-textbook-002', value);
+    // const { units, categories } = getLabelList(creations);
+    // await runLearningCycleScenario(data, units, categories);
+    navigate('/study');
   };
-  // --- 既存のロジック ---
 
   // 4. stateに保持したデータをpropsとして渡す
   return (

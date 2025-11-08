@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { TestMode } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
-import { IndividualRangeFormValue } from '../shared/shared-test-range-types';
+import { RangeWithId } from './range-form-types';
 
 /**
  * フォームの状態の型定義
@@ -9,7 +9,7 @@ export interface StartStudyFormValues {
   units: string[];
   studyTimeMin: number | null;
   testMode: TestMode | null;
-  testRange: IndividualRangeFormValue[];
+  testRange: RangeWithId[];
   testTimeMin: number;
 }
 
