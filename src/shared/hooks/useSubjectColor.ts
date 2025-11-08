@@ -35,7 +35,7 @@ export function useSubjectColor(subject: Subject, role?: ColorRole): string | Su
 /**
  * SubjectColorMap全体を返すフック (roleを指定しない場合の処理を上書きしないように別定義)
  */
-export function useSubjectColorMap(subject: Subject): SubjectColorMap {
+export function useSubjectColorMap(subject: Subject | 'unselected'): SubjectColorMap {
   const colorScheme: MantineColorScheme = useComputedColorScheme();
   return SUBJECT_COLORS[subject][colorScheme];
 }

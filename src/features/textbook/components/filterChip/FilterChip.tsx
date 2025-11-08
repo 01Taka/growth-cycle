@@ -4,7 +4,7 @@ import { useSubjectColorMap } from '@/shared/hooks/useSubjectColor';
 import { Subject } from '@/shared/types/subject-types';
 
 interface FilterChipProps {
-  subject: Subject;
+  subject: Subject | 'unselected';
   label: string;
   checked: boolean;
   size: MantineSize;

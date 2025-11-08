@@ -10,6 +10,7 @@ interface TextbookPlantsProps {
   maxSize: number;
   widthPer: number;
   displayPlant: boolean;
+  sizeRatio: number;
 }
 
 const TextbookPlants: React.FC<TextbookPlantsProps> = ({
@@ -18,9 +19,19 @@ const TextbookPlants: React.FC<TextbookPlantsProps> = ({
   maxSize,
   widthPer,
   displayPlant,
+  sizeRatio,
 }) => {
   return (
-    <Flex style={{ position: 'relative', width: '100%', height: maxSize }}>
+    <Flex
+      style={{
+        position: 'relative',
+        width: '100%',
+        height: maxSize,
+        transition: 'transform 0.5s ease-out', // 1秒間で滑らかに変化
+        transform: `scale(${sizeRatio})`, // 倍率を適用
+        transformOrigin: 'center bottom', // 中央を中心に拡大・縮小
+      }}
+    >
       {displayPlant &&
         plants.map((plant, index) => (
           <PlantImageItem

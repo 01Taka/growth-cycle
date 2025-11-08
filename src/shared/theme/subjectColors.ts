@@ -4,7 +4,45 @@ import { SubjectColorMap } from './subjectColorType';
 // SubjectColorMap の定義に 'accent' を含むことを前提とします。
 // 例: type SubjectColorMap = { text: string; textRevers: string; bgScreen: string; bgCard: string; bgChip: string; border: string; disabled: string; disabledText: string; accent: string; };
 
-export const SUBJECT_COLORS: Record<Subject, Record<'light' | 'dark', SubjectColorMap>> = {
+export const SUBJECT_COLORS: Record<
+  Subject | 'unselected',
+  Record<'light' | 'dark', SubjectColorMap>
+> = {
+  unselected: {
+    light: {
+      // 濃いグレー。白背景での可読性を確保。
+      text: '#444444',
+      textRevers: '#e8e8e8',
+      bgScreen: '#ffffff', // 白
+      // 非常に薄いグレー。
+      bgCard: '#f5f5f5',
+      // 薄いグレー。
+      bgChip: '#dddddd',
+      // 標準的なグレーのボーダー。
+      border: '#cccccc',
+      disabled: '#eeeeee',
+      disabledText: '#aaaaaa',
+      // 💥 ニュートラルなアクセントカラー（例：MantineのPrimary Colorなど）
+      accent: '#8b8b8b',
+    },
+    dark: {
+      // 明るいグレー。暗い背景での可読性を確保。
+      text: '#cccccc',
+      textRevers: '#444444',
+      // 非常に濃いダークグレー。
+      bgScreen: '#222222',
+      // 暗めのグレー。
+      bgCard: '#3a3a3a',
+      // 明るいグレー。
+      bgChip: '#666666',
+      // 標準的なグレーのボーダー。
+      border: '#888888',
+      disabled: '#4a4a4a',
+      disabledText: '#aaaaaa',
+      // 💥 ニュートラルなアクセントカラー（例：MantineのPrimary Colorなど）
+      accent: '#999999',
+    },
+  },
   // --- 1. 国語 (赤ベース) ---
   japanese: {
     light: {

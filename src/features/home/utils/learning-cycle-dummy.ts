@@ -68,14 +68,14 @@ function createTimestampFromMillis(ms: number): DummyTimestamp {
 }
 
 /**
- * 過去1年間のランダムなFirestoreTimestampを生成します。
+ * 過去n日のランダムなFirestoreTimestampを生成します。
  */
-function createRandomFirestoreTimestamp(): DummyTimestamp {
+function createRandomFirestoreTimestamp(days = 30): DummyTimestamp {
   const now = Date.now();
   // 1年前
-  const oneYearAgoInMs = now - 365 * 24 * 60 * 60 * 1000;
+  const daysAgoInMs = now - days * 24 * 60 * 60 * 1000;
 
-  const randomMs = getRandomInt(oneYearAgoInMs, now);
+  const randomMs = getRandomInt(daysAgoInMs, now);
   return createTimestampFromMillis(randomMs);
 }
 

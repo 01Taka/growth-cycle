@@ -1,11 +1,16 @@
-import React, { lazy } from 'react';
-import { Box, Stack } from '@mantine/core';
+import React from 'react';
+import { Stack } from '@mantine/core';
 import { TextbookItemProps } from '../shared-props-types';
 import { TextbookContents } from './TextbookContents';
 import TextbookPlants from './TextbookPlants';
 
 export const TextbookItem: React.FC<
-  TextbookItemProps & { widthPer: number; displayPlant: boolean }
+  TextbookItemProps & {
+    widthPer: number;
+    sizeRatio: number;
+    displayPlant: boolean;
+    onClick: () => void;
+  }
 > = ({
   subject,
   textbookName,
@@ -14,7 +19,9 @@ export const TextbookItem: React.FC<
   plants,
   maxSize,
   widthPer,
+  sizeRatio,
   displayPlant,
+  onClick,
 }) => {
   return (
     <Stack gap={-1}>
@@ -24,6 +31,7 @@ export const TextbookItem: React.FC<
         maxSize={maxSize}
         widthPer={widthPer}
         displayPlant={displayPlant}
+        sizeRatio={sizeRatio}
       />
 
       <TextbookContents
@@ -31,6 +39,7 @@ export const TextbookItem: React.FC<
         textbookName={textbookName}
         totalPlants={totalPlants}
         daysSinceLastAttempt={daysSinceLastAttempt}
+        onClick={onClick}
       />
     </Stack>
   );

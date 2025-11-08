@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Group, rem, Stack, Text, Title } from '@mantine/core';
+import { Button, Card, Group, rem, Stack, Text, Title } from '@mantine/core';
 import { useSubjectColorMap } from '@/shared/hooks/useSubjectColor';
 import { SubjectColorMap } from '@/shared/theme/subjectColorType';
 import { Subject } from '@/shared/types/subject-types';
@@ -9,6 +9,7 @@ interface TextbookContentsProps {
   textbookName: string;
   totalPlants: number;
   daysSinceLastAttempt: number;
+  onClick: () => void;
 }
 
 export const TextbookContents: React.FC<TextbookContentsProps> = ({
@@ -16,6 +17,7 @@ export const TextbookContents: React.FC<TextbookContentsProps> = ({
   textbookName,
   totalPlants,
   daysSinceLastAttempt,
+  onClick,
 }) => {
   const theme: SubjectColorMap = useSubjectColorMap(subject);
 
@@ -26,10 +28,14 @@ export const TextbookContents: React.FC<TextbookContentsProps> = ({
     <Card
       shadow="sm"
       padding="md"
-      radius="md"
       // 💡 Cardの背景色にbgCardを適用 (画像での薄い緑色)
-      style={{ backgroundColor: theme.bgCard, border: `2px solid ${theme.border}` }}
-      // 画像には枠線がないため withBorder は削除
+      style={{
+        backgroundColor: theme.bgCard,
+        border: `2px solid ${theme.border}`,
+        borderBottomRightRadius: 12,
+        borderBottomLeftRadius: 12,
+      }}
+      onClick={onClick}
     >
       {/* メインレイアウト: 左右に分割 */}
       <Group gap={0} justify="space-between" align="center" wrap="nowrap">
@@ -50,7 +56,13 @@ export const TextbookContents: React.FC<TextbookContentsProps> = ({
             order={2}
             size={rem(28)} // 画像の見た目に合わせて調整
             fw={900}
-            style={{ color: theme.text, lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'auto' }}
+            style={{
+              color: theme.text,
+              lineHeight: 1.2,
+              whiteSpace: 'nowrap',
+              overflowX: 'auto',
+              overflowY: 'hidden',
+            }}
           >
             {textbookName}
           </Title>

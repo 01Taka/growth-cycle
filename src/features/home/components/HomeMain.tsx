@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   convertLearningCyclesToReviewItemMap,
   createReviewCountGetter,
@@ -12,12 +13,14 @@ import { GrowthPresentation } from './startStudy/GrowthPresentation';
 interface HomeMainProps {}
 
 export const HomeMain: React.FC<HomeMainProps> = ({}) => {
-  const dummyCycles = useMemo(() => generateMultipleLearningCycles(10), []);
+  const dummyCycles = useMemo(() => generateMultipleLearningCycles(100), []);
 
   const reviewPropsMap = useMemo(
     () => convertLearningCyclesToReviewItemMap(dummyCycles),
     [dummyCycles]
   );
+
+  const navigate = useNavigate();
 
   const todayCycles = filterTodayLearningCycles(dummyCycles);
   const learnings = todayCycles.map((cycle) => ({ subject: cycle.subject }));
@@ -34,7 +37,7 @@ export const HomeMain: React.FC<HomeMainProps> = ({}) => {
         yesterdayItems={getItem(-1)}
         lastWeekItems={getItem(-7)}
       />
-      <GrowthPresentation learnings={learnings} onStartStudy={() => {}} />
+      <GrowthPresentation learnings={learnings} onStartStudy={() => navigate('/textbooks')} />
     </div>
   );
 };
