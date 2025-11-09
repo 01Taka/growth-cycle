@@ -6,7 +6,6 @@ export const LearningCycleClientDataSchema = LearningCycleSchema.pick({
   testMode: true,
   learningDurationMs: true,
   testDurationMs: true,
-  problems: true,
   isReviewTarget: true,
 }).describe('i18n:cycle.client_input');
 

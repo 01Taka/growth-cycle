@@ -7,35 +7,25 @@ import { LearningProblemBase, ProblemAttemptResult } from '../types/problem-type
  * @returns 変換された問題試行の配列
  */
 export const transformData = (data: LearningCycle): LearningProblemBase[] => {
-  const { problems, units, categories, sessions } = data;
+  const { problems, units, categories, latestAttemptedAt } = data;
   const transformedAttempts: LearningProblemBase[] = [];
 
   // ユニットとカテゴリのIDと名前のマッピングを効率化のために作成
   const unitMap = new Map(units.map((unit) => [unit.id, unit.name]));
   const categoryMap = new Map(categories.map((category) => [category.id, category.name]));
-  // problemIndexから問題の詳細情報へのマッピング
-  const problemDetailMap = new Map(problems.map((problem) => [problem.index, problem]));
 
-  // セッションごとに処理
-  sessions.forEach((session) => {
-    const attemptAt = session.attemptedAt as number; // attemptedAtはタイムスタンプ（number）と仮定
+  console.log(unitMap, categoryMap, problems);
 
-    // そのセッション内の結果ごとに処理
-    session.results.forEach((result) => {
-      const problemDetail = problemDetailMap.get(result.problemIndex);
+  problems.map((problem) => {
+    const unitName = unitMap.get(problem.unitId) || 'Unit: ???';
+    const categoryName = categoryMap.get(problem.categoryId) || 'Category: ???';
 
-      if (problemDetail) {
-        const unitName = unitMap.get(problemDetail.unitId) || 'Unknown Unit';
-        const categoryName = categoryMap.get(problemDetail.categoryId) || 'Unknown Category';
-
-        transformedAttempts.push({
-          unitName: unitName,
-          categoryName: categoryName,
-          problemNumber: problemDetail.problemNumber,
-          problemIndex: result.problemIndex,
-          attemptAt: attemptAt,
-        });
-      }
+    transformedAttempts.push({
+      unitName: unitName,
+      categoryName: categoryName,
+      problemNumber: problem.problemNumber,
+      problemIndex: problem.index,
+      attemptAt: latestAttemptedAt,
     });
   });
 

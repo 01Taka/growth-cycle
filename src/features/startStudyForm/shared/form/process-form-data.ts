@@ -27,8 +27,7 @@ export function processProblemMetadata(
   units: UnitDetail[],
   categories: CategoryDetail[],
   defaultTimePerProblem: number,
-  defaultProblemFormat: ProblemNumberFormat,
-  generateNewId: StartStudyFormNewIdGenerator
+  defaultProblemFormat: ProblemNumberFormat
 ): StartStudyFormProblemMetadata {
   // 1. 既存データの名前-IDマップを作成 (検索効率のため)
   const unitMap = new Map<string, UnitDetail>();
@@ -64,9 +63,8 @@ export function processProblemMetadata(
       } else {
         // 新規ユニット
         newUnits.push({
+          id: '',
           name: item.unitName,
-          // 外部関数でIDを生成
-          id: generateNewId('unit', unitCounter++),
           isNew: true,
         });
       }
@@ -89,7 +87,7 @@ export function processProblemMetadata(
         newCategories.push({
           name: item.categoryName,
           // 外部関数でIDを生成
-          id: generateNewId('category', categoryCounter++),
+          id: '',
           timePerProblem: item.timePerProblemForCategory ?? defaultTimePerProblem,
           problemNumberFormat: item.problemNumberFormatForCategory ?? defaultProblemFormat,
           isNew: true,

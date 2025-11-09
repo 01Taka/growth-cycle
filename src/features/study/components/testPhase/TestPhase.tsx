@@ -48,13 +48,20 @@ export const TestPhase: React.FC<TestPhaseProps> = ({
   onSelectSelfEvaluation,
   onStartScoring,
 }) => {
-  const currentProblem = problems[currentProblemIndex];
+  const currentProblem: LearningProblemBase | null = (problems[currentProblemIndex] ??
+    null) as LearningProblemBase | null;
+
   const selfEvaluations = problems.map(
     (problem) => selfEvaluationMap[problem.problemIndex] ?? 'unrated'
   );
   const totalProblemsNumber = problems.length;
   const isProblemUnrated =
-    (selfEvaluationMap[currentProblem.problemIndex] ?? 'unrated') === 'unrated';
+    (currentProblem ? (selfEvaluationMap[currentProblem.problemIndex] ?? 'unrated') : 'unrated') ===
+    'unrated';
+
+  if (!currentProblem) {
+    return <Text>問題が見つかりません</Text>;
+  }
 
   return (
     <Stack align="center" w={'100%'}>

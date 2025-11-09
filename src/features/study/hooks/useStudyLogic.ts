@@ -19,34 +19,26 @@ import {
   ProblemAttemptResult,
 } from '../types/problem-types';
 
-type Phase = 'study' | 'test' | 'scoring' | 'review';
-
 interface UseStudyLogicArgs {
   studyDuration: number;
   testDuration: number;
-  initialPhase: Phase;
   attemptingProblems: LearningProblemBase[];
   pastAttemptedResults: ProblemAttemptResult[];
   header: { subject: Subject; textbookName: string; units: string[] };
   timerProvider?: MultiTimerPersistenceProvider;
-  setPhase: (newPhase: Phase) => void;
 }
 
 export const useStudyLogic = ({
   studyDuration,
   testDuration,
-  initialPhase,
   attemptingProblems,
   pastAttemptedResults,
   header,
   timerProvider,
-  setPhase,
 }: UseStudyLogicArgs) => {
   // 教科はヘッダーから取得
   const subject = header.subject;
-
   // 1. フェーズ管理 (初期値を受け取り、変更関数は外部のものを利用)
-  const phase: Phase = initialPhase;
 
   // 2. 状態管理
   const [selfEvaluationMap, setSelfEvaluationMap] = useState<Record<number, TestSelfEvaluation>>(
@@ -122,7 +114,6 @@ export const useStudyLogic = ({
   // 6. 必要なすべての値を返す
   return {
     subject,
-    phase,
     header,
     theme,
     problems,
@@ -137,7 +128,6 @@ export const useStudyLogic = ({
     isFinishTestTimer,
     handleScoreChange,
     handleSelfEvaluationMap,
-    setPhase,
     resetAll,
     changeCurrentTestProblem,
     handleSwitchTimerRunning,

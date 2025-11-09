@@ -15,6 +15,7 @@ import { StudyPhase } from './studyPhase/StudyPhase';
 import { TestPhase } from './testPhase/TestPhase';
 
 const PERSISTENCE_KEY = 'multiTimer';
+type Phase = 'study' | 'test' | 'scoring' | 'review';
 
 interface StudyMainProps {}
 
@@ -22,6 +23,8 @@ export const StudyMain: React.FC<StudyMainProps> = ({}) => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const cycleId = searchParams.get('cycleId');
+
+  const [phase, setPhase] = useState<Phase>('scoring');
 
   // --- Zustand Store Data ---
   const {
@@ -101,15 +104,12 @@ export const StudyMain: React.FC<StudyMainProps> = ({}) => {
       units: (learningCycle?.units ?? []).map((unit) => unit.name),
       subject: textbook?.subject ?? 'japanese',
     },
-    initialPhase: 'study',
-    setPhase: () => {}, // ダミー
     timerProvider,
   });
 
   // 💡 studyLogicProps の展開 (データ準備ができたかどうかに関わらず常に展開)
   const {
     subject,
-    phase,
     header,
     theme,
     problems,
@@ -124,7 +124,6 @@ export const StudyMain: React.FC<StudyMainProps> = ({}) => {
     isFinishTestTimer,
     handleScoreChange,
     handleSelfEvaluationMap,
-    setPhase,
     resetAll,
     changeCurrentTestProblem,
     handleSwitchTimerRunning,

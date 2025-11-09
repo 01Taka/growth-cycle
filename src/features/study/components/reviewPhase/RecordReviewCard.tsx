@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Card, Flex, Pill, Stack, Table, Text } from '@mantine/core';
 import { TestSelfEvaluation } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { formatMillisecondsToMSS } from '@/shared/utils/datetime/time-utils';
-import { formatTimestampToDaysAgo, getJustBeforeLogs } from '../../functions/review-phase-utils';
+import { formatMsToDaysAgo, getJustBeforeLogs } from '../../functions/review-phase-utils';
 import { useReviewNecessity } from '../../hooks/useReviewNecessity';
 import { ProblemLearningRecord } from '../../types/problem-types';
 import { getScoringStatusIcon, getSelfEvaluationIcon } from './icons';
@@ -79,7 +79,7 @@ export const RecordReviewCard: React.FC<RecordReviewCardProps> = ({ record }) =>
                   key={`date-${index}`}
                   style={{ textAlign: 'center', backgroundColor: necessityColor.background }}
                 >
-                  {log ? formatTimestampToDaysAgo(log.attemptAt) : ''}
+                  {log ? formatMsToDaysAgo(log.attemptAt) : ''}
                 </Table.Td>
               );
             })}

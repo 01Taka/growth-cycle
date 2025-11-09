@@ -1,14 +1,11 @@
 import React, { useCallback, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom'; // 💡 useSearchParams をインポート
-import { Box, Center, Flex, Loader, Text } from '@mantine/core'; // 💡 UI要素をインポート
-
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Box, Center, Flex, Loader, Text } from '@mantine/core';
 import { StudyHeader } from '@/features/study/components/StudyHeader';
 import { useSubjectColorMap } from '@/shared/hooks/useSubjectColor';
 import { useTextbookStore } from '@/shared/stores/useTextbookStore';
-import { curdStudyData } from '../shared/form/crud-study-data';
-import { convertToLearningCycleClientData } from '../shared/form/form-data-converter';
+import { createLearningCycle } from '../shared/form/crud-study-data';
 import { StartStudyFormValues } from '../shared/form/form-types';
-import { processProblemMetadata } from '../shared/form/process-form-data';
 import { StartStudyForm } from './StartStudyForm';
 
 interface StartStudyMainProps {}
@@ -52,34 +49,13 @@ export const StartStudyMain: React.FC<StartStudyMainProps> = ({}) => {
         return;
       }
 
-      // textbook.units や textbook.categories が存在しない場合のフォールバックが必要な可能性あり
-      const units = textbook.units ?? [];
-      const categories = textbook.categories ?? [];
-
       try {
-        const data = convertToLearningCycleClientData(value, textbook.id);
-        if (!data) {
-          throw new Error('学習サイクルのデータ変換に失敗しました。');
-        }
-
-        const problemMeta = processProblemMetadata(
-          value.testRange,
-          // 💡 TextbookDocumentのプロパティを使用
-          units,
-          categories,
-          0,
-          'number',
-          () => (Date.now() + Math.random()).toString()
-        );
-
-        const cycleId = await curdStudyData(
-          data,
-          problemMeta,
-          new Date().toISOString().split('T')[0]
-        ); // 当日の日付を使用
-
-        console.log('Study Data:', data);
-        console.log('Problem Metadata:', problemMeta);
+        const cycleId = await createLearningCycle(textbook.id, value, {
+          nextReviewDate: new Date().toISOString().split('T')[0],
+          defaultProblemFormat: 'number',
+          defaultTimePerProblem: 0,
+          isReviewTarget: true,
+        });
 
         navigate(`/study?cycleId=${cycleId}`);
       } catch (error) {

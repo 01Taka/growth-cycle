@@ -102,3 +102,5 @@ export const ProblemDetailSchema = z
     problemNumber: z.number().int().min(1).describe('i18n:problem.number'),
   })
   .describe('i18n:problem.detail');
+
+export type ProblemDetail = z.infer<typeof ProblemDetailSchema>;
