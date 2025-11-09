@@ -1,11 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Textbook } from '@/shared/data/documents/textbook/textbook-document';
+import { TextbookDocument } from '@/shared/data/documents/textbook/textbook-document';
 import { Creations } from '@/shared/types/creatable-form-items-types';
 import { curdStudyData } from '../shared/form/crud-study-data';
 import { convertToLearningCycleClientData } from '../shared/form/form-data-converter';
 import { StartStudyFormCreatableItems, StartStudyFormValues } from '../shared/form/form-types';
-import { processTestData } from '../shared/form/process-form-data';
+import { processProblemMetadata } from '../shared/form/process-form-data';
 import { StartStudyForm } from './StartStudyForm';
 
 // UnitとCategoryのマスターデータの型を仮定
@@ -16,36 +16,42 @@ export const StartStudyMain: React.FC<StartStudyMainProps> = ({}) => {
   // 1. 取得したデータを保持するためのstate
   const navigate = useNavigate();
 
-  const textbook: Textbook & { id: string } = {
+  const textbook: TextbookDocument = {
     id: 'sample-id',
+    path: 'sample-path',
     name: '数学のテキスト',
     subject: 'math',
     units: [{ name: 'unitA', id: 'unitA ID' }],
     categories: [],
   };
 
-  curdStudyData();
-
   const handleSubmit = async (
     value: StartStudyFormValues,
     creations: Creations<StartStudyFormCreatableItems>
   ) => {
-    const data = convertToLearningCycleClientData(value, textbook.id);
-    const textData = processTestData(
-      value.testRange,
-      textbook.units,
-      textbook.categories,
-      0,
-      'number',
-      () => (Date.now() + Math.random()).toString()
-    );
+    try {
+      const data = convertToLearningCycleClientData(value, textbook.id);
+      if (!data) {
+        throw new Error('');
+      }
 
-    console.log(data);
-    console.log(textData);
+      const problemMeta = processProblemMetadata(
+        value.testRange,
+        textbook.units,
+        textbook.categories,
+        0,
+        'number',
+        () => (Date.now() + Math.random()).toString()
+      );
 
-    // const data = createEmptyLearningCycle('eng-textbook-002', value);
-    // const { units, categories } = getLabelList(creations);
-    // await runLearningCycleScenario(data, units, categories);
+      await curdStudyData(data, problemMeta, '2025-11-10');
+
+      console.log(data);
+      console.log(problemMeta);
+    } catch (error) {
+      console.error(error);
+    }
+
     // navigate('/study');
   };
 

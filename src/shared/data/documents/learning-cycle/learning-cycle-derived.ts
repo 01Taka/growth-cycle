@@ -7,13 +7,14 @@ export const LearningCycleClientDataSchema = LearningCycleSchema.pick({
   learningDurationMs: true,
   testDurationMs: true,
   problems: true,
+  isReviewTarget: true,
 }).describe('i18n:cycle.client_input');
 
 export type LearningCycleClientData = z.infer<typeof LearningCycleClientDataSchema>;
 
 export const LearningCycleToUpdateSchema = LearningCycleSchema.pick({
   sessions: true,
-  nextReviewAt: true,
+  nextReviewDate: true,
   latestAttemptedAt: true,
   isReviewTarget: true,
 })

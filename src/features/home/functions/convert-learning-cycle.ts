@@ -1,4 +1,7 @@
-import { LearningCycle } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
+import {
+  LearningCycle,
+  LearningCycleDocument,
+} from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 import { getDaysDifference } from '@/shared/utils/datetime/datetime-compare-utils';
 import { ReviewLearningCycleItemProps } from '../components/review/shared-types';
 import { getDeterministicRandom } from './deterministic-random';
@@ -12,7 +15,7 @@ const MILLISECONDS_PER_MINUTE = 60_000;
  * @returns daysDifferenceをキーとするレビューアイテムのマップ
  */
 export const convertLearningCyclesToReviewItemMap = (
-  cycles: LearningCycle[]
+  cycles: LearningCycleDocument[]
 ): Record<number, ReviewLearningCycleItemProps[]> => {
   const reviewItemMap: Record<number, ReviewLearningCycleItemProps[]> = {};
 
@@ -30,7 +33,7 @@ export const convertLearningCyclesToReviewItemMap = (
     const unitNames = cycle.units.map((unit) => unit.name);
 
     // 最後に学習を試みた日時との差分を計算。0日差なら完了済みとみなす。
-    const differenceFromLastAttempted = getDaysDifference(cycle.latestAttemptedAt.toMillis());
+    const differenceFromLastAttempted = getDaysDifference(cycle.latestAttemptedAt);
 
     const item: ReviewLearningCycleItemProps = {
       isCompleted: differenceFromLastAttempted === 0,
@@ -43,7 +46,7 @@ export const convertLearningCyclesToReviewItemMap = (
     };
 
     // サイクル開始日時との差分をキーとする
-    const differenceFromCycleStart = getDaysDifference(cycle.cycleStartAt.toMillis());
+    const differenceFromCycleStart = getDaysDifference(cycle.latestAttemptedAt);
 
     if (reviewItemMap[differenceFromCycleStart]) {
       reviewItemMap[differenceFromCycleStart].push(item);
@@ -147,7 +150,7 @@ export const createReviewItemGetter = (reviewMap: ReviewItemMap): ReviewItemGett
         // 2. Secondary Sort: cycleStartAt (遅い/新しいものを後に)
         // a.cycleStartAt.toMillis() - b.cycleStartAt.toMillis() は昇順ソート
         // aのタイムスタンプが大きい（新しい）と正の値になり、aがbより後に配置される
-        return a.cycleStartAt.toMillis() - b.cycleStartAt.toMillis();
+        return a.cycleStartAt - b.cycleStartAt;
       });
     }
 
@@ -157,6 +160,6 @@ export const createReviewItemGetter = (reviewMap: ReviewItemMap): ReviewItemGett
 
 export const filterTodayLearningCycles = (cycles: LearningCycle[]) => {
   return cycles.filter(
-    (cycle) => cycle.isReviewTarget && getDaysDifference(cycle.latestAttemptedAt.toMillis()) === 0
+    (cycle) => cycle.isReviewTarget && getDaysDifference(cycle.latestAttemptedAt) === 0
   );
 };

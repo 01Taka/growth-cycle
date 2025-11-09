@@ -1,7 +1,9 @@
 import { ReactNode } from 'react';
 import {
+  CategoryDetail,
   ProblemNumberFormat,
   TestMode,
+  UnitDetail,
 } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { RangeWithId } from '../range/range-form-types';
 
@@ -40,3 +42,19 @@ export interface StartStudyFormComponent {
   label: string;
   form: ReactNode;
 }
+
+export interface NewUnit extends UnitDetail {
+  isNew: boolean;
+}
+
+export interface NewCategory extends CategoryDetail {
+  isNew: boolean;
+}
+
+export interface StartStudyFormProblemMetadata {
+  units: NewUnit[];
+  categories: NewCategory[];
+}
+
+// 新規IDを生成するための関数の型定義
+export type StartStudyFormNewIdGenerator = (type: 'unit' | 'category', counter: number) => string;

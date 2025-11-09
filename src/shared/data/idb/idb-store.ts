@@ -1,5 +1,6 @@
 import { IDBPDatabase, openDB } from 'idb';
-import { DB_NAME, DB_VERSION, DocumentBase, SINGLE_STORE_NAME } from './idb-configs';
+import { DB_NAME, DB_VERSION, SINGLE_STORE_NAME } from './idb-configs';
+import { DocumentBase } from './idb-types';
 import { getDocumentId, isDocumentPath } from './idb-utils';
 
 /**
@@ -64,16 +65,6 @@ export class IDBStore {
 
     await db.put(SINGLE_STORE_NAME, document);
     return docId;
-  }
-
-  /**
-   * ドキュメントIDを指定してデータを書き込みます。
-   */
-  public async set<T extends DocumentBase>(
-    path: string,
-    data: Omit<T, 'id' | 'path'>
-  ): Promise<string> {
-    return this.add<T>(path, data);
   }
 
   /**

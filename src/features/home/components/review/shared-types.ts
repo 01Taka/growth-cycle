@@ -1,4 +1,3 @@
-import { Timestamp } from 'firebase/firestore';
 import { Subject } from '@/shared/types/subject-types';
 
 export interface ReviewLearningCycleItemProps {
@@ -7,5 +6,5 @@ export interface ReviewLearningCycleItemProps {
   subject: Subject;
   unitNames: string[];
   testDurationMin: number;
-  cycleStartAt: Timestamp;
+  cycleStartAt: number;
 }

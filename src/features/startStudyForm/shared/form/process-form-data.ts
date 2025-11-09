@@ -3,23 +3,13 @@ import {
   ProblemNumberFormat,
   UnitDetail,
 } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
-import { RangeFormData } from './form-types';
-
-interface NewUnit extends UnitDetail {
-  isNew: boolean;
-}
-
-interface NewCategory extends CategoryDetail {
-  isNew: boolean;
-}
-
-interface ProcessedData {
-  units: NewUnit[];
-  categories: NewCategory[];
-}
-
-// 新規IDを生成するための関数の型定義
-type NewIdGenerator = (type: 'unit' | 'category', counter: number) => string;
+import {
+  NewCategory,
+  NewUnit,
+  RangeFormData,
+  StartStudyFormNewIdGenerator,
+  StartStudyFormProblemMetadata,
+} from './form-types';
 
 /**
  * testRangeデータに基づき、既存のunits/categoriesと照合し、新規追加フラグ付きの統合リストを生成します。
@@ -32,14 +22,14 @@ type NewIdGenerator = (type: 'unit' | 'category', counter: number) => string;
  * @param generateNewId 新規ユニット/カテゴリの一時IDを生成する関数
  * @returns 新しいユニットとカテゴリのリスト（isNewフラグ付き）
  */
-export function processTestData(
+export function processProblemMetadata(
   testRange: RangeFormData[],
   units: UnitDetail[],
   categories: CategoryDetail[],
   defaultTimePerProblem: number,
   defaultProblemFormat: ProblemNumberFormat,
-  generateNewId: NewIdGenerator
-): ProcessedData {
+  generateNewId: StartStudyFormNewIdGenerator
+): StartStudyFormProblemMetadata {
   // 1. 既存データの名前-IDマップを作成 (検索効率のため)
   const unitMap = new Map<string, UnitDetail>();
   units.forEach((u) => unitMap.set(u.name, u));
