@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Creations } from '@/shared/types/creatable-form-items-types';
+import { createEmptyLearningCycle } from '../functions/create-learning-cycle-client-data';
 import {
   getAllCategoryMasterData,
   getAllUnitMasterData,
+  runLearningCycleScenario,
 } from '../functions/createLearningCycleInPseudoServer';
-import { StartStudyFormCreatableItems, StartStudyFormValues } from '../types/form-types';
+import { StartStudyFormCreatableItems, StartStudyFormValues } from '../shared/form/form-types';
 import { StartStudyForm } from './StartStudyForm';
 
 // UnitとCategoryのマスターデータの型を仮定
@@ -53,9 +55,12 @@ export const StartStudyMain: React.FC<StartStudyMainProps> = ({}) => {
     value: StartStudyFormValues,
     creations: Creations<StartStudyFormCreatableItems>
   ) => {
-    // const data = createEmptyLearningCycle('eng-textbook-002', value);
-    // const { units, categories } = getLabelList(creations);
-    // await runLearningCycleScenario(data, units, categories);
+    console.log(value);
+    console.log(creations);
+
+    const data = createEmptyLearningCycle('eng-textbook-002', value);
+    const { units, categories } = getLabelList(creations);
+    await runLearningCycleScenario(data, units, categories);
     navigate('/study');
   };
 

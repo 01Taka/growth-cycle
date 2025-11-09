@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, MantineStyleProp, Stack, Text } from '@mantine/core';
 import { sharedStyle } from '@/shared/styles/shared-styles';
-import { Theme } from '../../shared/theme';
+import { Theme } from './components-constants/study-form-colors';
 
 interface StartStudyFormSelectButtonProps {
   label: string;

@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { rem, Stack } from '@mantine/core';
-import { IndividualProblemRange } from '../../shared/shared-test-range-types';
+import { IndividualProblemRange } from '../../shared/components-types/shared-test-range-types';
 import { EnteredTestRangeDisplayItem } from './EnteredTestRangeDisplayItem';
 import { UnitBoundarySeparator } from './UnitBoundarySeparator';
 

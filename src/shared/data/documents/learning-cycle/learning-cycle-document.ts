@@ -22,9 +22,9 @@ export const LearningCycleSchema = z
     isReviewTarget: z.boolean().describe('i18n:cycle.is_review_target'),
 
     // --- サーバーが初期設定/管理するデータ ---
-    cycleStartAt: firestoreTimestampSchema.describe('i18n:cycle.cycle_start_at'),
-    subject: SubjectSchema.describe('i18n:cycle.subject'),
     textbookName: z.string().min(1).describe('i18n:cycle.textbook_name'),
+    subject: SubjectSchema.describe('i18n:cycle.subject'),
+    cycleStartAt: firestoreTimestampSchema.describe('i18n:cycle.cycle_start_at'),
     units: z.array(UnitDetailSchema).min(1).describe('i18n:cycle.units'),
     categories: z.array(CategoryDetailSchema).min(1).describe('i18n:cycle.categories'),
 

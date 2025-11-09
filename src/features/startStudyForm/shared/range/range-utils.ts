@@ -1,4 +1,4 @@
-import { RangeWithOrder } from '../../types/range-form-types';
+import { RangeWithOrder } from './range-form-types';
 
 /**
  * 範囲配列内の競合を解決する関数。オーダーが大きい（orderが大きい）範囲を優先します。
@@ -266,3 +266,18 @@ export const checkHasConflict = (ranges: { start: number; end?: number }[]): boo
   // 全ての範囲をチェックし終え、競合がなかった場合は false を返す
   return false;
 };
+
+/**
+ * 範囲オブジェクト (startとend) を、その範囲に含まれる連番の数字配列に展開します。
+ * endが指定されない場合は、startのみを含む配列を返します。
+ */
+export function expandRangeToNumbers(start: number, end?: number | undefined): number[] {
+  const numbers: number[] = [];
+  const actualEnd = end !== undefined ? end : start;
+
+  // startからactualEndまで（両端を含む）の連番を生成します
+  for (let i = start; i <= actualEnd; i++) {
+    numbers.push(i);
+  }
+  return numbers;
+}

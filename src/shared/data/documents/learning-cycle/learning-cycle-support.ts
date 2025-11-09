@@ -28,6 +28,12 @@ export const TestSelfEvaluationSchema = z
 
 export type TestSelfEvaluation = z.infer<typeof TestSelfEvaluationSchema>;
 
+export const ProblemNumberFormatSchema = z.union([
+  z.literal('number'),
+  z.literal('alphabet'),
+  z.literal('katakana'),
+]);
+
 /**
  * ユニット（単元）のIDと名前を保持します。
  */
@@ -35,8 +41,6 @@ export const UnitDetailSchema = z
   .object({
     id: z.string().describe('i18n:shared.unit_id'),
     name: z.string().describe('i18n:shared.unit_name'),
-    subject: SubjectSchema,
-    textbookIds: z.array(z.string()),
   })
   .describe('i18n:shared.unit_detail');
 
@@ -49,8 +53,8 @@ export const CategoryDetailSchema = z
   .object({
     id: z.string().describe('i18n:shared.category_id'),
     name: z.string().describe('i18n:shared.category_name'),
-    subject: SubjectSchema,
-    textbookIds: z.array(z.string()),
+    timePerProblem: z.number(),
+    problemNumberFormat: ProblemNumberFormatSchema,
   })
   .describe('i18n:shared.category_detail');
 

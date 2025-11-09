@@ -1,7 +1,7 @@
 import { TestMode } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
-import { ThemeColor } from './theme';
+import { ThemeColor } from '../components-constants/study-form-colors';
 
-export type StudyTimeButtonType = 'compact' | 'balance' | 'long';
+export type StudyTimeButtonType = 'instant' | 'compact' | 'balance' | 'long';
 export type TestRangeInputType = 'individual' | 'bulk';
 
 export interface StudyTimeSelectButtonConfig {

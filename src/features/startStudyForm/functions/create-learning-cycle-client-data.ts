@@ -6,7 +6,7 @@ import {
   UnitDetail,
 } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { Creations } from '@/shared/types/creatable-form-items-types';
-import { StartStudyFormCreatableItems, StartStudyFormValues } from '../types/form-types';
+import { StartStudyFormCreatableItems, StartStudyFormValues } from '../shared/form/form-types';
 
 /**
  * 入力データからTestSessionが空のLearningCycleを構築します。

@@ -1,15 +1,15 @@
 import { ReactNode } from 'react';
 import { TestMode } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
-import { RangeWithId } from './range-form-types';
+import { RangeFormData } from '../range/range-form-types';
 
 /**
  * フォームの状態の型定義
  */
 export interface StartStudyFormValues {
-  units: string[];
+  // units: string[];
   studyTimeMin: number | null;
   testMode: TestMode | null;
-  testRange: RangeWithId[];
+  testRange: RangeFormData[];
   testTimeMin: number;
 }
 

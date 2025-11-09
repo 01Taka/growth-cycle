@@ -12,7 +12,7 @@ export type ColorModeThemes = {
   dark: Record<ThemeColor, Theme>;
 };
 
-export const themes: ColorModeThemes = {
+export const STUDY_FORM_COLORS: ColorModeThemes = {
   // 💡 ライトモードのテーマ
   light: {
     // 🟡 黄色のテーマ (Light) - 既存

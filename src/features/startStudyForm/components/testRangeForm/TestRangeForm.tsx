@@ -1,16 +1,16 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Modal, Stack } from '@mantine/core';
 import {
-  useIndividualRangeFormItems,
-  UseIndividualRangeFormItemsReturn,
-} from '../../hooks/useIndividualRangeFormItems';
-import {
   IndividualProblemRange,
   IndividualRangeFormValue,
   OnFinishEditModeArgs,
-} from '../../shared/shared-test-range-types';
-import { useTheme } from '../../shared/useTheme';
-import { StartStudyFormSelectButton } from '../shared/StartStudyFormSelectButton';
+} from '../../shared/components-types/shared-test-range-types';
+import { StartStudyFormSelectButton } from '../../shared/StartStudyFormSelectButton';
+import {
+  useIndividualRangeFormItems,
+  UseIndividualRangeFormItemsReturn,
+} from '../../shared/useIndividualRangeFormItems';
+import { useStudyFormTheme } from '../../shared/useStudyFormTheme';
 import { EnteredTestRangeDisplay } from './EnteredTestRangeDisplay';
 import { IndividualRangeForm } from './individualRangeForm/IndividualRangeForm';
 
@@ -60,7 +60,7 @@ export const TestRangeForm: React.FC<TestRangeFormProps> = ({
     },
     [onCreateNewUnit, onCreateNewCategories]
   );
-  const getTheme = useTheme();
+  const getTheme = useStudyFormTheme();
 
   const filledProblems = useMemo(
     () =>

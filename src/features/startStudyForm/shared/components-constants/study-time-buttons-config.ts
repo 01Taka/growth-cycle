@@ -1,6 +1,16 @@
-import { StudyTimeButtonType, StudyTimeSelectButtonConfig } from '../shared-props-types';
+import {
+  StudyTimeButtonType,
+  StudyTimeSelectButtonConfig,
+} from '../components-types/shared-props-types';
 
 export const STUDY_TIME_BUTTON_CONFIGS: Record<StudyTimeButtonType, StudyTimeSelectButtonConfig> = {
+  instant: {
+    type: 'instant',
+    label: 'すぐにテスト',
+    timeMin: 0,
+    explanations: ['勉強なし', '実力を試す'],
+    themeColor: 'lime',
+  },
   compact: {
     type: 'compact',
     label: 'コンパクト',

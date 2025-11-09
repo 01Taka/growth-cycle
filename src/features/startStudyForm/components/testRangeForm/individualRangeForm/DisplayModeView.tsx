@@ -7,7 +7,7 @@ import { Box, Divider, Flex, Group, Paper, rem, Text, ThemeIcon } from '@mantine
 import {
   IndividualRangeFormHandlers,
   IndividualRangeFormValue,
-} from '../../../shared/shared-test-range-types';
+} from '../../../shared/components-types/shared-test-range-types';
 import { ProblemNumberSelect } from './ProblemNumberSelect';
 
 // DisplayModeViewに渡すために必要なプロパティ

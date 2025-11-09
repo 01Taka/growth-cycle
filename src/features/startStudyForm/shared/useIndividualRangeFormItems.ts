@@ -6,7 +6,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'; // �
 import {
   IndividualRangeFormHandlers,
   IndividualRangeFormValue,
-} from '../shared/shared-test-range-types';
+} from './components-types/shared-test-range-types';
 
 // ---------------------------
 // 1. 状態管理の型定義

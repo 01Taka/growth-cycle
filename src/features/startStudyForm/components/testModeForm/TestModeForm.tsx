@@ -1,10 +1,10 @@
 import React from 'react';
 import { Flex } from '@mantine/core';
 import { TestMode } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
-import { TEST_MODE_BUTTON_CONFIGS } from '../../shared/constants/test-mode-form-config';
-import { TestModeSelectButtonConfig } from '../../shared/shared-props-types';
-import { useTheme } from '../../shared/useTheme';
-import { StartStudyFormSelectButton } from '../shared/StartStudyFormSelectButton';
+import { TEST_MODE_BUTTON_CONFIGS } from '../../shared/components-constants/test-mode-form-config';
+import { TestModeSelectButtonConfig } from '../../shared/components-types/shared-props-types';
+import { StartStudyFormSelectButton } from '../../shared/StartStudyFormSelectButton';
+import { useStudyFormTheme } from '../../shared/useStudyFormTheme';
 
 interface TestModeFormProps {
   selectedMode: TestMode | null;
@@ -12,7 +12,7 @@ interface TestModeFormProps {
 }
 
 export const TestModeForm: React.FC<TestModeFormProps> = ({ selectedMode, onClick }) => {
-  const getTheme = useTheme();
+  const getTheme = useStudyFormTheme();
 
   return (
     <Flex gap={10} h={140}>

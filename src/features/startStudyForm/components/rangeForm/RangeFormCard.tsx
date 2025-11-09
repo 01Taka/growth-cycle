@@ -17,8 +17,8 @@ import {
   Title,
 } from '@mantine/core';
 import { CustomCreatableSelect } from '@/shared/components/CustomCreatableSelect';
-import { RangeFormCardManagerPropsBase, RangeWithId } from '../../types/range-form-types';
-import { useRangeFormColors } from './useRangeFormColors';
+import { RangeFormCardManagerPropsBase, RangeWithId } from '../../shared/range/range-form-types';
+import { useRangeFormColors } from '../../shared/range/useRangeFormColors';
 
 interface RangeFormCardProps extends RangeFormCardManagerPropsBase {
   unitHandler: {

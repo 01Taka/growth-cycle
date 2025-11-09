@@ -22,7 +22,7 @@ import {
   IndividualRangeFormHandlers,
   IndividualRangeFormValue,
   OnFinishEditModeArgs,
-} from '../../../shared/shared-test-range-types';
+} from '../../../shared/components-types/shared-test-range-types';
 import { ProblemNumberSelect } from './ProblemNumberSelect';
 
 // EditModeViewに渡すために必要なプロパティ
