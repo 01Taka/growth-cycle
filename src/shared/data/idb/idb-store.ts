@@ -145,12 +145,15 @@ export class IDBStore {
     // getAllの戻り値は T[] とは限らないため、T[] にキャストする
     const allDocs = (await db.getAll(SINGLE_STORE_NAME)) as T[];
 
+    // コレクションパスのセグメント数
+    const collectionSegmentsLength = collectionPath.split('/').length;
+
     const prefix = `${collectionPath}/`;
     const directChildren = allDocs.filter(
       (doc) =>
         doc.path.startsWith(prefix) &&
-        // direct children (例: 'users/alice' は 'users/' の子) のみを抽出
-        doc.path.split('/').length === collectionPath.split('/').length + 2
+        // ドキュメントパスのセグメント数がコレクションパスのセグメント数 + 1 であること
+        doc.path.split('/').length === collectionSegmentsLength + 1
     );
 
     return directChildren;

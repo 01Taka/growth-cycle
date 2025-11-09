@@ -8,7 +8,7 @@ interface TextbookContentsProps {
   subject: Subject;
   textbookName: string;
   totalPlants: number;
-  daysSinceLastAttempt: number;
+  daysSinceLastAttempt: number | null;
   onClick: () => void;
 }
 
@@ -22,7 +22,12 @@ export const TextbookContents: React.FC<TextbookContentsProps> = ({
   const theme: SubjectColorMap = useSubjectColorMap(subject);
 
   // 最後の取り組み日数を日本語文字列に変換
-  const daysText = daysSinceLastAttempt === 0 ? '本日' : `${daysSinceLastAttempt}日前`;
+  const daysText =
+    daysSinceLastAttempt === null
+      ? '未着手'
+      : daysSinceLastAttempt === 0
+        ? '本日'
+        : `${daysSinceLastAttempt}日前`;
 
   return (
     <Card

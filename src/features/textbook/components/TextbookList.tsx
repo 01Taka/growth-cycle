@@ -1,13 +1,14 @@
 import React from 'react';
 import { Stack } from '@mantine/core';
-import { TextbookItemProps } from './shared-props-types';
+import { TextbookDocument } from '@/shared/data/documents/textbook/textbook-document';
+import { getDaysDifference } from '@/shared/utils/datetime/datetime-compare-utils';
 import { TextbookItem } from './textbookItem/TextbookItem';
 
 interface TextbookListProps {
-  textbookItems: TextbookItemProps[];
+  textbookItems: TextbookDocument[];
   sizeRatio: number;
   displayPlant?: boolean;
-  onClick: (item: TextbookItemProps) => void;
+  onClick: (item: TextbookDocument) => void;
 }
 
 export const TextbookList: React.FC<TextbookListProps> = ({
@@ -25,6 +26,11 @@ export const TextbookList: React.FC<TextbookListProps> = ({
           sizeRatio={sizeRatio}
           displayPlant={displayPlant}
           onClick={() => onClick(item)}
+          textbookName={item.name}
+          daysSinceLastAttempt={
+            item.lastAttemptedAt ? getDaysDifference(item.lastAttemptedAt) : null
+          }
+          maxSize={50}
           {...item}
         />
       ))}

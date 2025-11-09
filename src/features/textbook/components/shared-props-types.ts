@@ -10,7 +10,7 @@ export interface TextbookItemProps {
   subject: Subject;
   textbookName: string;
   totalPlants: number;
-  daysSinceLastAttempt: number;
+  daysSinceLastAttempt: number | null;
   plants: TextbookPlant[];
   maxSize: number;
 }

@@ -1,3 +1,3 @@
-export const SINGLE_STORE_NAME = 'growth-cycle-documents';
-export const DB_NAME = 'FirestoreStyleDB';
+export const SINGLE_STORE_NAME = 'mainDB';
+export const DB_NAME = 'growth-cycle';
 export const DB_VERSION = 1;
