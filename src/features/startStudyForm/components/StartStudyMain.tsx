@@ -1,70 +1,140 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { TextbookDocument } from '@/shared/data/documents/textbook/textbook-document';
-import { Creations } from '@/shared/types/creatable-form-items-types';
+import React, { useCallback, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom'; // 💡 useSearchParams をインポート
+import { Box, Center, Flex, Loader, Text } from '@mantine/core'; // 💡 UI要素をインポート
+
+import { StudyHeader } from '@/features/study/components/StudyHeader';
+import { useSubjectColorMap } from '@/shared/hooks/useSubjectColor';
+import { useTextbookStore } from '@/shared/stores/useTextbookStore';
 import { curdStudyData } from '../shared/form/crud-study-data';
 import { convertToLearningCycleClientData } from '../shared/form/form-data-converter';
-import { StartStudyFormCreatableItems, StartStudyFormValues } from '../shared/form/form-types';
+import { StartStudyFormValues } from '../shared/form/form-types';
 import { processProblemMetadata } from '../shared/form/process-form-data';
 import { StartStudyForm } from './StartStudyForm';
-
-// UnitとCategoryのマスターデータの型を仮定
 
 interface StartStudyMainProps {}
 
 export const StartStudyMain: React.FC<StartStudyMainProps> = ({}) => {
-  // 1. 取得したデータを保持するためのstate
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const textbookId = searchParams.get('textbookId');
 
-  const textbook: TextbookDocument = {
-    id: 'sample-id',
-    path: 'sample-path',
-    name: '数学のテキスト',
-    subject: 'math',
-    units: [{ name: 'unitA', id: 'unitA ID' }],
-    categories: [],
-  };
+  // 1. 💡 Zustandストアから必要な状態とアクションを取得
+  const { activeTextbook, getTextbookById, isLoading } = useTextbookStore((state) => state);
 
-  const handleSubmit = async (
-    value: StartStudyFormValues,
-    creations: Creations<StartStudyFormCreatableItems>
-  ) => {
-    try {
-      const data = convertToLearningCycleClientData(value, textbook.id);
-      if (!data) {
-        throw new Error('');
+  // activeTextbookからデータを取得し、使用しやすい変数に格納
+  const textbook = activeTextbook.data;
+  const isFound = activeTextbook.isFound;
+
+  const theme = useSubjectColorMap(textbook?.subject ?? 'unselected');
+
+  // 2. 💡 IDが変わるか、初回マウント時にデータをフェッチ
+  useEffect(() => {
+    if (!textbookId) return; // IDがなければ何もしない
+
+    // 既にアクティブなIDと一致する場合は再フェッチをスキップ（性能最適化）
+    if (activeTextbook.id === textbookId && activeTextbook.isFound) return;
+
+    // IDが存在する場合、getTextbookByIdを実行
+    const fetchActiveTextbook = async () => {
+      // activeTextbook の更新は getTextbookById の中で行われる
+      await getTextbookById(textbookId);
+    };
+
+    fetchActiveTextbook();
+  }, [textbookId, activeTextbook.id, activeTextbook.isFound, getTextbookById]);
+
+  // 3. フォーム送信ハンドラ
+  const handleSubmit = useCallback(
+    async (value: StartStudyFormValues) => {
+      // 💡 教科書データがない場合は処理を中断
+      if (!textbook) {
+        console.error('Textbook data is not available for submission.');
+        return;
       }
 
-      const problemMeta = processProblemMetadata(
-        value.testRange,
-        textbook.units,
-        textbook.categories,
-        0,
-        'number',
-        () => (Date.now() + Math.random()).toString()
-      );
+      // textbook.units や textbook.categories が存在しない場合のフォールバックが必要な可能性あり
+      const units = textbook.units ?? [];
+      const categories = textbook.categories ?? [];
 
-      await curdStudyData(data, problemMeta, '2025-11-10');
+      try {
+        const data = convertToLearningCycleClientData(value, textbook.id);
+        if (!data) {
+          throw new Error('学習サイクルのデータ変換に失敗しました。');
+        }
 
-      console.log(data);
-      console.log(problemMeta);
-    } catch (error) {
-      console.error(error);
-    }
+        const problemMeta = processProblemMetadata(
+          value.testRange,
+          // 💡 TextbookDocumentのプロパティを使用
+          units,
+          categories,
+          0,
+          'number',
+          () => (Date.now() + Math.random()).toString()
+        );
 
-    // navigate('/study');
-  };
+        const cycleId = await curdStudyData(
+          data,
+          problemMeta,
+          new Date().toISOString().split('T')[0]
+        ); // 当日の日付を使用
 
-  // 4. stateに保持したデータをpropsとして渡す
+        console.log('Study Data:', data);
+        console.log('Problem Metadata:', problemMeta);
+
+        navigate(`/study?cycleId=${cycleId}`);
+      } catch (error) {
+        console.error('Study submission error:', error);
+      }
+    },
+    [textbook] // textbook が変更されたら再生成
+  );
+
+  // 4. 💡 ローディング・エラー・データなしの表示
+  if (!textbookId) {
+    return (
+      <Center h={300}>
+        <Text style={{ color: 'red' }}>エラー: 教科書IDが指定されていません。</Text>
+      </Center>
+    );
+  }
+
+  // ZustandのisLoadingとactiveTextbookのローディング状態を区別して使用
+  if (isLoading || activeTextbook.id !== textbookId) {
+    // グローバルローディング中、またはIDが変わった直後のフェッチ中はローディングを表示
+    return (
+      <Center h={300}>
+        <Flex direction="column" align="center" gap="sm">
+          <Loader size="xl" />
+          <Text>教科書データを読み込み中...</Text>
+        </Flex>
+      </Center>
+    );
+  }
+
+  if (!isFound || !textbook) {
+    // 💡 TextbookDocument が見つからなかった場合
+    return (
+      <Center h={300}>
+        <Text color="red">エラー: ID "{textbookId}" の教科書が見つかりませんでした。</Text>
+      </Center>
+    );
+  }
+
+  // 5. フォームのレンダリング (データが揃っている場合のみ)
   return (
-    <div>
+    <Box p="md" bg={theme.bgScreen}>
+      <StudyHeader
+        textbookName={textbook.name}
+        subject={textbook.subject}
+        units={textbook.units.map((unit) => unit.name)}
+      />
       <StartStudyForm
         textbookName={textbook.name}
         subject={textbook.subject}
-        existUnits={textbook.units.map((unit) => unit.name)}
-        existCategories={textbook.categories.map((category) => category.name)}
+        existUnits={textbook.units?.map((unit) => unit.name) ?? []}
+        existCategories={textbook.categories?.map((category) => category.name) ?? []}
         handleSubmit={handleSubmit}
       />
-    </div>
+    </Box>
   );
 };

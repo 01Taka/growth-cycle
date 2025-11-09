@@ -1,5 +1,7 @@
-import { Timestamp } from 'firebase/firestore';
-import { TestSelfEvaluation } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
+import {
+  ProblemScoringStatus,
+  TestSelfEvaluation,
+} from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 
 export interface LearningProblemKey {
   unitName: string;
@@ -10,7 +12,7 @@ export interface LearningProblemKey {
 
 // 学習問題の識別情報（問題の特定に使うキー）
 export interface LearningProblemBase extends LearningProblemKey {
-  attemptAt: Timestamp;
+  attemptAt: number;
 }
 
 // 問題に対する一回の試行の詳細情報（自己評価と所要時間を含む）
@@ -20,7 +22,6 @@ export interface ProblemAttemptDetail extends LearningProblemBase {
 }
 
 // 問題の採点状態
-export type ProblemScoringStatus = 'correct' | 'incorrect' | 'unrated';
 
 // 問題に対する最終的な試行結果（採点情報を含む）
 export interface ProblemAttemptResult extends ProblemAttemptDetail {
@@ -29,7 +30,7 @@ export interface ProblemAttemptResult extends ProblemAttemptDetail {
 
 // 特定の問題への一回の試行ログ（履歴）
 export interface AttemptLog {
-  attemptAt: Timestamp;
+  attemptAt: number;
   selfEvaluation: TestSelfEvaluation;
   timeSpentMs: number;
   scoringStatus: ProblemScoringStatus;

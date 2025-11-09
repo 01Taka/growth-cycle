@@ -1,10 +1,12 @@
-import { TestSelfEvaluation } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
+import {
+  ProblemScoringStatus,
+  TestSelfEvaluation,
+} from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import {
   AttemptLog,
   LearningProblemBase,
   ProblemAttemptResult,
   ProblemLearningRecord,
-  ProblemScoringStatus,
 } from '../types/problem-types';
 
 type ElapsedTimeMap = Record<number, number>; // numberをキーとするとして処理します。

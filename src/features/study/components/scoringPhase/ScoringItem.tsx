@@ -1,8 +1,9 @@
 import React from 'react';
 import { IconCheck, IconX } from '@tabler/icons-react'; // アイコンを追加
 import { Button, Card, Flex, Group, Stack, Text } from '@mantine/core';
+import { ProblemScoringStatus } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { useSelfEvaluationColors } from '../../hooks/useSelfEvaluationColors';
-import { ProblemAttemptDetail, ProblemScoringStatus } from '../../types/problem-types';
+import { ProblemAttemptDetail } from '../../types/problem-types';
 import { getSelfEvaluationIcon } from '../reviewPhase/icons';
 
 interface ScoringItemProps {

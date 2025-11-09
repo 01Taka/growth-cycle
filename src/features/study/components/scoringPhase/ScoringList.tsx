@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Stack } from '@mantine/core';
-import { ProblemAttemptDetail, ProblemScoringStatus } from '../../types/problem-types';
+import { ProblemScoringStatus } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
+import { ProblemAttemptDetail } from '../../types/problem-types';
 import { ScoringItem } from './ScoringItem';
 
 interface ScoringListProps {

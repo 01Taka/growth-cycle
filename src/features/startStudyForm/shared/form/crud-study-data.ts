@@ -66,7 +66,7 @@ export const curdStudyData = async (
   clientData: LearningCycleClientData,
   problemMeta: StartStudyFormProblemMetadata,
   nextReviewDate: string
-): Promise<void> => {
+) => {
   const newLearningCyclePath = generateIdbPath(IDB_PATH.learningCycles, '', true);
   const textbookPath = generateIdbPath(IDB_PATH.textbooks, clientData.textbookId);
 
@@ -115,7 +115,7 @@ export const curdStudyData = async (
 
   try {
     // IDBに新しいLearningCycleを追加
-    await idbStore.add(newLearningCyclePath, newLearningCycleData);
+    return await idbStore.add(newLearningCyclePath, newLearningCycleData);
   } catch (error) {
     throw new Error(`IDBへのLearningCycle追加に失敗しました (Path: ${newLearningCyclePath})`);
   }

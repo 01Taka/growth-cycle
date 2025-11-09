@@ -1,11 +1,13 @@
 import React from 'react';
 import { IconSearch } from '@tabler/icons-react';
 import { Box, Button, Flex, rem, Stack, Text } from '@mantine/core'; // Boxコンポーネントを追加
+
+import { ProblemScoringStatus } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { sharedStyle } from '@/shared/styles/shared-styles';
 import { SubjectColorMap } from '@/shared/theme/subjectColorType';
 import { Subject } from '@/shared/types/subject-types';
 import { toRGBA } from '@/shared/utils/color/color-convert-utils';
-import { ProblemAttemptDetail, ProblemScoringStatus } from '../../types/problem-types';
+import { ProblemAttemptDetail } from '../../types/problem-types';
 import { StudyHeader } from '../StudyHeader';
 import { ScoringList } from './ScoringList';
 import { ScoringSummary } from './ScoringSummary';

@@ -1,16 +1,16 @@
-import React, { useMemo, useState } from 'react';
-import { Button, Flex, Stack, TextInput } from '@mantine/core';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Button, Stack, TextInput } from '@mantine/core';
 import { LocalStorageMultiTimerPersistenceProvider } from '@/shared/hooks/multi-timer/localStoragePersistenceProvider';
-import { Subject } from '@/shared/types/subject-types';
-import { range } from '@/shared/utils/range';
-import {
-  createDummyLearningProblemBases,
-  generateDummyTestResults,
-} from '../functions/generate-dummy';
+import { useLearningCycleStore } from '@/shared/stores/useLearningCycleStore';
+import { useTextbookStore } from '@/shared/stores/useTextbookStore';
+import { convertLearningCycleToAttempts, transformData } from '../functions/transform-data';
 import { useStudyLogic } from '../hooks/useStudyLogic';
+import { LearningProblemBase } from '../types/problem-types';
 import { ParticleOverlay } from './ParticleOverlay';
 import { ReviewPhase } from './reviewPhase/ReviewPhase';
 import { ScoringPhase } from './scoringPhase/ScoringPhase';
+import { StudyLoadingOrError } from './StudyLoadingOrError';
 import { StudyPhase } from './studyPhase/StudyPhase';
 import { TestPhase } from './testPhase/TestPhase';
 
@@ -19,15 +19,94 @@ const PERSISTENCE_KEY = 'multiTimer';
 interface StudyMainProps {}
 
 export const StudyMain: React.FC<StudyMainProps> = ({}) => {
-  // ダミーデータ生成ロジックは、フックの独立性を保つために残す（データ層と仮定）
-  const attemptingProblems = useMemo(() => createDummyLearningProblemBases(10), []);
-  const problems01 = useMemo(() => generateDummyTestResults(10), []);
-  const problems02 = useMemo(() => generateDummyTestResults(10), []);
-  const [newExpectedDuration, setNewExpectedDuration] = useState(0.1);
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const cycleId = searchParams.get('cycleId');
+
+  // --- Zustand Store Data ---
+  const {
+    activeLearningCycle,
+    getLearningCycleById,
+    isLoading: isLoadingCycle,
+    error: cycleError,
+  } = useLearningCycleStore((state) => state);
+  const learningCycle = activeLearningCycle.data;
+  const isFoundCycle = activeLearningCycle.isFound;
+
+  const {
+    activeTextbook,
+    getTextbookById,
+    isLoading: isLoadingTextbook,
+    error: textbookError,
+  } = useTextbookStore((state) => state);
+  const textbook = activeTextbook.data;
+  const isFoundTextbook = activeTextbook.isFound;
+
+  // 💡 統合されたローディング状態
+  const overallLoading = isLoadingCycle || isLoadingTextbook;
+
+  // --- Data Fetching Effect ---
+  useEffect(() => {
+    if (!cycleId) return;
+
+    // 1. 学習サイクルデータのフェッチ
+    const fetchCycleData = async () => {
+      // 既にアクティブなIDと一致する場合は再フェッチをスキップ
+      if (activeLearningCycle.id === cycleId && activeLearningCycle.isFound) return;
+
+      const result = await getLearningCycleById(cycleId);
+
+      // 2. サイクルデータが取得できたら、関連付けられた教科書IDを使って教科書データをフェッチ
+      if (result.isFound && result.data && result.data.textbookId) {
+        // 教科書データが既にアクティブなIDと一致する場合は再フェッチをスキップ
+        if (activeTextbook.id === result.data.textbookId && activeTextbook.isFound) return;
+
+        await getTextbookById(result.data.textbookId);
+      }
+    };
+
+    fetchCycleData();
+    // cycleId, getLearningCycleById, activeLearningCycle.id, activeLearningCycle.isFound は必須
+    // 依存配列にactiveTextbookを含めると無限ループの原因になりやすいため、fetchCycleData内で直接チェック
+  }, [cycleId, getLearningCycleById, getTextbookById]);
+
+  // --- Data Preparation (useMemo/Memoized values) ---
+
+  // 💡 データが揃っているか確認し、揃っていない場合は空の配列を使用
+  const attemptingProblems: LearningProblemBase[] = useMemo(
+    () => (learningCycle ? transformData(learningCycle) : []),
+    [learningCycle]
+  );
+
+  const pastAttemptedResults = useMemo(
+    () => (learningCycle ? convertLearningCycleToAttempts(learningCycle) : []),
+    [learningCycle]
+  );
+
+  const isDataReady = isFoundCycle && isFoundTextbook && !!learningCycle && !!textbook;
+
+  // --- useStudyLogic ---
   const timerProvider = useMemo(
     () => new LocalStorageMultiTimerPersistenceProvider(PERSISTENCE_KEY),
-    [] // 依存配列は空でOK
+    []
   );
+
+  const studyLogicProps = useStudyLogic({
+    studyDuration: isDataReady ? learningCycle.learningDurationMs : 0,
+    testDuration: isDataReady ? learningCycle.testDurationMs : 0,
+    attemptingProblems: isDataReady ? attemptingProblems : [],
+    pastAttemptedResults: isDataReady ? pastAttemptedResults : [],
+    header: {
+      textbookName: textbook?.name ?? 'Loading...',
+      units: (learningCycle?.units ?? []).map((unit) => unit.name),
+      subject: textbook?.subject ?? 'japanese',
+    },
+    initialPhase: 'study',
+    setPhase: () => {}, // ダミー
+    timerProvider,
+  });
+
+  // 💡 studyLogicProps の展開 (データ準備ができたかどうかに関わらず常に展開)
   const {
     subject,
     phase,
@@ -49,21 +128,31 @@ export const StudyMain: React.FC<StudyMainProps> = ({}) => {
     resetAll,
     changeCurrentTestProblem,
     handleSwitchTimerRunning,
-  } = useStudyLogic({
-    attemptingProblems,
-    pastAttemptedResults: [...problems01, ...problems02],
-    header: {
-      textbookName: 'TEXT_A',
-      units: ['UNIT_A'],
-      subject: 'english',
-    },
-    initialPhase: 'study',
-    setPhase: () => {},
-  });
+  } = studyLogicProps;
 
+  const [newExpectedDuration, setNewExpectedDuration] = useState(0.1);
+
+  // --- Render Logic ---
+
+  // 💡 ロード中/エラーの場合は専用コンポーネントを表示
+  if (!isDataReady) {
+    return (
+      <StudyLoadingOrError
+        isLoading={overallLoading}
+        cycleId={cycleId}
+        isCycleFound={isFoundCycle}
+        isTextbookFound={isFoundTextbook}
+        cycleError={cycleError}
+        textbookError={textbookError}
+      />
+    );
+  }
+
+  // 💡 データが揃った後のフェーズレンダリング
   const renderPhase = () => {
     switch (phase) {
       case 'study':
+        // ... (StudyPhase のレンダリングロジックは変更なし)
         return (
           <StudyPhase
             isReadyTest={studyTimer.remainingTime <= 0}
@@ -99,6 +188,7 @@ export const StudyMain: React.FC<StudyMainProps> = ({}) => {
           />
         );
       case 'scoring':
+        // ... (ScoringPhase のレンダリングロジックは変更なし)
         return (
           <ScoringPhase
             scoringStatusMap={scoringStatusMap}
@@ -154,22 +244,6 @@ export const StudyMain: React.FC<StudyMainProps> = ({}) => {
           >
             更新
           </Button>
-          {/* <Flex>
-            {range(5).map((index) => {
-              const subjects: Subject[] = [
-                'japanese',
-                'english',
-                'math',
-                'science',
-                'socialStudies',
-              ];
-              return (
-                <Button key={subjects[index]} onClick={() => setSubject(subjects[index])}>
-                  {subjects[index]}
-                </Button>
-              );
-            })}
-          </Flex> */}
         </Stack>
       </Stack>
     </>

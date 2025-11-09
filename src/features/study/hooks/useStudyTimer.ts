@@ -177,6 +177,20 @@ export const useStudyTimer = (
     }
   }, [testTimer, currentActiveProblemTimer, timer, isFinishTestTimer]); // timer全体を依存に入れることで start/stopAll の安定性を担保
 
+  const changeStudyDuration = useCallback(
+    (duration: number) => {
+      timer.onDurationChange(STUDY_TIMER_ID, duration);
+    },
+    [timer.onDurationChange]
+  );
+
+  const changeTestDuration = useCallback(
+    (duration: number) => {
+      timer.onDurationChange(TEST_TIMER_ID, duration);
+    },
+    [timer.onDurationChange]
+  );
+
   return {
     studyTimer,
     testTimer,
@@ -184,6 +198,8 @@ export const useStudyTimer = (
     currentTestProblemIndex,
     elapsedTimeMap,
     isFinishTestTimer,
+    changeStudyDuration,
+    changeTestDuration,
     changeCurrentTestProblem,
     handleSwitchTimerRunning,
     resetAll: timer.resetAll,

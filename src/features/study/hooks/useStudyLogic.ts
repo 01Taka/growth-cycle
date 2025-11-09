@@ -1,7 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 // useSearchParams は引数で受け取るため、フック内でのインポートは削除
 
-import { TestSelfEvaluation } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
+import {
+  ProblemScoringStatus,
+  TestSelfEvaluation,
+} from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { MultiTimerPersistenceProvider } from '@/shared/hooks/multi-timer/multi-timer-types';
 import { useSubjectColorMap } from '@/shared/hooks/useSubjectColor';
 import { Subject } from '@/shared/types/subject-types';
@@ -14,12 +17,13 @@ import {
   LearningProblemBase,
   ProblemAttemptDetail,
   ProblemAttemptResult,
-  ProblemScoringStatus,
 } from '../types/problem-types';
 
 type Phase = 'study' | 'test' | 'scoring' | 'review';
 
 interface UseStudyLogicArgs {
+  studyDuration: number;
+  testDuration: number;
   initialPhase: Phase;
   attemptingProblems: LearningProblemBase[];
   pastAttemptedResults: ProblemAttemptResult[];
@@ -29,6 +33,8 @@ interface UseStudyLogicArgs {
 }
 
 export const useStudyLogic = ({
+  studyDuration,
+  testDuration,
   initialPhase,
   attemptingProblems,
   pastAttemptedResults,
@@ -58,10 +64,20 @@ export const useStudyLogic = ({
     currentActiveProblemTimer,
     elapsedTimeMap,
     isFinishTestTimer,
+    changeStudyDuration,
+    changeTestDuration,
     changeCurrentTestProblem,
     handleSwitchTimerRunning,
     resetAll,
   } = useStudyTimer(attemptingProblems.length, timerProvider);
+
+  useEffect(() => {
+    changeStudyDuration(studyDuration);
+  }, [studyDuration, changeStudyDuration]);
+
+  useEffect(() => {
+    changeTestDuration(testDuration);
+  }, [testDuration, changeTestDuration]);
 
   // 4. アクションハンドラ
   const handleSelfEvaluationMap = (index: number, evaluation: TestSelfEvaluation) => {

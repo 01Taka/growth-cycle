@@ -66,11 +66,19 @@ export interface CategoryDetail extends z.infer<typeof CategoryDetailSchema> {}
 // セッションと結果の構造
 // ------------------------------------------------------------
 
+export const ProblemScoringStatusSchema = z.union([
+  z.literal('correct'),
+  z.literal('incorrect'),
+  z.literal('unrated'),
+]);
+
+export type ProblemScoringStatus = z.infer<typeof ProblemScoringStatusSchema>;
+
 export const TestResultSchema = z
   .object({
     problemIndex: z.number().int().min(0).describe('i18n:result.problem_index'),
     selfEvaluation: TestSelfEvaluationSchema.describe('i18n:result.self_evaluation'),
-    isCorrect: z.boolean().describe('i18n:result.is_correct'),
+    scoringStatus: ProblemScoringStatusSchema.describe('i18n:result.is_correct'),
     timeTakenMs: z.number().int().min(0).describe('i18n:result.time_taken_ms'),
   })
   .describe('i18n:result.test_result');
@@ -79,7 +87,7 @@ export type TestResult = z.infer<typeof TestResultSchema>;
 
 export const TestSessionSchema = z
   .object({
-    attemptedAt: z.any().describe('i18n:session.attempted_at'),
+    attemptedAt: z.number().describe('i18n:session.attempted_at'),
     results: z.array(TestResultSchema).describe('i18n:session.results_list'),
   })
   .describe('i18n:session.test_session');
