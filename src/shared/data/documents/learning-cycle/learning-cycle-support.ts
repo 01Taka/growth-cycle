@@ -34,6 +34,8 @@ export const ProblemNumberFormatSchema = z.union([
   z.literal('katakana'),
 ]);
 
+export type ProblemNumberFormat = z.infer<typeof ProblemNumberFormatSchema>;
+
 /**
  * ユニット（単元）のIDと名前を保持します。
  */

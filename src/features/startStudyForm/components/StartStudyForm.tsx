@@ -4,6 +4,7 @@ import { useForm } from '@mantine/form';
 import { useCreatableFormItems } from '@/shared/hooks/useCreatableFormItems';
 import { Creations } from '@/shared/types/creatable-form-items-types';
 import { FormInputProps } from '@/shared/types/mantine-form-types';
+import { Subject } from '@/shared/types/subject-types';
 import { STUDY_TIME_BUTTON_CONFIGS } from '../shared/components-constants/study-time-buttons-config';
 import {
   StartStudyFormComponent,
@@ -16,6 +17,8 @@ import { TestModeForm } from './testModeForm/TestModeForm';
 import { TestTimeForm } from './testTimeForm/TestTimeForm';
 
 interface StartStudyFormProps {
+  textbookName: string;
+  subject: Subject;
   existUnits: string[];
   existCategories: string[];
   handleSubmit: (
@@ -25,6 +28,8 @@ interface StartStudyFormProps {
 }
 
 export const StartStudyForm: React.FC<StartStudyFormProps> = ({
+  textbookName,
+  subject,
   existUnits,
   existCategories,
   handleSubmit,

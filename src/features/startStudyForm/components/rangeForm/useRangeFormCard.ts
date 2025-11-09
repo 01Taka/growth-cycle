@@ -1,9 +1,9 @@
 import { ReactNode, useCallback } from 'react';
 import { UseFormReturnType } from '@mantine/form';
+import { RangeFormData } from '../../shared/form/form-types';
 import {
   RangeData,
   RangeFormCardManagerPropsBase,
-  RangeFormData,
   RangeWithId,
 } from '../../shared/range/range-form-types';
 import { checkHasConflict, handleResolveConflict } from '../../shared/range/range-utils';

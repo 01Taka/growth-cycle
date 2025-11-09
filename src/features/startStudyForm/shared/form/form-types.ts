@@ -1,6 +1,21 @@
 import { ReactNode } from 'react';
-import { TestMode } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
-import { RangeFormData } from '../range/range-form-types';
+import {
+  ProblemNumberFormat,
+  TestMode,
+} from '@/shared/data/documents/learning-cycle/learning-cycle-support';
+import { RangeWithId } from '../range/range-form-types';
+
+export interface RangeFormData {
+  unitName: string;
+  categoryName: string;
+  ranges: RangeWithId[];
+
+  // 既存カテゴリーの場合
+  categoryId?: string;
+  // 新規のカテゴリーの場合
+  timePerProblemForCategory?: number;
+  problemNumberFormatForCategory?: ProblemNumberFormat;
+}
 
 /**
  * フォームの状態の型定義

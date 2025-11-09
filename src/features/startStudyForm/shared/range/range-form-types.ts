@@ -14,12 +14,6 @@ export interface RangeWithId extends RangeData {
   id: number;
 }
 
-export interface RangeFormData {
-  unitName: string;
-  categoryName: string;
-  ranges: RangeWithId[];
-}
-
 export interface RangeFormCardManagerPropsBase {
   unitForm: {
     value: string;

@@ -1,13 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Textbook } from '@/shared/data/documents/textbook/textbook-document';
 import { Creations } from '@/shared/types/creatable-form-items-types';
-import { createEmptyLearningCycle } from '../functions/create-learning-cycle-client-data';
-import {
-  getAllCategoryMasterData,
-  getAllUnitMasterData,
-  runLearningCycleScenario,
-} from '../functions/createLearningCycleInPseudoServer';
+import { curdStudyData } from '../shared/form/crud-study-data';
+import { convertToLearningCycleClientData } from '../shared/form/form-data-converter';
 import { StartStudyFormCreatableItems, StartStudyFormValues } from '../shared/form/form-types';
+import { processTestData } from '../shared/form/process-form-data';
 import { StartStudyForm } from './StartStudyForm';
 
 // UnitとCategoryのマスターデータの型を仮定
@@ -17,59 +15,48 @@ interface StartStudyMainProps {}
 export const StartStudyMain: React.FC<StartStudyMainProps> = ({}) => {
   // 1. 取得したデータを保持するためのstate
   const navigate = useNavigate();
-  const [existUnits, setExistUnits] = useState<string[]>([]);
-  const [existCategories, setExistCategories] = useState<string[]>([]);
 
-  // 2. useEffectを使ってコンポーネントマウント時にデータを取得
-  useEffect(() => {
-    // useEffectのコールバック関数自体はasyncにできないため、内部で非同期関数を定義し即時実行
-    const fetchMasterData = async () => {
-      try {
-        const unitsData = await getAllUnitMasterData('user_low_study');
-        const categoriesData = await getAllCategoryMasterData('user_low_study');
-
-        // 3. stateを更新
-        setExistUnits(unitsData.map((data) => data.name));
-        setExistCategories(categoriesData.map((data) => data.name));
-      } catch (error) {
-        console.error('マスターデータの取得中にエラーが発生しました:', error);
-        // エラーハンドリング（必要に応じてエラー状態をセットするなど）
-      }
-    };
-
-    fetchMasterData();
-    // 依存配列を空（[]）にすることで、コンポーネントのマウント時（初回レンダリング後）に一度だけ実行される
-  }, []);
-
-  // --- 既存のロジック ---
-  const getLabelList = (creations: Creations<StartStudyFormCreatableItems>) => {
-    return {
-      units: creations.units ? Object.values(creations.units).map((unit) => unit.label) : [],
-      categories: creations.categories
-        ? Object.values(creations.categories).map((category) => category.label)
-        : [],
-    };
+  const textbook: Textbook & { id: string } = {
+    id: 'sample-id',
+    name: '数学のテキスト',
+    subject: 'math',
+    units: [{ name: 'unitA', id: 'unitA ID' }],
+    categories: [],
   };
+
+  curdStudyData();
 
   const handleSubmit = async (
     value: StartStudyFormValues,
     creations: Creations<StartStudyFormCreatableItems>
   ) => {
-    console.log(value);
-    console.log(creations);
+    const data = convertToLearningCycleClientData(value, textbook.id);
+    const textData = processTestData(
+      value.testRange,
+      textbook.units,
+      textbook.categories,
+      0,
+      'number',
+      () => (Date.now() + Math.random()).toString()
+    );
 
-    const data = createEmptyLearningCycle('eng-textbook-002', value);
-    const { units, categories } = getLabelList(creations);
-    await runLearningCycleScenario(data, units, categories);
-    navigate('/study');
+    console.log(data);
+    console.log(textData);
+
+    // const data = createEmptyLearningCycle('eng-textbook-002', value);
+    // const { units, categories } = getLabelList(creations);
+    // await runLearningCycleScenario(data, units, categories);
+    // navigate('/study');
   };
 
   // 4. stateに保持したデータをpropsとして渡す
   return (
     <div>
       <StartStudyForm
-        existUnits={existUnits}
-        existCategories={existCategories}
+        textbookName={textbook.name}
+        subject={textbook.subject}
+        existUnits={textbook.units.map((unit) => unit.name)}
+        existCategories={textbook.categories.map((category) => category.name)}
         handleSubmit={handleSubmit}
       />
     </div>
