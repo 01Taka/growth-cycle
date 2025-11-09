@@ -3,6 +3,7 @@ import { HomePage } from './pages/Home.page';
 import { StartStudyPage } from './pages/StartStudy.page';
 import { StudyPage } from './pages/Study.page';
 import { TextBookPage } from './pages/Textbook.page';
+import { TextbookCreatePage } from './pages/TextbookCreate.page';
 
 const router = createBrowserRouter([
   {
@@ -12,6 +13,10 @@ const router = createBrowserRouter([
   {
     path: '/textbooks',
     element: <TextBookPage />,
+  },
+  {
+    path: '/create-textbook',
+    element: <TextbookCreatePage />,
   },
   {
     path: '/start-study',

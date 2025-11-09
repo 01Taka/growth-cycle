@@ -13,7 +13,7 @@ export const SUBJECT_COLORS: Record<
       // 濃いグレー。白背景での可読性を確保。
       text: '#444444',
       textRevers: '#e8e8e8',
-      bgScreen: '#ffffff', // 白
+      bgScreen: '#f8f8f8', // 変更: ニュートラルな超薄いグレー
       // 非常に薄いグレー。
       bgCard: '#f5f5f5',
       // 薄いグレー。
@@ -49,7 +49,7 @@ export const SUBJECT_COLORS: Record<
       // 濃い赤黒色。白背景での可読性を確保。
       text: '#6a0000',
       textRevers: '#ffe0e0',
-      bgScreen: '#ffffff', // 白
+      bgScreen: '#fffafa', // 変更: 非常に薄い赤
       // 非常に薄い赤。彩度を上げたベースカラー。
       bgCard: '#ffedee',
       // 鮮やかな赤のサブカラー。
@@ -85,7 +85,7 @@ export const SUBJECT_COLORS: Record<
       // 濃いインクブルー。白背景での可読性を確保。
       text: '#00206a',
       textRevers: '#e0f0ff',
-      bgScreen: '#ffffff', // 白
+      bgScreen: '#fafbff', // 変更: 非常に薄い青
       // 非常に薄い青。彩度を上げたベースカラー。
       bgCard: '#e6f0ff',
       // 鮮やかな青のサブカラー。
@@ -106,7 +106,7 @@ export const SUBJECT_COLORS: Record<
       bgCard: '#183a6a',
       // 明るい鮮やかな青。
       bgChip: '#3a66a3',
-      // 鮮やかな青のボーダー。
+      //       // 鮮やかな青のボーダー。
       border: '#7fa3ff',
       disabled: '#303a4a',
       disabledText: '#b0bac6',
@@ -121,7 +121,7 @@ export const SUBJECT_COLORS: Record<
       // 濃いフォレストグリーン。白背景での可読性を確保。
       text: '#105010',
       textRevers: '#e0ffe0',
-      bgScreen: '#ffffff', // 白
+      bgScreen: '#fafffa', // 変更: 非常に薄い緑
       // 非常に薄いミント。彩度を上げたベースカラー。
       bgCard: '#effff0',
       // 鮮やかな緑のサブカラー。
@@ -157,7 +157,7 @@ export const SUBJECT_COLORS: Record<
       // 濃いセピアブラウン。白背景での可読性を確保。
       text: '#6a3000',
       textRevers: '#fff5e0',
-      bgScreen: '#ffffff', // 白
+      bgScreen: '#fffbf9', // 変更: 非常に薄いオレンジ
       // 非常に薄いクリーム。彩度を上げたベースカラー。
       bgCard: '#fff8eb',
       // 鮮やかなオレンジのサブカラー。
@@ -193,7 +193,7 @@ export const SUBJECT_COLORS: Record<
       // 濃いディープパープル。白背景での可読性を確保。
       text: '#4a0070',
       textRevers: '#fce0ff',
-      bgScreen: '#ffffff', // 白
+      bgScreen: '#fefaff', // 変更: 非常に薄い紫
       // 非常に薄いラベンダー。彩度を上げたベースカラー。
       bgCard: '#fef0ff',
       // 鮮やかな紫のサブカラー。

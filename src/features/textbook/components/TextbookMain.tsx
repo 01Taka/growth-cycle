@@ -1,9 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Card, Flex } from '@mantine/core';
+import { useSubjectColorMap } from '@/shared/hooks/useSubjectColor';
 import { Subject } from '@/shared/types/subject-types';
 import { generateDummyTextbookItemProps } from '../functions/generate-dummy';
 import { FilterChips } from './filterChip/FilterChips';
+import { NewFAB } from './NewFAB';
 import { TextbookItemProps } from './shared-props-types';
 import { TextbookList } from './TextbookList';
 
@@ -19,11 +21,12 @@ export const TextbookMain: React.FC<TextbookMainProps> = () => {
     [selectedSubject, dummyData]
   );
 
-  const [displayPlant, setDisplayPlant] = useState(false); // 初期値をtrueに設定
+  const theme = useSubjectColorMap(selectedSubject ?? 'japanese');
+
+  const [displayPlant, setDisplayPlant] = useState(false);
 
   useEffect(() => {
     const timerId = setTimeout(() => {}, 100);
-
     return () => clearTimeout(timerId);
   }, []);
 
@@ -53,10 +56,14 @@ export const TextbookMain: React.FC<TextbookMainProps> = () => {
     navigate('/start-study');
   };
 
+  const onCreate = () => {
+    navigate(`/create-textbook?subject=${selectedSubject ?? 'japanese'}`);
+  };
+
   return (
     <div>
       <Card
-        shadow="md"
+        shadow="sm"
         style={{
           position: 'fixed',
           top: 0,
@@ -75,12 +82,15 @@ export const TextbookMain: React.FC<TextbookMainProps> = () => {
           />
         </Flex>
       </Card>
-      <Box mt={120} />
-      <TextbookList
-        textbookItems={filterData}
-        sizeRatio={displayPlant ? 1 : 0}
-        onClick={onSelectTextbook}
-      />
+      <Box mt={130} mb={130}>
+        <TextbookList
+          textbookItems={filterData}
+          sizeRatio={displayPlant ? 1 : 0}
+          onClick={onSelectTextbook}
+        />
+      </Box>
+
+      <NewFAB onClick={onCreate} style={{ backgroundColor: theme.accent }} />
     </div>
   );
 };
