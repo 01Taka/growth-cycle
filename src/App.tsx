@@ -9,7 +9,7 @@ import { theme } from './theme';
 
 export default function App() {
   useParticlesEngine();
-  useAppSounds();
+  // useAppSounds();
 
   return (
     <MantineProvider theme={theme}>

@@ -7,7 +7,7 @@ import { sharedStyle } from '@/shared/styles/shared-styles';
 import { SubjectColorMap } from '@/shared/theme/subjectColorType';
 import { Subject } from '@/shared/types/subject-types';
 import { LearningProblemBase } from '../../types/problem-types';
-import { StudyHeader } from '../StudyHeader';
+import { StudyHeader } from '../main/StudyHeader';
 import { StudyTimer } from '../studyPhase/StudyTimer';
 import { TestProblemCard } from './card/TestProblemCard';
 import { TestStateGrid } from './grid/TestStateGrid';

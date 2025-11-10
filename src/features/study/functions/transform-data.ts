@@ -14,8 +14,6 @@ export const transformData = (data: LearningCycle): LearningProblemBase[] => {
   const unitMap = new Map(units.map((unit) => [unit.id, unit.name]));
   const categoryMap = new Map(categories.map((category) => [category.id, category.name]));
 
-  console.log(unitMap, categoryMap, problems);
-
   problems.map((problem) => {
     const unitName = unitMap.get(problem.unitId) || 'Unit: ???';
     const categoryName = categoryMap.get(problem.categoryId) || 'Category: ???';

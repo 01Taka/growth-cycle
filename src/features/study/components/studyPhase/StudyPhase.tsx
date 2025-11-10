@@ -4,7 +4,7 @@ import { SingleTimerData } from '@/shared/hooks/multi-timer/multi-timer-types';
 import { SubjectColorMap } from '@/shared/theme/subjectColorType';
 import { ImportPlantsType } from '@/shared/types/plant-shared-types';
 import { Subject } from '@/shared/types/subject-types';
-import { StudyHeader } from '../StudyHeader';
+import { StudyHeader } from '../main/StudyHeader';
 import { StudyActionButtons } from './StudyActionButtons';
 import { StudyPhasePlantDisplay } from './StudyPhasePlantDisplay';
 import { StudyTimer } from './StudyTimer';
