@@ -79,7 +79,7 @@ export const TestResultSchema = z
     problemIndex: z.number().int().min(0).describe('i18n:result.problem_index'),
     selfEvaluation: TestSelfEvaluationSchema.describe('i18n:result.self_evaluation'),
     scoringStatus: ProblemScoringStatusSchema.describe('i18n:result.is_correct'),
-    timeTakenMs: z.number().int().min(0).describe('i18n:result.time_taken_ms'),
+    timeSpentMs: z.number().int().min(0).describe('i18n:result.time_taken_ms'),
   })
   .describe('i18n:result.test_result');
 

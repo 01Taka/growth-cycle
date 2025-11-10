@@ -1,5 +1,5 @@
-import { JSX, useEffect, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { JSX, useCallback, useEffect, useMemo } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { LearningCycleDocument } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 import {
   ProblemScoringStatus,
@@ -9,6 +9,7 @@ import { TextbookDocument } from '@/shared/data/documents/textbook/textbook-docu
 import { SingleTimerData } from '@/shared/hooks/multi-timer/multi-timer-types';
 import { useLearningCycleStore } from '@/shared/stores/useLearningCycleStore';
 import { useTextbookStore } from '@/shared/stores/useTextbookStore';
+import { handleRecordSession } from '../../functions/curd-learning-cycle';
 import { convertLearningCycleToAttempts, transformData } from '../../functions/transform-data';
 import { LearningProblemBase, ProblemAttemptResult } from '../../types/problem-types';
 import { StudyLoadingOrError } from './StudyLoadingOrError';
@@ -39,13 +40,14 @@ export interface StudyData {
   isDataReady: boolean;
   // レンダリングのためのLoading/Errorコンポーネント
   renderLoadingOrError: () => JSX.Element;
-  handleFinishLearning: (args: StudyResultData) => void;
+  handleFinishLearning: (args: StudyResultData) => Promise<void>;
 }
 
 /**
  * 学習サイクルと教科書のデータをフェッチし、前処理を行うカスタムフック
  */
 export const useStudyData = (): StudyData => {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const cycleId = searchParams.get(CYCLE_ID_KEY);
 
@@ -53,6 +55,7 @@ export const useStudyData = (): StudyData => {
   const {
     activeLearningCycle,
     getLearningCycleById,
+    fetchLearningCycles,
     isLoading: isLoadingCycle,
     error: cycleError,
   } = useLearningCycleStore((state) => state);
@@ -131,9 +134,27 @@ export const useStudyData = (): StudyData => {
     />
   );
 
-  const handleFinishLearning = (args: StudyResultData) => {
-    console.log(args.problems);
-  };
+  const handleFinishLearning = useCallback(
+    async (args: StudyResultData) => {
+      if (isDataReady) {
+        try {
+          await handleRecordSession(textbook.id, learningCycle.id, args.problems);
+          await fetchLearningCycles(); // storeのデータを更新する
+          navigate('/');
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    },
+    [
+      isDataReady,
+      textbook?.id,
+      learningCycle?.id,
+      navigate,
+      fetchLearningCycles,
+      handleRecordSession,
+    ]
+  );
 
   return {
     cycleId,

@@ -11,6 +11,7 @@ export const StudyMain: React.FC<StudyMainProps> = () => {
   const studyData = useStudyData();
   useNavigationBlocker({
     shouldNavigationBlock: true,
+    allowedUrls: ['/'],
     onBlock: (location) => console.log('ブロックされました', location),
   });
 

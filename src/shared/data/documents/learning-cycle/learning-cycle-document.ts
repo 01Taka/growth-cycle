@@ -30,12 +30,12 @@ export const LearningCycleSchema = z
 
     // --- 使用するごとに更新されるデータ ---
     sessions: z.array(TestSessionSchema).describe('i18n:cycle.sessions'),
-    nextReviewDate: z.iso.date().describe('i18n:cycle.next_review_at'),
+    nextReviewDate: z.iso.date().nullable().describe('i18n:cycle.next_review_at'),
     latestAttemptedAt: TimestampSchema.describe('i18n:cycle.latest_attempted_at'),
   })
   .describe('i18n:cycle.full_document_schema');
 
-const LearningCycleDocumentSchema = LearningCycleSchema.and(IDBDocumentSchema);
+export const LearningCycleDocumentSchema = LearningCycleSchema.and(IDBDocumentSchema);
 
 export type LearningCycle = z.infer<typeof LearningCycleSchema>;
 export type LearningCycleDocument = z.infer<typeof LearningCycleDocumentSchema>;

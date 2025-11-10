@@ -11,6 +11,7 @@ import { BlockerFunction, To, useBlocker } from 'react-router-dom';
 export interface UseNavigationBlockerProps {
   shouldNavigationBlock?: boolean;
   shouldUnloadBlock?: boolean;
+  shouldBlockSamePath?: boolean;
   allowedUrls?: string[]; // オプショナル
   onBlock?: (nextLocation: To) => void; // ブロック時のコールバック
 }
@@ -39,6 +40,7 @@ export interface NavigationBlockerState {
 export const useNavigationBlocker = ({
   shouldNavigationBlock,
   shouldUnloadBlock,
+  shouldBlockSamePath,
   allowedUrls = [], // デフォルト値を空配列に設定
   onBlock,
 }: UseNavigationBlockerProps): NavigationBlockerState => {
@@ -64,7 +66,7 @@ export const useNavigationBlocker = ({
       const isSamePath = nextPathname === currentPathname;
 
       // 許可条件:
-      if (isAllowedByList || (allowedUrls.length === 0 && isSamePath)) {
+      if (isAllowedByList || (!shouldBlockSamePath && isSamePath)) {
         return false; // ブロックしない
       }
 

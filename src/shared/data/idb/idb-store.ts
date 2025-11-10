@@ -87,9 +87,9 @@ export class IDBStore {
   /**
    * 既存のドキュメントの特定のフィールドを更新します。
    */
-  public async update<T extends DocumentBase>(
+  public async update<T extends Omit<DocumentBase, 'id' | 'path'>>(
     path: string,
-    updates: Partial<Omit<T, 'id' | 'path'>>
+    updates: Partial<T>
   ): Promise<boolean> {
     const db = await this.dbPromise;
 

@@ -24,9 +24,7 @@ export interface ProblemAttemptDetail extends LearningProblemBase {
 // 問題の採点状態
 
 // 問題に対する最終的な試行結果（採点情報を含む）
-export interface ProblemAttemptResult extends ProblemAttemptDetail {
-  scoringStatus: ProblemScoringStatus;
-}
+export type ProblemAttemptResult = ProblemAttemptDetail & { scoringStatus: ProblemScoringStatus };
 
 // 特定の問題への一回の試行ログ（履歴）
 export interface AttemptLog {
