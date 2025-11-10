@@ -10,9 +10,10 @@ import { RecordReviewCard } from './RecordReviewCard';
 interface ReviewPhaseProps {
   records: ProblemLearningRecord[];
   theme: SubjectColorMap;
+  onFinish: () => void;
 }
 
-export const ReviewPhase: React.FC<ReviewPhaseProps> = ({ records, theme }) => {
+export const ReviewPhase: React.FC<ReviewPhaseProps> = ({ records, theme, onFinish }) => {
   const sortedRecords = useMemo(() => sortLearningRecord(records), [records]);
 
   return (
@@ -37,6 +38,7 @@ export const ReviewPhase: React.FC<ReviewPhaseProps> = ({ records, theme }) => {
           left: 0,
           color: theme.text,
         }}
+        onClick={onFinish}
       >
         見直し完了
         <IconCircleCheck />

@@ -1,8 +1,6 @@
-// src/components/study/StudyLogicContainer.tsx (新しいコンポーネント)
-
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Button, Stack, TextInput } from '@mantine/core'; // テスト用UI
+import { Button, Stack } from '@mantine/core'; // テスト用UI
 import { LocalStorageMultiTimerPersistenceProvider } from '@/shared/hooks/multi-timer/localStoragePersistenceProvider';
 import { useStudyLogic } from '../../hooks/useStudyLogic';
 import { useSyncedLocalStorage } from '../../hooks/useSyncedLocalStorage';
@@ -124,6 +122,23 @@ export const StudyLogicContainer: React.FC<StudyLogicContainerProps> = ({
     handleResetTimer
   );
 
+  const onFinish = useCallback(() => {
+    const isTimerCompleted = studyTimer.remainingTime <= 0 && testTimer.remainingTime <= 0;
+    const isEnteredData =
+      Object.keys(selfEvaluationMap).length > 0 && Object.keys(scoringStatusMap).length > 0;
+    // ポップアップの表示などに利用
+    const _isCompleted = isEnteredData && isTimerCompleted;
+
+    studyData.handleFinishLearning({
+      problems,
+      selfEvaluationMap,
+      scoringStatusMap,
+      elapsedTimeMap,
+      studyTimer,
+      testTimer,
+    });
+  }, [problems, selfEvaluationMap, scoringStatusMap, elapsedTimeMap, studyTimer, testTimer]);
+
   // 💡 データが揃った後のフェーズレンダリング
   const renderPhase = () => {
     switch (phase) {
@@ -174,7 +189,7 @@ export const StudyLogicContainer: React.FC<StudyLogicContainerProps> = ({
           />
         );
       case 'review':
-        return <ReviewPhase records={records} theme={theme} />;
+        return <ReviewPhase records={records} theme={theme} onFinish={() => onFinish()} />;
       default:
         return null;
     }

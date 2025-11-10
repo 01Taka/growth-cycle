@@ -1,7 +1,12 @@
 import { JSX, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { LearningCycleDocument } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
+import {
+  ProblemScoringStatus,
+  TestSelfEvaluation,
+} from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { TextbookDocument } from '@/shared/data/documents/textbook/textbook-document';
+import { SingleTimerData } from '@/shared/hooks/multi-timer/multi-timer-types';
 import { useLearningCycleStore } from '@/shared/stores/useLearningCycleStore';
 import { useTextbookStore } from '@/shared/stores/useTextbookStore';
 import { convertLearningCycleToAttempts, transformData } from '../../functions/transform-data';
@@ -9,6 +14,15 @@ import { LearningProblemBase, ProblemAttemptResult } from '../../types/problem-t
 import { StudyLoadingOrError } from './StudyLoadingOrError';
 
 const CYCLE_ID_KEY = 'cycleId';
+
+interface StudyResultData {
+  problems: ProblemAttemptResult[];
+  selfEvaluationMap: Record<number, TestSelfEvaluation>;
+  scoringStatusMap: Record<number, ProblemScoringStatus>;
+  elapsedTimeMap: Record<number, number>;
+  studyTimer: SingleTimerData;
+  testTimer: SingleTimerData;
+}
 
 // 戻り値の型定義
 export interface StudyData {
@@ -25,6 +39,7 @@ export interface StudyData {
   isDataReady: boolean;
   // レンダリングのためのLoading/Errorコンポーネント
   renderLoadingOrError: () => JSX.Element;
+  handleFinishLearning: (args: StudyResultData) => void;
 }
 
 /**
@@ -116,6 +131,10 @@ export const useStudyData = (): StudyData => {
     />
   );
 
+  const handleFinishLearning = (args: StudyResultData) => {
+    console.log(args.problems);
+  };
+
   return {
     cycleId,
     learningCycle,
@@ -129,5 +148,6 @@ export const useStudyData = (): StudyData => {
     pastAttemptedResults,
     isDataReady,
     renderLoadingOrError,
+    handleFinishLearning,
   };
 };
