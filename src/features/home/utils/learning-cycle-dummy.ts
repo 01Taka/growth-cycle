@@ -1,6 +1,7 @@
 import { LearningCycleDocument } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 import { generateFirestoreId } from '@/shared/data/idb/generate-path';
 import { IDB_PATH } from '@/shared/data/idb/idb-path';
+import { getDateAfterDays } from '@/shared/utils/datetime/datetime-utils';
 
 // ユーティリティ関数: 乱数に応じて要素をランダムに選択
 const getRandomElement = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
@@ -74,13 +75,17 @@ export const generateDummyLearningCycle = (
         const isCorrect = Math.random() < (problem.categoryId === 'CAT-EASY' ? 0.8 : 0.5); // 易しい問題は正答率高め
         const selfEvaluation: LearningCycleDocument['sessions'][0]['results'][0]['selfEvaluation'] =
           getRandomElement(['confident', 'imperfect', 'notSure']);
+
+        const scoringStatus: LearningCycleDocument['sessions'][0]['results'][0]['scoringStatus'] =
+          getRandomElement(['unrated', 'correct', 'incorrect']);
         const timeTakenMs = getRandomInt(avgTime * 0.5, avgTime * 1.5);
 
         return {
           problemIndex: problem.index,
           selfEvaluation: isCorrect ? 'confident' : selfEvaluation, // 正解なら自信ありに偏らせる
           isCorrect: isCorrect,
-          timeTakenMs: timeTakenMs,
+          timeSpentMs: timeTakenMs,
+          scoringStatus,
         };
       });
 
@@ -104,16 +109,14 @@ export const generateDummyLearningCycle = (
     learningDurationMs: getRandomInt(1, 10) * 3600000, // 1〜10時間
     testDurationMs: problemCount * 60000, // 問題数 x 1分
     problems: problems,
-    isReviewTarget: Math.random() > 0.5,
+    isReviewTarget: Math.random() > 0.9,
     textbookName: `${subject.charAt(0).toUpperCase() + subject.slice(1)} ${testMode === 'memory' ? '用語集' : '問題集'}`,
     subject: subject,
     cycleStartAt: cycleStartAt,
     units: units,
     categories: categories,
     sessions: sessions,
-    nextReviewDate: new Date(latestAttemptedAt + 7 * 24 * 60 * 60 * 1000)
-      .toISOString()
-      .split('T')[0], // 最終試行の7日後
+    nextReviewDate: getDateAfterDays(Math.random() > 0.5 ? 1 : 7),
     latestAttemptedAt: latestAttemptedAt,
   };
 };

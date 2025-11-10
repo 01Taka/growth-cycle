@@ -23,3 +23,18 @@ export const TextbookDocumentSchema = TextbookSchema.and(IDBDocumentSchema);
 
 export type Textbook = z.infer<typeof TextbookSchema>;
 export type TextbookDocument = z.infer<typeof TextbookDocumentSchema>;
+
+interface PlantModule {
+  part: string; // Recordのkeyのコピー
+  moduleType: string;
+  moduleRarity: string; // このモジュールのレアリティ
+}
+
+interface Plant {
+  subject: string;
+  seedType: string; // どの種を使って育てているか
+  size: number; // 植物の表示サイズを決めるランダム値
+  plantType: string; // 2回目の成長での変化
+  plantRarity: string;
+  modules: Record<string, PlantModule>; // 3回目の成長で決まる、plantTypeに応じたモジュールの組み合わせ
+}

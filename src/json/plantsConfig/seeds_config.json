@@ -1,0 +1,12 @@
+{
+    "science": {
+        "plants": {
+            "TulipB": {
+                "minSize": 150,
+                "maxSize": 200,
+                "rarity": "SR",
+                "weight": 75
+            }
+        }
+    }
+}

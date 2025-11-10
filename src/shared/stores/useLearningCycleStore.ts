@@ -1,5 +1,3 @@
-// src/stores/useLearningCycleStore.ts
-
 import { create } from 'zustand';
 // 💡 学習サイクルデータの型を仮定
 import { LearningCycleDocument } from '@/shared/data/documents/learning-cycle/learning-cycle-document';

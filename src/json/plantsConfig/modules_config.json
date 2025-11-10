@@ -1,0 +1,10 @@
+{
+  "SCIENCE_TULIPB_STEM_STEM_V1": {
+    "imgPath": "src/assets/images/plantModules\\seeds\\science\\plants\\tulipb\\parts\\stem\\modules\\stem_v1\\stem_v1.png",
+    "zIndex": 10
+  },
+  "SCIENCE_TULIPB_FLOWER_FLOWER_SR": {
+    "imgPath": "src/assets/images/plantModules\\seeds\\science\\plants\\tulipb\\parts\\flower\\modules\\flower_sr\\flower_sr.png",
+    "zIndex": 20
+  }
+}

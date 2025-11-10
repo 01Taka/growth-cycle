@@ -1,5 +1,6 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLearningCycleStore } from '@/shared/stores/useLearningCycleStore';
 import {
   convertLearningCyclesToReviewItemMap,
   createReviewCountGetter,
@@ -13,16 +14,22 @@ import { GrowthPresentation } from './startStudy/GrowthPresentation';
 interface HomeMainProps {}
 
 export const HomeMain: React.FC<HomeMainProps> = ({}) => {
-  const dummyCycles = useMemo(() => generateMultipleLearningCycles(100), []);
+  const { fetchLearningCycles } = useLearningCycleStore((state) => state);
+
+  const learningCycles = useMemo(() => generateMultipleLearningCycles(10), []);
+
+  useEffect(() => {
+    fetchLearningCycles();
+  }, [fetchLearningCycles]);
 
   const reviewPropsMap = useMemo(
-    () => convertLearningCyclesToReviewItemMap(dummyCycles),
-    [dummyCycles]
+    () => convertLearningCyclesToReviewItemMap(learningCycles),
+    [learningCycles]
   );
 
   const navigate = useNavigate();
 
-  const todayCycles = filterTodayLearningCycles(dummyCycles);
+  const todayCycles = filterTodayLearningCycles(learningCycles);
   const learnings = todayCycles.map((cycle) => ({ subject: cycle.subject }));
   const getItem = createReviewItemGetter(reviewPropsMap);
   const getCount = createReviewCountGetter(reviewPropsMap);
