@@ -71,13 +71,3 @@ export interface SeedSetting {
   // plantTypeをキーとする辞書
   plants: Record<string, PlantOption>; // 抽選される可能性がある植物
 }
-
-interface ModuleItem {
-  moduleType: string;
-  moduleRarity: string;
-  weight: number;
-  zIndex: number;
-  image_filename: string;
-}
-
-type Module = Record<string, ModuleItem[]>;

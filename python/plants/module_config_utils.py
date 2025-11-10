@@ -86,7 +86,8 @@ def create_new_module(
     part_type: str,
     module_type: str,
     z_index: int,
-    image_data: bytes # 画像データをバイト列(bytes)として想定
+    image_data: bytes, # 画像データをバイト列(bytes)として想定
+    allow_overwrite: bool # **追加: 上書きを許可するかどうかのフラグ**
 ) -> None:
     """
     新しいモジュールの画像アセット保存と設定カタログへの追加を行う（実際のファイル操作）。
@@ -98,61 +99,60 @@ def create_new_module(
         module_type: モジュールのタイプ
         z_index: レンダリング時のZ座標
         image_data: 保存する画像データ (バイト列)
+        allow_overwrite: モジュールキーが既存の場合に上書きを許可するかどうか
         
     Raises:
-        ValueError: モジュールキーが既存の設定に重複している場合
+        ValueError: モジュールキーが既存の設定に重複しており、上書きが許可されていない場合
         IOError: ファイル操作中にエラーが発生した場合
     """
+    module_key = get_module_key(seed_type, plant_type, part_type, module_type)
+    directory_path = get_module_image_directory_path(seed_type, plant_type, part_type, module_type)
+    image_file_name = f"{module_type.lower()}.png"
+    image_file_path = os.path.join(directory_path, image_file_name)
+
+    print(f"\n--- [START] Creating New Module: {module_key} ---")
+    
     try:
-        # 構造要素を個別に渡す
-        module_key = get_module_key(seed_type, plant_type, part_type, module_type)
-        directory_path = get_module_image_directory_path(seed_type, plant_type, part_type, module_type)
-        
-        image_file_name = f"{module_type.lower()}.png"
-        image_file_path = os.path.join(directory_path, image_file_name)
-
-        print(f"--- [START] Creating New Module: {module_key} ---")
-        print(f"Target Directory: {directory_path}")
-
-        # 1. ディレクトリの作成 (実際の操作)
-        # 既に存在する場合は何もしない (exist_ok=True)
-        os.makedirs(directory_path, exist_ok=True)
-        print(f"[ACTION] Directory created/checked: {directory_path}")
-        
-        # 2. 画像ファイルの保存 (実際の操作: バイナリ書き込み)
-        with open(image_file_path, 'wb') as f:
-            f.write(image_data)
-        print(f"[ACTION] Image saved to: {image_file_path}")
-
-        # 3. JSON設定の読み込み (実際の操作)
+        # 1. JSON設定の読み込み
         modules_config: Dict[str, ModuleSetting] = {}
         try:
             with open(MODULES_CONFIG_JSON_PATH, 'r', encoding='utf-8') as f:
                 modules_config = json.load(f)
-            print(f"[ACTION] Loaded existing config from: {MODULES_CONFIG_JSON_PATH}")
         except FileNotFoundError:
-            # ファイルが存在しない場合は空の辞書から開始
             print("[INFO] Config file not found. Starting with empty config.")
         except json.JSONDecodeError:
-            # JSON形式が不正な場合は警告を出し、空の辞書から開始
             print("[WARNING] Error decoding existing JSON. Overwriting config with new data.")
-            # 既存のデータは破損しているとみなし、空の辞書で上書きする
 
-        # 4. 整合性チェック: モジュールキーの重複を確認
+        # 2. 整合性チェック: モジュールキーの重複を確認と上書き処理
         if module_key in modules_config:
-            # 重複は重大なエラーとしてスロー
-            raise ValueError(f"Module key already exists (Integrity Check Failed): {module_key}")
+            if allow_overwrite:
+                print(f"[WARNING] Module key '{module_key}' already exists. Overwriting is ALLOWED.")
+            else:
+                # 上書きが許可されていない場合、エラーをスロー
+                raise ValueError(
+                    f"Module key already exists (Integrity Check Failed): {module_key}. "
+                    "Use 'allow_overwrite=True' to force an update."
+                )
 
-        # 5. JSONに新しい設定を追加
+        # 3. ディレクトリの作成
+        os.makedirs(directory_path, exist_ok=True)
+        print(f"[ACTION] Directory created/checked: {directory_path}")
+        
+        # 4. 画像ファイルの保存
+        # 'wb' モードは、ファイルが存在すれば上書きされます
+        with open(image_file_path, 'wb') as f:
+            f.write(image_data)
+        print(f"[ACTION] Image saved/overwritten to: {image_file_path}")
+
+        # 5. JSONに新しい設定を追加/更新
         new_setting: ModuleSetting = {
             'imgPath': image_file_path,
             'zIndex': z_index
         }
         modules_config[module_key] = new_setting
         
-        # 6. JSONを保存 (実際の操作: 読みやすいようにインデントと日本語対応)
+        # 6. JSONを保存
         with open(MODULES_CONFIG_JSON_PATH, 'w', encoding='utf-8') as f:
-            # ensure_ascii=False で日本語などをそのまま保存
             json.dump(modules_config, f, indent=4, ensure_ascii=False)
         
         print("[INFO] Updated config data (partial view):")
@@ -161,9 +161,108 @@ def create_new_module(
         print(f"--- [SUCCESS] Module {module_key} configuration completed. ---")
 
     except Exception as e:
-        # すべてのファイルI/Oエラーやその他の予期せぬエラーを捕捉し、より具体的なIOErrorで再スロー
+        # ValueError以外（主にファイルI/Oエラー）を捕捉し、具体的なIOErrorで再スロー
         print(f"[FATAL ERROR] Operation failed: {e}")
-        # ValueErrorは重複チェックでスローされるため、それ以外はIOErrorとして扱う
         if not isinstance(e, ValueError):
             raise IOError(f"File operation failed for {module_key}: {e}") from e
         raise # ValueErrorを再スロー
+
+# --- テスト実行エリア ---
+
+def cleanup_test_files():
+    """テスト用に作成されたファイルとディレクトリをクリーンアップします。"""
+    if os.path.exists(MODULES_CONFIG_JSON_PATH):
+        os.remove(MODULES_CONFIG_JSON_PATH)
+    
+    # テスト用のディレクトリパスを削除
+    test_path = os.path.join(ROOT_DIR_KEY, SEEDS_DIR_KEY, 'test', PLANTS_DIR_KEY)
+    if os.path.exists(test_path):
+        # ROOT_DIR_KEYからtestディレクトリを削除するためにパスを調整
+        top_level_test_dir = os.path.join(ROOT_DIR_KEY, SEEDS_DIR_KEY, 'test')
+        if os.path.exists(top_level_test_dir):
+            shutil.rmtree(top_level_test_dir)
+            
+    print("\n[CLEANUP] Test files and directories cleaned up.")
+
+if __name__ == '__main__':
+    import shutil # テスト用クリーンアップのために必要
+    
+    # クリーンアップから開始
+    cleanup_test_files()
+
+    # --- テストデータ ---
+    TEST_SEED = "Test"
+    TEST_PLANT = "TreeA"
+    TEST_PART = "Stem"
+    TEST_MODULE = "Basic"
+    
+    # ダミー画像データ (バイナリデータとして)
+    DUMMY_IMAGE_DATA_V1 = b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15\xc4\x89\x00\x00\x00\x0cIDAT\x08\xd7c`\x00\x00\x00\x02\x00\x01\xe2!\xbc \x00\x00\x00\x00IEND\xaeB`\x82'
+    DUMMY_IMAGE_DATA_V2 = b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15\xc4\x89\x00\x00\x00\x0cIDAT\x08\xd7c`\x00\x00\x00\x02\x00\x01\xe2!\xbc \x00\x00\x00\x00IEND\xaeB`\x82' * 2 # サイズを変更したと仮定
+
+    # --- テストシナリオ 1: 初回作成 (成功) ---
+    print("\n================== SCENARIO 1: First Creation (Success) ==================")
+    try:
+        create_new_module(
+            seed_type=TEST_SEED,
+            plant_type=TEST_PLANT,
+            part_type=TEST_PART,
+            module_type=TEST_MODULE,
+            z_index=10,
+            image_data=DUMMY_IMAGE_DATA_V1,
+            allow_overwrite=False # 初回なのでFalseでも問題ない
+        )
+    except Exception as e:
+        print(f"[TEST ERROR] SCENARIO 1 FAILED: {e}")
+
+    # --- テストシナリオ 2: 重複キーの作成 (失敗: allow_overwrite=False) ---
+    print("\n================== SCENARIO 2: Duplicate Attempt (Failure) ==================")
+    try:
+        create_new_module(
+            seed_type=TEST_SEED,
+            plant_type=TEST_PLANT,
+            part_type=TEST_PART,
+            module_type=TEST_MODULE,
+            z_index=20, # zIndexを変更
+            image_data=DUMMY_IMAGE_DATA_V2,
+            allow_overwrite=False # 上書きを許可しない
+        )
+    except ValueError as e:
+        print(f"[TEST SUCCESS] SCENARIO 2 CAUGHT EXPECTED ERROR: {e}")
+    except Exception as e:
+        print(f"[TEST ERROR] SCENARIO 2 FAILED UNEXPECTEDLY: {e}")
+
+    # --- テストシナリオ 3: 重複キーの作成 (成功: allow_overwrite=True) ---
+    print("\n================== SCENARIO 3: Overwrite Attempt (Success) ==================")
+    try:
+        create_new_module(
+            seed_type=TEST_SEED,
+            plant_type=TEST_PLANT,
+            part_type=TEST_PART,
+            module_type=TEST_MODULE,
+            z_index=30, # zIndexをさらに変更
+            image_data=DUMMY_IMAGE_DATA_V2,
+            allow_overwrite=True # 上書きを許可
+        )
+    except Exception as e:
+        print(f"[TEST ERROR] SCENARIO 3 FAILED: {e}")
+        
+    # --- 最終確認 ---
+    print("\n================== FINAL CONFIG CHECK ==================")
+    try:
+        with open(MODULES_CONFIG_JSON_PATH, 'r', encoding='utf-8') as f:
+            final_config = json.load(f)
+            print(json.dumps(final_config, indent=4, ensure_ascii=False))
+            
+            final_module_key = get_module_key(TEST_SEED, TEST_PLANT, TEST_PART, TEST_MODULE)
+            
+            # 最終的な zIndex が 30 (上書きされた値) であることを確認
+            if final_config.get(final_module_key, {}).get('zIndex') == 30:
+                print("\n[TEST RESULT] Final zIndex is 30. Overwrite successful.")
+            else:
+                print("\n[TEST RESULT] Final zIndex is incorrect. Overwrite FAILED.")
+    except Exception as e:
+        print(f"[TEST ERROR] Final check failed: {e}")
+        
+    # 最終クリーンアップ（オプション）
+    # cleanup_test_files()

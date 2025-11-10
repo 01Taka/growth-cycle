@@ -1,13 +1,20 @@
 import json
 import os
-from typing import Dict, Any, List, Union
+import shutil
+from typing import Dict, Any, List
 
 # --- グローバル定数 (ユーザー指定のパス) ---
 MODULES_CONFIG_JSON_PATH = 'src/json/plantsConfig/modules_config.json'
 PLANTS_CONFIG_JSON_PATH = 'src/json/plantsConfig/plants_config.json'
 SEEDS_CONFIG_JSON_PATH = 'src/json/plantsConfig/seeds_config.json'
 
-# --- ヘルパー関数 (既存の構造から再定義) ---
+# 出力先パスの指定
+OUTPUT_FILE_PATH = 'python/plants/new_plants.json'
+
+# 画像のコピー先ディレクトリ
+IMAGE_BASE_DIR = 'python/plants/images'
+
+# --- ヘルパー関数 ---
 
 def get_plant_key(seed_type: str, plant_type: str) -> str:
     """PlantSettingを参照するためのキーを生成する (例: ART_SAKURAA)"""
@@ -26,28 +33,100 @@ def get_module_key(
 
 def load_config(path: str) -> Dict[str, Any]:
     """JSON設定ファイルを読み込むヘルパー関数"""
-    print(f"[INFO] Loading: {path}")
     try:
         with open(path, 'r', encoding='utf-8') as f:
             return json.load(f)
-    except FileNotFoundError:
-        print(f"[ERROR] Config file not found at: {path}")
-        return {}
-    except json.JSONDecodeError:
-        print(f"[ERROR] Invalid JSON format in: {path}")
+    except (FileNotFoundError, json.JSONDecodeError):
+        # 実行時にエラーメッセージは出すが、呼び出し元で安全に処理できるように空の辞書を返す
         return {}
 
-# --- メインロジック関数 ---
+def write_json_output(data: Dict[str, Any], path: str):
+    """結果のJSONデータを指定されたパスに書き込む"""
+    try:
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        
+        with open(path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=4, ensure_ascii=False)
+        
+        print(f"\n--- [SUCCESS] Output JSON written to: {path} ---")
+    except Exception as e:
+        print(f"\n[ERROR] Failed to write output file to {path}. Error: {e}")
+
+# --- 画像処理関数 ---
+
+def handle_image_directory_cleanup(base_dir: str):
+    """画像ディレクトリのクリアをユーザーに確認し、実行する"""
+    if os.path.exists(base_dir):
+        print(f"\n[CLEANUP] 対象ディレクトリ: {base_dir}")
+        response = input("このディレクトリをクリアしますか？ (y/N): ").lower()
+        if response == 'y':
+            try:
+                # ディレクトリを削除し、再作成する
+                shutil.rmtree(base_dir)
+                os.makedirs(base_dir)
+                print(f"[SUCCESS] ディレクトリ '{base_dir}' をクリアしました。")
+            except Exception as e:
+                print(f"[ERROR] ディレクトリのクリアに失敗しました: {e}")
+        else:
+            print("[INFO] ディレクトリのクリアをスキップしました。")
+    else:
+        # ディレクトリが存在しない場合は作成
+        os.makedirs(base_dir, exist_ok=True)
+        print(f"[INFO] ディレクトリ '{base_dir}' が存在しなかったため作成しました。")
+
+def copy_module_images(modules_config: Dict[str, Any], dest_dir: str):
+    """モジュール画像をアセットディレクトリから指定されたディレクトリにコピーする"""
+    response = input("\n[COPY] コピー元の imgPath の画像をコピー先のディレクトリにコピーしますか？ (y/N): ").lower()
+    
+    if response == 'y':
+        os.makedirs(dest_dir, exist_ok=True)
+        copied_count = 0
+        skipped_count = 0
+        
+        # Modules Configからすべての imgPath を抽出
+        source_paths = [
+            setting['imgPath'] 
+            for setting in modules_config.values() 
+            if 'imgPath' in setting
+        ]
+
+        print(f"\n[COPY START] {len(source_paths)} 個の画像を '{dest_dir}' にコピーします...")
+
+        for src_path in source_paths:
+            # 簡略化のため、imgPathは実行ディレクトリからの相対パスと仮定します
+            source_file = src_path
+            
+            # ファイル名を取得
+            filename = os.path.basename(source_file)
+            destination_file = os.path.join(dest_dir, filename)
+
+            if os.path.exists(source_file):
+                try:
+                    # ファイルのコピー (メタデータも保持する copy2 を使用)
+                    shutil.copy2(source_file, destination_file)
+                    copied_count += 1
+                except Exception as e:
+                    print(f"[ERROR] '{source_file}' のコピー中にエラーが発生しました: {e}")
+            else:
+                # ダミーとして作成したファイルが存在しない場合 (通常は発生しないはず)
+                print(f"[WARNING] コピー元ファイルが見つかりませんでした: '{source_file}'")
+                skipped_count += 1
+
+        print(f"\n[COPY COMPLETE] 完了しました。コピー数: {copied_count}, スキップ数: {skipped_count}")
+    else:
+        print("[INFO] 画像のコピーをスキップしました。")
+
+# --- メインロジック関数 (変更なし) ---
 
 def reverse_engineer_new_plants_json(
     seed_type: str, 
     plant_type: str
-) -> Union[Dict[str, Any], None]:
+):
     """
     seeds, plants, modulesの各設定ファイルから、
     new_plants.jsonの構造を逆生成します。
     """
-    print(f"--- [START] Reverse Engineering for {seed_type.upper()}/{plant_type.upper()} ---")
+    print(f"\n--- [START] Reverse Engineering for {seed_type.upper()}/{plant_type.upper()} ---")
 
     # 1. すべての設定ファイルを読み込み
     seeds_config = load_config(SEEDS_CONFIG_JSON_PATH)
@@ -75,16 +154,14 @@ def reverse_engineer_new_plants_json(
         return None
         
     plant_modules_structure = plant_setting['modules']
-    plant_rarity_from_plants = plant_setting.get('rarity', plant_option_data.get('rarity', ''))
+    print(plant_modules_structure)
 
     # 4. モジュール情報を集約し、zIndexとimage_filenameを結合
     final_modules_map: Dict[str, List[Dict[str, Any]]] = {}
     
-    # modules: Record<partType, Record<moduleType, ModuleOption>> を反復処理
     for part_type, module_type_options in plant_modules_structure.items():
         final_modules_map[part_type] = []
         
-        # moduleTypeごとの抽選情報を反復処理
         for module_type, module_option in module_type_options.items():
             # 5. グローバルキーを生成し、Modules Configから静的情報を取得
             module_key = get_module_key(seed_type, plant_type, part_type, module_type)
@@ -108,42 +185,54 @@ def reverse_engineer_new_plants_json(
             
     if not any(final_modules_map.values()):
         print("[WARNING] No valid modules were found for this plant.")
-
+        
     # 7. 最終的な new_plants.json 構造の構築
     result_data = {
         "seed_type": seed_type,
         "plant_type": plant_type,
-        # PlantOptionから取得した情報
         "min_size": plant_option_data.get('minSize', 0),
         "max_size": plant_option_data.get('maxSize', 0),
-        "rarity": plant_option_data.get('rarity', plant_rarity_from_plants), # Optionのrarityを優先
+        "rarity": plant_option_data.get('rarity', ""),
         "weight": plant_option_data.get('weight', 0),
-        # 結合されたモジュール情報
         "modules": final_modules_map
     }
     
-    print("--- [SUCCESS] Reverse Engineering complete. ---")
-    return result_data
+    print("\n--- [SUCCESS] Reverse Engineering complete. ---")
+    return result_data, modules_config
+
 
 if __name__ == '__main__':
-    # ユーザーに入力を求める
     print("\n-----------------------------------------------------")
     print("設定ファイルの逆生成を実行します。")
-    print("例: Seed Type -> Art, Plant Type -> SakuraA または RoseB")
+    print(f"JSON結果は '{OUTPUT_FILE_PATH}' に出力されます。")
+    print(f"画像コピー先は '{IMAGE_BASE_DIR}' です。")
     print("-----------------------------------------------------")
     
-    # input関数でseed_typeとplant_typeを取得
+    # ユーザーに入力を求める
     seed_type_input = input("Seed Type (例: Art): ")
     plant_type_input = input("Plant Type (例: SakuraA): ")
 
-    # 逆生成を実行
-    result = reverse_engineer_new_plants_json(
+    # 逆生成を実行 (modules_configも戻り値として受け取る)
+    result_tuple = reverse_engineer_new_plants_json(
         seed_type=seed_type_input, 
         plant_type=plant_type_input
     )
     
-    if result:
-        print("\n--- [RESULT] Generated new_plants.json structure ---")
-        print(json.dumps(result, indent=4, ensure_ascii=False))
+    if result_tuple:
+        result_data, modules_config = result_tuple
+        
+        # 1. JSONファイルをファイルに出力
+        write_json_output(result_data, OUTPUT_FILE_PATH)
+        
+        # 2. 画像ディレクトリのクリアを処理
+        handle_image_directory_cleanup(IMAGE_BASE_DIR)
+
+        # 3. 画像のコピーを処理
+        copy_module_images(modules_config, IMAGE_BASE_DIR)
+        
+        # 4. コンソールにも最終JSONを表示（確認用）
+        print("\n--- [CONSOLE PREVIEW] Generated JSON Content ---")
+        print(json.dumps(result_data, indent=4, ensure_ascii=False))
+
     else:
-        print("\n[RESULT] 逆生成に失敗しました。入力されたSeed TypeとPlant Typeを確認してください。")
+        print("\n[RESULT] 逆生成に失敗しました。ファイル出力および画像処理はスキップされました。")
