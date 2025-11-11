@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { IconPencil } from '@tabler/icons-react';
 import { Box, Button, Card, Divider, Flex, Stack, Text } from '@mantine/core';
 import { TestSelfEvaluation } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
@@ -6,12 +6,13 @@ import { SingleTimerData } from '@/shared/hooks/multi-timer/multi-timer-types';
 import { sharedStyle } from '@/shared/styles/shared-styles';
 import { SubjectColorMap } from '@/shared/theme/subjectColorType';
 import { Subject } from '@/shared/types/subject-types';
+import { StudyHeader } from '../../../../shared/components/StudyHeader';
 import { LearningProblemBase } from '../../types/problem-types';
-import { StudyHeader } from '../main/StudyHeader';
 import { StudyTimer } from '../studyPhase/StudyTimer';
 import { TestProblemCard } from './card/TestProblemCard';
 import { TestStateGrid } from './grid/TestStateGrid';
 import { TestProblemsList } from './list/TestProblemsList';
+import { TimerStartModal } from './TimerStartModal';
 
 interface TestPhaseProps {
   problems: LearningProblemBase[];
@@ -48,6 +49,14 @@ export const TestPhase: React.FC<TestPhaseProps> = ({
   onSelectSelfEvaluation,
   onStartScoring,
 }) => {
+  const [openedTimerModal, setOpenedTimerModal] = useState(!mainTimer.isRunning);
+
+  useEffect(() => {
+    if (mainTimer.isRunning) {
+      setOpenedTimerModal(false);
+    }
+  }, [mainTimer.isRunning]);
+
   const currentProblem: LearningProblemBase | null = (problems[currentProblemIndex] ??
     null) as LearningProblemBase | null;
 
@@ -161,6 +170,18 @@ export const TestPhase: React.FC<TestPhaseProps> = ({
           </Stack>
         </Card>
       </Stack>
+      <TimerStartModal
+        isStarted={mainTimer.elapsedTime !== 0}
+        remainingTimeMin={Math.floor(mainTimer.remainingTime / 60000)}
+        problems={problems}
+        theme={theme}
+        opened={openedTimerModal}
+        onClose={() => setOpenedTimerModal(false)}
+        onStartTest={() => {
+          setOpenedTimerModal(false);
+          switchTimerRunning();
+        }}
+      />
     </Stack>
   );
 };

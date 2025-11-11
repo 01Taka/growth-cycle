@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Box, Center, Flex, Loader, Text } from '@mantine/core';
-import { StudyHeader } from '@/features/study/components/main/StudyHeader';
+import { StudyHeader } from '@/shared/components/StudyHeader';
 import { useSubjectColorMap } from '@/shared/hooks/useSubjectColor';
 import { useTextbookStore } from '@/shared/stores/useTextbookStore';
 import { createLearningCycle } from '../shared/form/crud-study-data';

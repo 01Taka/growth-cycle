@@ -82,7 +82,7 @@ export const useStudyTimer = (
   const studyTimer = useMemo(() => timer.getSingleTimer(STUDY_TIMER_ID), [timer.getSingleTimer]);
   const testTimer = useMemo(() => timer.getSingleTimer(TEST_TIMER_ID), [timer.getSingleTimer]);
 
-  const [currentTestProblemIndex, setCurrentTestProblemIndex] = useState<number | null>(null);
+  const [currentTestProblemIndex, setCurrentTestProblemIndex] = useState<number | null>(0);
 
   // 6. 現在アクティブな問題タイマーのインスタンスを取得
   const currentActiveProblemTimer = useMemo(

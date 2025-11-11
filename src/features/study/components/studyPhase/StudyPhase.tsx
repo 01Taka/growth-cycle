@@ -1,15 +1,18 @@
-import React from 'react';
-import { Stack } from '@mantine/core';
+import React, { useState } from 'react';
+import { Modal, Stack } from '@mantine/core';
 import { SingleTimerData } from '@/shared/hooks/multi-timer/multi-timer-types';
 import { SubjectColorMap } from '@/shared/theme/subjectColorType';
-import { ImportPlantsType, Plant } from '@/shared/types/plant-shared-types';
+import { Plant } from '@/shared/types/plant-shared-types';
 import { Subject } from '@/shared/types/subject-types';
-import { StudyHeader } from '../main/StudyHeader';
+import { StudyHeader } from '../../../../shared/components/StudyHeader';
+import { LearningProblemKey } from '../../types/problem-types';
+import { LearningProblemKeyList } from '../shared/problemList/LearningProblemKeyList';
 import { StudyActionButtons } from './StudyActionButtons';
 import { StudyPhasePlantDisplay } from './StudyPhasePlantDisplay';
 import { StudyTimer } from './StudyTimer';
 
 interface StudyPhaseProps {
+  problems: LearningProblemKey[];
   isReadyTest: boolean;
   header: {
     subject: Subject;
@@ -21,10 +24,10 @@ interface StudyPhaseProps {
   theme: SubjectColorMap;
   switchState: () => void;
   onStartTest: () => void;
-  onShowTextRange: () => void;
 }
 
 export const StudyPhase: React.FC<StudyPhaseProps> = ({
+  problems,
   isReadyTest,
   header,
   plant,
@@ -32,8 +35,9 @@ export const StudyPhase: React.FC<StudyPhaseProps> = ({
   theme,
   switchState,
   onStartTest,
-  onShowTextRange,
 }) => {
+  const [showTestRange, setShowTestRange] = useState(false);
+
   return (
     <Stack align="center">
       <StudyHeader {...header} />
@@ -48,9 +52,20 @@ export const StudyPhase: React.FC<StudyPhaseProps> = ({
         theme={theme}
         isReadyTest={isReadyTest}
         onStartTest={onStartTest}
-        onShowTextRange={onShowTextRange}
+        onShowTextRange={() => setShowTestRange(true)}
       />
       {plant && <StudyPhasePlantDisplay subject={header.subject} plant={plant} />}
+      <Modal
+        opened={showTestRange}
+        onClose={() => setShowTestRange(false)}
+        styles={{
+          root: { position: 'relative', borderRadius: 16 },
+          header: { backgroundColor: theme.bgCard },
+          body: { backgroundColor: theme.bgCard },
+        }}
+      >
+        <LearningProblemKeyList problems={problems} theme={theme} />
+      </Modal>
     </Stack>
   );
 };

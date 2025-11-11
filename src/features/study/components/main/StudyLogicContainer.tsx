@@ -4,11 +4,11 @@ import { Button, Stack } from '@mantine/core'; // テスト用UI
 import { LocalStorageMultiTimerPersistenceProvider } from '@/shared/hooks/multi-timer/localStoragePersistenceProvider';
 import { useStudyLogic } from '../../hooks/useStudyLogic';
 import { useSyncedLocalStorage } from '../../hooks/useSyncedLocalStorage';
-import { ParticleOverlay } from '../ParticleOverlay';
 import { ReviewPhase } from '../reviewPhase/ReviewPhase';
 import { ScoringPhase } from '../scoringPhase/ScoringPhase';
 import { StudyPhase } from '../studyPhase/StudyPhase';
 import { TestPhase } from '../testPhase/TestPhase';
+import { ParticleOverlay } from './ParticleOverlay';
 import { StudyData } from './useStudyData';
 
 const PERSISTENCE_KEY = 'multiTimer';
@@ -144,6 +144,7 @@ export const StudyLogicContainer: React.FC<StudyLogicContainerProps> = ({
       case 'study':
         return (
           <StudyPhase
+            problems={problems}
             isReadyTest={studyTimer.remainingTime <= 0}
             header={header}
             plant={learningCycle?.plant ?? null}
@@ -151,7 +152,6 @@ export const StudyLogicContainer: React.FC<StudyLogicContainerProps> = ({
             theme={theme}
             switchState={studyTimer.switchState}
             onStartTest={() => setPhase('test')}
-            onShowTextRange={() => {}}
           />
         );
       case 'test':

@@ -7,8 +7,8 @@ import { sharedStyle } from '@/shared/styles/shared-styles';
 import { SubjectColorMap } from '@/shared/theme/subjectColorType';
 import { Subject } from '@/shared/types/subject-types';
 import { toRGBA } from '@/shared/utils/color/color-convert-utils';
+import { StudyHeader } from '../../../../shared/components/StudyHeader';
 import { ProblemAttemptDetail } from '../../types/problem-types';
-import { StudyHeader } from '../main/StudyHeader';
 import { ScoringList } from './ScoringList';
 import { ScoringSummary } from './ScoringSummary';
 

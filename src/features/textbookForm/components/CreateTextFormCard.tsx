@@ -1,12 +1,12 @@
 import React from 'react';
 import { Box, Button, Card, Divider, Select, Stack, Text, TextInput } from '@mantine/core';
-import { Form, UseFormReturnType } from '@mantine/form';
+import { UseFormReturnType } from '@mantine/form';
 import { sharedStyle } from '@/shared/styles/shared-styles';
 import { SubjectColorMap } from '@/shared/theme/subjectColorType';
 import { Subject } from '@/shared/types/subject-types';
+import { StudyHeader } from '../../../shared/components/StudyHeader';
 import { CreateTextbookForm } from '../shared/form/create-textbook-form-types';
 import { DynamicTextList } from './DynamicTextList';
-import { StudyHeader } from './StudyHeader';
 
 interface CreateTextFormCardProps {
   form: UseFormReturnType<CreateTextbookForm, (values: CreateTextbookForm) => CreateTextbookForm>;
