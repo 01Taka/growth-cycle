@@ -28,9 +28,6 @@ export const StartStudyMain: React.FC<StartStudyMainProps> = ({}) => {
   useEffect(() => {
     if (!textbookId) return; // IDがなければ何もしない
 
-    // 既にアクティブなIDと一致する場合は再フェッチをスキップ（性能最適化）
-    if (activeTextbook.id === textbookId && activeTextbook.isFound) return;
-
     // IDが存在する場合、getTextbookByIdを実行
     const fetchActiveTextbook = async () => {
       // activeTextbook の更新は getTextbookById の中で行われる
@@ -105,8 +102,6 @@ export const StartStudyMain: React.FC<StartStudyMainProps> = ({}) => {
         units={textbook.units.map((unit) => unit.name)}
       />
       <StartStudyForm
-        textbookName={textbook.name}
-        subject={textbook.subject}
         existUnits={textbook.units?.map((unit) => unit.name) ?? []}
         existCategories={textbook.categories?.map((category) => category.name) ?? []}
         handleSubmit={handleSubmit}

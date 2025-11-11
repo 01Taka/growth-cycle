@@ -4,7 +4,6 @@ import { useForm } from '@mantine/form';
 import { useCreatableFormItems } from '@/shared/hooks/useCreatableFormItems';
 import { Creations } from '@/shared/types/creatable-form-items-types';
 import { FormInputProps } from '@/shared/types/mantine-form-types';
-import { Subject } from '@/shared/types/subject-types';
 import { STUDY_TIME_BUTTON_CONFIGS } from '../shared/components-constants/study-time-buttons-config';
 import {
   StartStudyFormComponent,
@@ -17,8 +16,6 @@ import { TestModeForm } from './testModeForm/TestModeForm';
 import { TestTimeForm } from './testTimeForm/TestTimeForm';
 
 interface StartStudyFormProps {
-  textbookName: string;
-  subject: Subject;
   existUnits: string[];
   existCategories: string[];
   handleSubmit: (
@@ -28,8 +25,6 @@ interface StartStudyFormProps {
 }
 
 export const StartStudyForm: React.FC<StartStudyFormProps> = ({
-  textbookName,
-  subject,
   existUnits,
   existCategories,
   handleSubmit,
@@ -64,10 +59,6 @@ export const StartStudyForm: React.FC<StartStudyFormProps> = ({
   const handleCreateNewUnit = useCallback(
     (unit: string) => {
       onCreate('units', unit);
-      // setFieldValue を使用して、既存の配列に新しいユニットを追加
-      // if (!form.values.units.includes(unit)) {
-      //   form.setFieldValue('units', [...form.values.units, unit]);
-      // }
     },
     [form, onCreate]
   );
@@ -81,16 +72,6 @@ export const StartStudyForm: React.FC<StartStudyFormProps> = ({
 
   const forms: StartStudyFormComponent[] = useMemo(
     () => [
-      // {
-      //   label: '単元',
-      //   form: (
-      //     <UnitForm
-      //       {...(form.getInputProps('units') as FormInputProps<string[]>)}
-      //       unitData={combinedItems.units}
-      //       onCreateNewUnit={handleCreateNewUnit}
-      //     />
-      //   ),
-      // },
       {
         label: '勉強時間',
         form: (
@@ -146,7 +127,6 @@ export const StartStudyForm: React.FC<StartStudyFormProps> = ({
       <Stack gap={30}>
         {forms.map((item) => (
           <Stack key={item.label}>
-            {' '}
             {/* keyを追加 */}
             <Text size="lg" fw={700}>
               {item.label}

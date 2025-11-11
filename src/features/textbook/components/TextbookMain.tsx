@@ -20,10 +20,8 @@ export const TextbookMain: React.FC<TextbookMainProps> = () => {
   // 💡 コンポーネントマウント時にデータをフェッチ
   useEffect(() => {
     // データがまだロードされていない場合のみフェッチを実行
-    if (textbooks.length === 0 && !isLoading && !error) {
-      fetchTextbooks();
-    }
-  }, [fetchTextbooks, textbooks.length, isLoading, error]);
+    fetchTextbooks();
+  }, [fetchTextbooks]);
 
   // useTextbookFilter にはストアから取得した textbooks を渡します
   const { selectedSubject, filterData, displayPlant, handleSubjectClick } =

@@ -18,6 +18,7 @@ import {
 import { generateFirestoreId, generateIdbPath } from '@/shared/data/idb/generate-path';
 import { IDB_PATH } from '@/shared/data/idb/idb-path';
 import { idbStore } from '@/shared/data/idb/idb-store';
+import { Plant, PlantShape } from '@/shared/types/plant-shared-types';
 import { safeArrayToRecord } from '@/shared/utils/object/object-utils';
 import { range } from '@/shared/utils/range';
 import { RangeWithId } from '../range/range-form-types';
@@ -49,13 +50,24 @@ const fetchTextbook = async (
   }
 };
 
+const getNewPlant = (plantShape: PlantShape, now: number): Plant => {
+  return {
+    ...plantShape,
+    currentStage: 0,
+    lastGrownAt: now,
+    textbookPositionX: Math.random(),
+  };
+};
+
 /**
- * Textbookドキュメントのユニット/カテゴリを更新し、IDBに保存する
+ * Textbookドキュメントのユニット/カテゴリ/植物を更新し、IDBに保存する
  */
-const updateTextbookUnitsAndCategories = async (
+const updateTextbook = async (
   path: string,
   textbook: TextbookDocument,
-  problemMeta: StartStudyFormProblemMetadata
+  problemMeta: StartStudyFormProblemMetadata,
+  newPlantShape: PlantShape,
+  now: number
 ): Promise<Textbook> => {
   const existingUnitIds = new Set(textbook.units.map((unit) => unit.id));
   const existingCategoryIds = new Set(textbook.categories.map((category) => category.id));
@@ -63,17 +75,24 @@ const updateTextbookUnitsAndCategories = async (
   // 新規ユニットに新しいIDを生成
   const newUnits: UnitDetail[] = problemMeta.units
     .filter((unit) => !existingUnitIds.has(unit.id))
-    .map((unit) => ({ ...unit, id: generateFirestoreId() }));
+    .map((unit) => ({ name: unit.name, id: generateFirestoreId() }));
 
   // 新規カテゴリに新しいIDを生成
   const newCategories: CategoryDetail[] = problemMeta.categories
     .filter((category) => !existingCategoryIds.has(category.id))
-    .map((category) => ({ ...category, id: generateFirestoreId() }));
+    .map((category) => ({
+      name: category.name,
+      timePerProblem: category.timePerProblem,
+      problemNumberFormat: category.problemNumberFormat,
+      id: generateFirestoreId(),
+    }));
 
   const newTextbook: Textbook = {
     ...textbook,
     units: [...textbook.units, ...newUnits],
     categories: [...textbook.categories, ...newCategories],
+    plants: [...textbook.plants, getNewPlant(newPlantShape, now)],
+    totalPlants: textbook.plants.length + 1,
   };
 
   try {
@@ -188,6 +207,13 @@ export const createLearningCycle = async (
     );
     return;
   }
+  const now = Date.now();
+
+  const plantShape = await generatePlantShapeWithConfigLoad(seedType);
+
+  if (!plantShape) {
+    throw new Error('Failed to generate plantShape');
+  }
 
   // 2. パスの生成
   const newLearningCyclePath = generateIdbPath(IDB_PATH.learningCycles, '', true);
@@ -206,7 +232,7 @@ export const createLearningCycle = async (
   );
 
   // 5. Textbookの更新
-  const newTextbook = await updateTextbookUnitsAndCategories(textbookPath, textbook, problemMeta);
+  const newTextbook = await updateTextbook(textbookPath, textbook, problemMeta, plantShape, now);
 
   // 6. 問題リストと使用メタデータの生成
   const { problems, usedUnits, usedCategories } = createProblemsAndUsedMetadata(
@@ -215,14 +241,8 @@ export const createLearningCycle = async (
     newTextbook.categories
   );
 
-  const plantShape = await generatePlantShapeWithConfigLoad(seedType);
-
-  if (!plantShape) {
-    throw new Error('Failed to generate plantShape');
-  }
-
   // 7. LearningCycleオブジェクトの構築
-  const now = Date.now();
+
   const newLearningCycleData: LearningCycle = {
     testMode: form.testMode,
     learningDurationMs: form.studyTimeMin * 60000,
@@ -238,12 +258,7 @@ export const createLearningCycle = async (
     latestAttemptedAt: now,
     isReviewTarget: settings.isReviewTarget,
     nextReviewDate: settings.nextReviewDate,
-    plant: {
-      ...plantShape,
-      currentStage: 0,
-      lastGrownAt: now,
-      textbookPositionX: Math.random(),
-    },
+    plantShape,
   };
 
   // 8. LearningCycleのバリデーション

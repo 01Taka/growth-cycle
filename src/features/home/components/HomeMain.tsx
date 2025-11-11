@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { generatePlantShapeWithConfigLoad } from '@/features/plants/functions/plant-utils';
 import { useLearningCycleStore } from '@/shared/stores/useLearningCycleStore';
 import {
   convertLearningCyclesToReviewItemMap,
@@ -27,16 +26,6 @@ export const HomeMain: React.FC<HomeMainProps> = ({}) => {
     () => convertLearningCyclesToReviewItemMap(learningCycles),
     [learningCycles]
   );
-
-  useEffect(() => {
-    const generate = async () => {
-      const plant = await generatePlantShapeWithConfigLoad('science');
-      console.log(plant);
-    };
-    for (let index = 0; index < 10; index++) {
-      generate();
-    }
-  }, []);
 
   const navigate = useNavigate();
 

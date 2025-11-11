@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { PlantSchema } from '@/shared/types/plant-shared-types';
+import { PlantSchema, PlantShapeSchema } from '@/shared/types/plant-shared-types';
 import { SubjectSchema } from '@/shared/types/subject-types';
 import { IDBDocumentSchema } from '../../idb/idb-types';
 import {
@@ -33,7 +33,7 @@ export const LearningCycleSchema = z
     sessions: z.array(TestSessionSchema).describe('i18n:cycle.sessions'),
     nextReviewDate: z.iso.date().nullable().describe('i18n:cycle.next_review_at'),
     latestAttemptedAt: TimestampSchema.describe('i18n:cycle.latest_attempted_at'),
-    plant: PlantSchema,
+    plantShape: PlantShapeSchema,
   })
   .describe('i18n:cycle.full_document_schema');
 
