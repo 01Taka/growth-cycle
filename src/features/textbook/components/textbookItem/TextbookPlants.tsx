@@ -46,7 +46,7 @@ const TextbookPlants: React.FC<TextbookPlantsProps> = ({
               position: 'absolute',
               // positionX (0~1)をパーセンテージ (0%~100%) に変換して left に設定
               left: `${plant.textbookPositionX * widthPer}%`,
-              bottom: 0,
+              bottom: -5,
             }}
           />
         ))}

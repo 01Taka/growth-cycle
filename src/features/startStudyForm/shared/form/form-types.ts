@@ -23,7 +23,6 @@ export interface RangeFormData {
  * フォームの状態の型定義
  */
 export interface StartStudyFormValues {
-  // units: string[];
   studyTimeMin: number | null;
   testMode: TestMode | null;
   testRange: RangeFormData[];

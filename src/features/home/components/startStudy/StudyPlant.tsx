@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, rem } from '@mantine/core';
+import { Box, Flex, rem } from '@mantine/core';
 import { PlantImageItem } from '@/features/plants/components/PlantImageItem';
 import { Plant } from '@/shared/types/plant-shared-types';
 import { Subject } from '@/shared/types/subject-types';
@@ -11,7 +11,7 @@ interface StudyPlantProps {
 
 export const StudyPlant: React.FC<StudyPlantProps> = ({
   learning,
-  width = 60, // デフォルトの幅を設定 (rem単位で使うため数値)
+  width = 46, // デフォルトの幅を設定 (rem単位で使うため数値)
 }) => {
   // 土台の幅を rem 単位に変換
   const soilWidth = rem(width);
@@ -24,6 +24,7 @@ export const StudyPlant: React.FC<StudyPlantProps> = ({
     // PlantImageItemと土台をStackで縦に配置
     <Box
       style={{
+        position: 'relative',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -31,16 +32,23 @@ export const StudyPlant: React.FC<StudyPlantProps> = ({
       }}
     >
       {/* 1. PlantImageItem (双葉) */}
-      <Box style={{ width: soilWidth, height: soilWidth }}>
+      <Flex align="end" style={{ width: soilWidth, height: soilWidth, position: 'relative' }}>
         {learning && (
           <PlantImageItem
             subject={learning.subject}
             plant={learning.plant}
-            width={soilWidth}
-            height={soilWidth}
+            width={'100%'}
+            height={'100%'}
+            isRemSize={true}
+            style={{
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+              right: 0,
+            }}
           />
         )}
-      </Box>
+      </Flex>
 
       {/* 2. 土台 (Box) */}
       <Box
@@ -49,9 +57,9 @@ export const StudyPlant: React.FC<StudyPlantProps> = ({
           height: soilHeight,
           borderRadius: rem(4), // 角を丸くする
           backgroundColor: soilColor,
-          // 土台と双葉が重なるように、土台を少し上にずらす
-          marginTop: rem(-5),
           zIndex: 1, // 双葉よりも手前に見せることも可能ですが、ここではシンプルに
+          position: 'absolute',
+          bottom: 5,
         }}
       />
     </Box>

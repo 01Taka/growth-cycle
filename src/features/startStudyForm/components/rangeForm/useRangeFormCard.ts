@@ -86,7 +86,6 @@ export const useRangeFormCardsManager = <TKey extends string>(
           value: unitValue,
           error: unitError,
           onChange: (value) => {
-            console.log(value);
             (form.setFieldValue as any)(unitNamePath, value);
           },
         },

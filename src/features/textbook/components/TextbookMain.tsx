@@ -11,7 +11,7 @@ import { TextbookList } from './TextbookList';
 
 interface TextbookMainProps {}
 
-const PLANT_SIZE_RATIO = 28;
+const PLANT_SIZE_RATIO = 48;
 
 export const TextbookMain: React.FC<TextbookMainProps> = () => {
   const navigate = useNavigate();

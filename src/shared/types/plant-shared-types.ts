@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+export const PLANT_MAX_STAGE = 3;
+
 export const ImportPlantsTypeSchema = z.union([z.literal('adult'), z.literal('bud')]);
 
 export type ImportPlantsType = z.infer<typeof ImportPlantsTypeSchema>;
@@ -39,7 +41,8 @@ export const PlantShapeSchema = z
 
 export const PlantSchema = PlantShapeSchema.and(
   z.object({
-    currentStage: z.number().int().min(0).max(2),
+    id: z.string(),
+    currentStage: z.number().int().min(0).max(PLANT_MAX_STAGE),
     lastGrownAt: z.number(),
     textbookPositionX: z.number().min(0).max(1), // テキスト一覧での表示の際にどの位置に配置するか
   })

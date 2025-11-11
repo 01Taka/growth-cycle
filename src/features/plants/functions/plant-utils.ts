@@ -171,7 +171,32 @@ export const generatePlantShape = (
   return plant;
 };
 
-export const generatePlantShapeWithConfigLoad = async (seedType: string) => {
-  const config = await loadConfigInstance();
-  return generatePlantShape(config, seedType);
+const generatePlantShapeForMVP = () => {
+  const MIN_SIZE = 80;
+  const MAX_SIZE = 120;
+  const MAX_INDEX = 16;
+  const SEED_TYPE = 'mvpSeed';
+
+  const size =
+    Math.floor(Math.random() * (MAX_SIZE - MIN_SIZE + 1)) / 100 + // 100, 120 -> 1.00, 1.20
+    MIN_SIZE / 100;
+
+  const plantIndex = Math.floor(Math.random() * (MAX_INDEX + 1));
+
+  const plant: PlantShape = {
+    size,
+    seedType: SEED_TYPE,
+    plantType: plantIndex.toString(),
+    plantRarity: '',
+    modules: {},
+  };
+  return plant;
+};
+
+export const generatePlantShapeWithConfigLoad = async (_seedType: string) => {
+  // TODO
+  // 本番環境では切り替える
+  // const config = await loadConfigInstance();
+  // return generatePlantShape(config, seedType);
+  return generatePlantShapeForMVP();
 };

@@ -1,7 +1,7 @@
 // src/components/PlantImageItem.tsx (元のファイル)
 
 import React from 'react';
-import { MantineStyleProp } from '@mantine/core';
+import { MantineStyleProp, rem } from '@mantine/core';
 import { Plant } from '@/shared/types/plant-shared-types';
 import { Subject } from '@/shared/types/subject-types';
 import { usePlantImageLoader } from '../hooks/usePlantImageLoader';
@@ -15,9 +15,10 @@ interface PlantImageItemProps {
   /** 画像が見つからない/エラー時に「Not Found/Load Failed」のオーバーレイを表示するか */
   displayNotFound?: boolean;
   /** コンポーネントの幅 */
-  width?: number | string;
+  width?: number | `${string}%`;
   /** 画像の高さ */
-  height?: number | string;
+  height?: number | `${string}%`;
+  isRemSize?: boolean;
   style?: MantineStyleProp;
 }
 
@@ -32,16 +33,36 @@ export const PlantImageItem: React.FC<PlantImageItemProps> = ({
   displayNotFound = false,
   width = 160,
   height = 160,
+  isRemSize = false,
   style,
 }) => {
-  const type = (plant?.currentStage ?? 0) > 0 ? 'adult' : 'bud';
+  const type = (plant?.currentStage ?? 0) > 1 ? 'adult' : 'bud';
 
   const plantTypeValue = +plant?.plantType;
 
-  const imageIndex = Number.isNaN(plantTypeValue) ? 0 : plantTypeValue;
+  const imageIndex = type === 'adult' ? (Number.isNaN(plantTypeValue) ? 0 : plantTypeValue) : 0;
 
   // ロジック層から画像の状態を取得
   const { imageUrl, isLoading, loadError } = usePlantImageLoader(subject, type, imageIndex, isLoop);
+
+  const sizeRatio = type === 'adult' ? 1 : 0.7;
+  const remSizeRatio = type === 'adult' ? 1 : 0.87;
+
+  const isPercent = (value: number | `${string}%`): value is `${string}%` =>
+    typeof value === 'string' && value.endsWith('%');
+
+  // 幅と高さを計算するロジック
+  const calculatedWidth = isPercent(width)
+    ? width // % の場合はそのまま
+    : isRemSize
+      ? rem(width * remSizeRatio) // rem の場合は rem と ratio を適用
+      : width * sizeRatio; // px/数値の場合は ratio を適用
+
+  const calculatedHeight = isPercent(height)
+    ? height // % の場合はそのまま
+    : isRemSize
+      ? rem(height * remSizeRatio) // rem の場合は rem と ratio を適用
+      : height * sizeRatio; // px/数値の場合は ratio を適用
 
   // 表示層に全てを渡す
   return (
@@ -52,8 +73,8 @@ export const PlantImageItem: React.FC<PlantImageItemProps> = ({
       loadError={loadError}
       subject={subject}
       displayNotFound={displayNotFound}
-      width={width}
-      height={height}
+      width={calculatedWidth}
+      height={calculatedHeight}
       style={style}
     />
   );

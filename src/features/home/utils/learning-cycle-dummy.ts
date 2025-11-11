@@ -128,12 +128,16 @@ export const generateDummyLearningCycle = (
     sessions: sessions,
     nextReviewDate,
     latestAttemptedAt: latestAttemptedAt,
-    plantShape: {
+    plant: {
       seedType: '',
       size: 0,
       plantType: '',
       plantRarity: '',
       modules: {},
+      id: generateFirestoreId(),
+      currentStage: getRandomInt(0, 2),
+      lastGrownAt: latestAttemptedAt,
+      textbookPositionX: Math.random(),
     },
   };
 };

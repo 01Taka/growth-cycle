@@ -50,15 +50,6 @@ const fetchTextbook = async (
   }
 };
 
-const getNewPlant = (plantShape: PlantShape, now: number): Plant => {
-  return {
-    ...plantShape,
-    currentStage: 0,
-    lastGrownAt: now,
-    textbookPositionX: Math.random(),
-  };
-};
-
 /**
  * Textbookドキュメントのユニット/カテゴリ/植物を更新し、IDBに保存する
  */
@@ -66,8 +57,7 @@ const updateTextbook = async (
   path: string,
   textbook: TextbookDocument,
   problemMeta: StartStudyFormProblemMetadata,
-  newPlantShape: PlantShape,
-  now: number
+  plant: Plant
 ): Promise<Textbook> => {
   const existingUnitIds = new Set(textbook.units.map((unit) => unit.id));
   const existingCategoryIds = new Set(textbook.categories.map((category) => category.id));
@@ -91,7 +81,7 @@ const updateTextbook = async (
     ...textbook,
     units: [...textbook.units, ...newUnits],
     categories: [...textbook.categories, ...newCategories],
-    plants: [...textbook.plants, getNewPlant(newPlantShape, now)],
+    plants: [...textbook.plants, plant],
     totalPlants: textbook.plants.length + 1,
   };
 
@@ -183,6 +173,16 @@ const createProblemsAndUsedMetadata = (
   };
 };
 
+const getNewPlant = (plantShape: PlantShape, now: number): Plant => {
+  return {
+    ...plantShape,
+    id: generateFirestoreId(),
+    currentStage: 0,
+    lastGrownAt: now,
+    textbookPositionX: Math.random(),
+  };
+};
+
 // --- メイン関数 ---
 
 /**
@@ -215,6 +215,8 @@ export const createLearningCycle = async (
     throw new Error('Failed to generate plantShape');
   }
 
+  const plant = getNewPlant(plantShape, now);
+
   // 2. パスの生成
   const newLearningCyclePath = generateIdbPath(IDB_PATH.learningCycles, '', true);
   const textbookPath = generateIdbPath(IDB_PATH.textbooks, textbookId);
@@ -232,7 +234,7 @@ export const createLearningCycle = async (
   );
 
   // 5. Textbookの更新
-  const newTextbook = await updateTextbook(textbookPath, textbook, problemMeta, plantShape, now);
+  const newTextbook = await updateTextbook(textbookPath, textbook, problemMeta, plant);
 
   // 6. 問題リストと使用メタデータの生成
   const { problems, usedUnits, usedCategories } = createProblemsAndUsedMetadata(
@@ -258,7 +260,7 @@ export const createLearningCycle = async (
     latestAttemptedAt: now,
     isReviewTarget: settings.isReviewTarget,
     nextReviewDate: settings.nextReviewDate,
-    plantShape,
+    plant,
   };
 
   // 8. LearningCycleのバリデーション
