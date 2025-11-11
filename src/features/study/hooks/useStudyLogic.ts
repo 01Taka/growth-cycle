@@ -60,6 +60,7 @@ export const useStudyLogic = ({
     changeTestDuration,
     changeCurrentTestProblem,
     handleSwitchTimerRunning,
+    stopAll,
     resetAll,
   } = useStudyTimer(attemptingProblems.length, timerProvider);
 
@@ -111,6 +112,13 @@ export const useStudyLogic = ({
     [attemptResults]
   );
 
+  const isAllProblemsEvaluated = useMemo(() => {
+    const validEvaluations = Object.values(selfEvaluationMap).filter(
+      (value) => value !== 'unrated'
+    );
+    return validEvaluations.length === problems.length;
+  }, [selfEvaluationMap, problems.length]);
+
   // 6. 必要なすべての値を返す
   return {
     header,
@@ -124,9 +132,11 @@ export const useStudyLogic = ({
     currentTestProblemIndex,
     currentActiveProblemTimer,
     elapsedTimeMap,
+    isAllProblemsEvaluated,
     isFinishTestTimer,
     handleScoreChange,
     handleSelfEvaluationMap,
+    stopAll,
     resetAll,
     changeCurrentTestProblem,
     handleSwitchTimerRunning,

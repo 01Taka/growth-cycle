@@ -76,16 +76,15 @@ export const ScoringPhase: React.FC<ScoringPhaseProps> = ({
         />
       </Box>
       <Button
-        w={'100%'}
         h={64}
         color={isFilled ? theme.accent : toRGBA(theme.disabled, 0.95)}
         size={rem(20)}
         style={{
           ...(isFilled ? sharedStyle.button : sharedStyle.disabledButton),
           position: 'fixed',
-          bottom: 0,
-          right: 0,
-          left: 0,
+          bottom: 5,
+          right: 5,
+          left: 5,
           color: theme.text,
         }}
         onClick={onStartReview}

@@ -82,7 +82,7 @@ export const useStudyTimer = (
   const studyTimer = useMemo(() => timer.getSingleTimer(STUDY_TIMER_ID), [timer.getSingleTimer]);
   const testTimer = useMemo(() => timer.getSingleTimer(TEST_TIMER_ID), [timer.getSingleTimer]);
 
-  const [currentTestProblemIndex, setCurrentTestProblemIndex] = useState<number | null>(0);
+  const [currentTestProblemIndex, setCurrentTestProblemIndex] = useState<number>(0);
 
   // 6. 現在アクティブな問題タイマーのインスタンスを取得
   const currentActiveProblemTimer = useMemo(
@@ -121,10 +121,10 @@ export const useStudyTimer = (
   );
 
   const changeCurrentTestProblem = useCallback(
-    (newIndex: number | null, type: 'set' | 'increment') => {
+    (newIndex: number, type: 'set' | 'increment') => {
       setCurrentTestProblemIndex((prevIndex) => {
         // インデックスのバリデーション
-        let validatedIndex: number | null = null;
+        let validatedIndex: number = 0;
         if (newIndex !== null) {
           // prevIndexは存在するがエラー対策
           const index = type === 'set' ? newIndex : (prevIndex ?? 0) + newIndex;
@@ -202,6 +202,7 @@ export const useStudyTimer = (
     changeTestDuration,
     changeCurrentTestProblem,
     handleSwitchTimerRunning,
+    stopAll: timer.stopAll,
     resetAll: timer.resetAll,
   };
 };

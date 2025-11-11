@@ -18,7 +18,7 @@ export const ReviewPhase: React.FC<ReviewPhaseProps> = ({ records, theme, onFini
 
   return (
     <Box style={{ position: 'relative' }}>
-      <Stack w={'100%'} align="center" justify="center">
+      <Stack w={'100%'} align="center" justify="center" mb={120}>
         {sortedRecords.map((record, index) => (
           <Box key={index} w={'95%'}>
             <RecordReviewCard record={record} />
@@ -26,16 +26,15 @@ export const ReviewPhase: React.FC<ReviewPhaseProps> = ({ records, theme, onFini
         ))}
       </Stack>
       <Button
-        w={'100%'}
         h={64}
         color={theme.accent}
         size={rem(20)}
         style={{
           ...sharedStyle.button,
           position: 'fixed',
-          bottom: 0,
-          right: 0,
-          left: 0,
+          bottom: 5,
+          right: 5,
+          left: 5,
           color: theme.text,
         }}
         onClick={onFinish}

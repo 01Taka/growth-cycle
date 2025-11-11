@@ -22,6 +22,7 @@ interface TestPhaseProps {
     units: string[];
   };
   isFinishTestTimer: boolean;
+  isAllProblemsEvaluated: boolean;
   mainTimer: SingleTimerData;
   currentTimerElapsedTime: number | null;
   elapsedTimeMap: Record<number, number>;
@@ -29,7 +30,7 @@ interface TestPhaseProps {
   theme: SubjectColorMap;
   currentProblemIndex: number;
   switchTimerRunning: () => void;
-  changeCurrentTestProblem: (newIndex: number | null, type: 'set' | 'increment') => void;
+  changeCurrentTestProblem: (newIndex: number, type: 'set' | 'increment') => void;
   onSelectSelfEvaluation: (index: number, evaluation: TestSelfEvaluation) => void;
   onStartScoring: () => void;
 }
@@ -37,6 +38,7 @@ interface TestPhaseProps {
 export const TestPhase: React.FC<TestPhaseProps> = ({
   problems,
   header,
+  isAllProblemsEvaluated,
   isFinishTestTimer,
   mainTimer,
   currentTimerElapsedTime,
@@ -86,6 +88,24 @@ export const TestPhase: React.FC<TestPhaseProps> = ({
         />
       </Flex>
       <Stack align="center" w={'90%'}>
+        {isAllProblemsEvaluated && !isFinishTestTimer && (
+          <Button
+            size="md"
+            style={{
+              borderRadius: 12,
+              color: theme.text,
+              backgroundColor: theme.bgScreen,
+              border: `2px solid ${theme.border}`,
+              width: '100%',
+              marginTop: 10,
+              marginBottom: 10,
+            }}
+            onClick={onStartScoring}
+          >
+            早めに採点をはじめる
+            <IconPencil />
+          </Button>
+        )}
         {isFinishTestTimer && (
           <Button
             size="xl"

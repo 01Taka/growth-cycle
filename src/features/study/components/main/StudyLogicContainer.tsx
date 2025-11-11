@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Button, Stack } from '@mantine/core'; // テスト用UI
 import { LocalStorageMultiTimerPersistenceProvider } from '@/shared/hooks/multi-timer/localStoragePersistenceProvider';
@@ -41,6 +41,12 @@ export const StudyLogicContainer: React.FC<StudyLogicContainerProps> = ({
     setSearchParam(newSearchParams);
   };
 
+  useEffect(() => {
+    if (studyData.learningCycle?.learningDurationMs === 0 && phase === 'study') {
+      setPhase('test');
+    }
+  }, [studyData.learningCycle?.learningDurationMs, phase, setPhase]);
+
   // --- useStudyLogic ---
   const timerProvider = useMemo(
     () => new LocalStorageMultiTimerPersistenceProvider(PERSISTENCE_KEY),
@@ -80,9 +86,11 @@ export const StudyLogicContainer: React.FC<StudyLogicContainerProps> = ({
     currentTestProblemIndex,
     currentActiveProblemTimer,
     elapsedTimeMap,
+    isAllProblemsEvaluated,
     isFinishTestTimer,
     handleScoreChange,
     handleSelfEvaluationMap,
+    stopAll,
     resetAll,
     changeCurrentTestProblem,
     handleSwitchTimerRunning,
@@ -159,6 +167,7 @@ export const StudyLogicContainer: React.FC<StudyLogicContainerProps> = ({
           <TestPhase
             problems={problems}
             header={header}
+            isAllProblemsEvaluated={isAllProblemsEvaluated}
             isFinishTestTimer={isFinishTestTimer}
             mainTimer={testTimer}
             currentTimerElapsedTime={currentActiveProblemTimer?.elapsedTime ?? null}
@@ -169,7 +178,10 @@ export const StudyLogicContainer: React.FC<StudyLogicContainerProps> = ({
             onSelectSelfEvaluation={handleSelfEvaluationMap}
             changeCurrentTestProblem={changeCurrentTestProblem}
             switchTimerRunning={handleSwitchTimerRunning}
-            onStartScoring={() => setPhase('scoring')}
+            onStartScoring={() => {
+              stopAll();
+              setPhase('scoring');
+            }}
           />
         );
       case 'scoring':
@@ -197,7 +209,7 @@ export const StudyLogicContainer: React.FC<StudyLogicContainerProps> = ({
         {renderPhase()}
 
         {/* --- テスト用UI --- */}
-        <Stack mt={50}>
+        {/* <Stack mt={50}>
           <Button variant="filled" color="blue" onClick={() => setPhase('study')}>
             Go to Study Phase
           </Button>
@@ -214,7 +226,7 @@ export const StudyLogicContainer: React.FC<StudyLogicContainerProps> = ({
           <Button variant="transparent" onClick={resetAll}>
             resetAll
           </Button>
-        </Stack>
+        </Stack> */}
       </Stack>
     </>
   );
