@@ -1,16 +1,7 @@
 import React from 'react';
 import { IconCircle } from '@tabler/icons-react';
 import { Slider } from '@mantine/core';
-
-// スライダーの目盛り設定
-const marks = [
-  { value: 5, label: '5分' },
-  { value: 10, label: '10分' },
-  { value: 15, label: '15分' }, // デフォルト値の近く
-  { value: 20, label: '20分' },
-  { value: 25, label: '25分' },
-  { value: 30, label: '30分' },
-];
+import { range } from '@/shared/utils/range';
 
 interface TestTimeFormProps {
   value: number;
@@ -18,13 +9,22 @@ interface TestTimeFormProps {
 }
 
 export const TestTimeForm: React.FC<TestTimeFormProps> = ({ value, onChange }) => {
+  const minTime = 5;
+  const maxTime = 60;
+  const step = 5;
+
+  const marks = [...range(minTime, maxTime + 1, step)].map((value) => ({
+    value,
+    label: `${value}`,
+  }));
+
   return (
     <Slider
       value={value}
       onChange={onChange}
-      min={5}
-      max={30}
-      step={5}
+      min={minTime}
+      max={maxTime}
+      step={step}
       // 1. 目盛り設定
       marks={marks}
       // 2. 色を緑に変更

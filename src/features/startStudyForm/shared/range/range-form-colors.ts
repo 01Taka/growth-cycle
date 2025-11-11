@@ -1,25 +1,4 @@
-// RangeFormCard コンポーネントの外部で定義
-interface ColorDetail {
-  background: string; // チップや警告エリアの背景色
-  accent: string; // アクセントカラー (アイコン、ボーダーの強調色、以前のtext/buttonの役割)
-  text: string; // 可読性重視の基本テキストカラー (明度が低い色)
-  border: string; // 警告エリアやチップのボーダー色 (チップでは通常backgroundと同じ)
-  button?: string; // ボタンの背景色
-  buttonText?: string; // ボタンの上のテキスト色 (NEW)
-}
-
-interface ColorSet {
-  range: ColorDetail;
-  individual: ColorDetail;
-  conflict: ColorDetail;
-  disabled: ColorDetail;
-  addTitle: { accent: string };
-}
-
-interface RangeFormColors {
-  light: ColorSet;
-  dark: ColorSet;
-}
+import { RangeFormColors } from './range-form-types';
 
 export const RANGE_FORM_COLORS: RangeFormColors = {
   // ☀️ ライトモード

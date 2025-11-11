@@ -102,6 +102,7 @@ export const StartStudyMain: React.FC<StartStudyMainProps> = ({}) => {
         units={textbook.units.map((unit) => unit.name)}
       />
       <StartStudyForm
+        theme={theme}
         existUnits={textbook.units?.map((unit) => unit.name) ?? []}
         existCategories={textbook.categories?.map((category) => category.name) ?? []}
         handleSubmit={handleSubmit}

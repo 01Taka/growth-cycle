@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, ComboboxItem, Stack } from '@mantine/core';
 import { UseFormReturnType } from '@mantine/form';
-import { RangeFormCard } from './RangeFormCard';
+import { RangeFormCard } from './card/RangeFormCard';
 import { useRangeFormCardsManager } from './useRangeFormCard';
 
 interface TestRangeFormProps {
@@ -11,6 +11,7 @@ interface TestRangeFormProps {
   onCreateUnit: (name: string) => void;
   onCreateCategory: (name: string) => void;
 }
+const RANGE_MAX = 1024;
 
 export const TestRangeForm: React.FC<TestRangeFormProps> = ({
   form,
@@ -40,6 +41,7 @@ export const TestRangeForm: React.FC<TestRangeFormProps> = ({
               args.categoryForm.onChange(value);
             },
           }}
+          valueMax={RANGE_MAX}
           {...args}
         />
       ))}
@@ -49,7 +51,7 @@ export const TestRangeForm: React.FC<TestRangeFormProps> = ({
         size="md"
         radius={'md'}
       >
-        範囲を追加 +
+        他の分類の問題を追加 +
       </Button>
     </Stack>
   );

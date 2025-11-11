@@ -200,13 +200,28 @@ export const createLearningCycle = async (
   seedType: string = 'science'
 ) => {
   // 1. フォームのバリデーションと早期リターン
-  if (!form.testMode || form.studyTimeMin === null || form.testTimeMin === null) {
+  if (
+    !form.testMode ||
+    form.studyTimeMin === null ||
+    form.testTimeMin === null ||
+    !form.testRange
+  ) {
     // ログなどを追加するとデバッグしやすい
     console.info(
       'Test mode is off or study time or test time is not set. Aborting Learning Cycle creation.'
     );
     return;
   }
+
+  const validRanges = form.testRange.filter(
+    (range) => !!range.categoryName.trim() && !!range.unitName.trim() && range.ranges.length > 0
+  );
+
+  if (validRanges.length === 0) {
+    console.error('range cannot be empty');
+    return;
+  }
+
   const now = Date.now();
 
   const plantShape = await generatePlantShapeWithConfigLoad(seedType);
@@ -226,7 +241,7 @@ export const createLearningCycle = async (
 
   // 4. 問題メタデータの事前処理（新規ユニット/カテゴリの抽出）
   const problemMeta = processProblemMetadata(
-    form.testRange,
+    validRanges,
     textbook.units,
     textbook.categories,
     settings.defaultTimePerProblem,
@@ -238,7 +253,7 @@ export const createLearningCycle = async (
 
   // 6. 問題リストと使用メタデータの生成
   const { problems, usedUnits, usedCategories } = createProblemsAndUsedMetadata(
-    form.testRange,
+    validRanges,
     newTextbook.units,
     newTextbook.categories
   );

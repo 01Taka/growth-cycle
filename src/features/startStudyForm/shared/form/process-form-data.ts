@@ -43,9 +43,6 @@ export function processProblemMetadata(
   const processedUnitNames = new Set<string>();
   const processedCategoryNames = new Set<string>();
 
-  let unitCounter = 1;
-  let categoryCounter = 1;
-
   // 3. testRangeを反復処理し、統合リストを作成
   testRange.forEach((item) => {
     // --- ユニット (Unit) の処理 ---

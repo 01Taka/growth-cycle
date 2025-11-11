@@ -1,15 +1,11 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Modal, Stack } from '@mantine/core';
 import {
   IndividualProblemRange,
-  IndividualRangeFormValue,
   OnFinishEditModeArgs,
 } from '../../shared/components-types/shared-test-range-types';
 import { StartStudyFormSelectButton } from '../../shared/StartStudyFormSelectButton';
-import {
-  useIndividualRangeFormItems,
-  UseIndividualRangeFormItemsReturn,
-} from '../../shared/useIndividualRangeFormItems';
+import { UseIndividualRangeFormItemsReturn } from '../../shared/useIndividualRangeFormItems';
 import { useStudyFormTheme } from '../../shared/useStudyFormTheme';
 import { EnteredTestRangeDisplay } from './EnteredTestRangeDisplay';
 import { IndividualRangeForm } from './individualRangeForm/IndividualRangeForm';

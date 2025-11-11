@@ -2,6 +2,8 @@ import React, { useCallback, useMemo } from 'react';
 import { Box, Button, Stack, Text } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useCreatableFormItems } from '@/shared/hooks/useCreatableFormItems';
+import { sharedStyle } from '@/shared/styles/shared-styles';
+import { SubjectColorMap } from '@/shared/theme/subjectColorType';
 import { Creations } from '@/shared/types/creatable-form-items-types';
 import { FormInputProps } from '@/shared/types/mantine-form-types';
 import { STUDY_TIME_BUTTON_CONFIGS } from '../shared/components-constants/study-time-buttons-config';
@@ -22,9 +24,11 @@ interface StartStudyFormProps {
     value: StartStudyFormValues,
     creations: Creations<StartStudyFormCreatableItems>
   ) => void;
+  theme: SubjectColorMap;
 }
 
 export const StartStudyForm: React.FC<StartStudyFormProps> = ({
+  theme,
   existUnits,
   existCategories,
   handleSubmit,
@@ -37,9 +41,15 @@ export const StartStudyForm: React.FC<StartStudyFormProps> = ({
       testTimeMin: 15,
     },
     validate: {
-      studyTimeMin: (value) => (value === null ? '勉強時間を選択してください' : null), // nullは埋められている必要あり
-      testMode: (value) => (value === null ? 'テストモードを選択してください' : null), // nullは埋められている必要あり
-      testTimeMin: (value) => (value === null ? 'テスト時間を入力してください' : null), // nullは埋められている必要あり
+      studyTimeMin: (value) => (value === null ? '勉強時間を選択してください' : null),
+      testMode: (value) => (value === null ? 'テストモードを選択してください' : null),
+      testRange: (value) => {
+        const validRanges = value.filter(
+          (range) => !!range.categoryName && !!range.unitName && range.ranges.length > 0
+        );
+        return validRanges.length > 0 ? null : '範囲を入力してください';
+      },
+      testTimeMin: (value) => (value === null ? 'テスト時間を入力してください' : null),
     },
   });
 
@@ -69,6 +79,11 @@ export const StartStudyForm: React.FC<StartStudyFormProps> = ({
     },
     [onCreate]
   );
+
+  const isFormValid = useMemo(() => {
+    const validationResult = form.validate();
+    return Object.keys(validationResult.errors).length === 0;
+  }, [form.values]);
 
   const forms: StartStudyFormComponent[] = useMemo(
     () => [
@@ -103,7 +118,7 @@ export const StartStudyForm: React.FC<StartStudyFormProps> = ({
         ),
       },
       {
-        label: 'テスト時間',
+        label: 'テスト時間(分)',
         form: <TestTimeForm {...(form.getInputProps('testTimeMin') as FormInputProps<number>)} />,
       },
     ],
@@ -124,7 +139,7 @@ export const StartStudyForm: React.FC<StartStudyFormProps> = ({
         handleSubmit({ ...data }, creations);
       })}
     >
-      <Stack gap={30}>
+      <Stack gap={30} mb={120}>
         {forms.map((item) => (
           <Stack key={item.label}>
             {/* keyを追加 */}
@@ -136,8 +151,24 @@ export const StartStudyForm: React.FC<StartStudyFormProps> = ({
             </Box>
           </Stack>
         ))}
-        <Button type="submit">学習開始</Button>
       </Stack>
+      <Button
+        type="submit"
+        size="lg"
+        bg={isFormValid ? theme.accent : theme.disabled}
+        color={isFormValid ? theme.text : theme.disabledText}
+        style={{
+          borderRadius: sharedStyle.button.borderRadius,
+          position: 'fixed',
+          bottom: 5,
+          right: 5,
+          left: 5,
+          zIndex: 1000,
+        }}
+        disabled={!isFormValid}
+      >
+        学習開始
+      </Button>
     </Box>
   );
 };
