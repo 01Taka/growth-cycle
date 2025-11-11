@@ -30,7 +30,7 @@ export const HomeMain: React.FC<HomeMainProps> = ({}) => {
 
   const groupedCycles = useMemo(
     () => groupCyclesByAllDateDifferences({ todayReviewCycles, todayReviewedCycles }),
-    []
+    [todayReviewCycles, todayReviewedCycles]
   );
 
   const learnings = todayStartedCycles.map((cycle) => ({
@@ -38,8 +38,8 @@ export const HomeMain: React.FC<HomeMainProps> = ({}) => {
     plant: cycle.plant,
   }));
 
-  const handleStartReview = (cycle: LearningCycleDocument, isCompleted: boolean) => {
-    if (!isCompleted) {
+  const handleStartReview = (cycle: LearningCycleDocument | null) => {
+    if (cycle) {
       navigate(`/study?cycleId=${cycle.id}&phase=test`);
     }
   };

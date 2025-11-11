@@ -56,7 +56,7 @@ export const LearningProblemKeyList: React.FC<LearningProblemKeyListProps> = ({
             <Flex align="center" gap="xs">
               <IconBook size={24} />
               <Text size="xl" fw={700}>
-                学習問題一覧
+                テスト問題一覧
               </Text>
             </Flex>
             {/* 2. 検索アイコンとトグル機能の追加 */}

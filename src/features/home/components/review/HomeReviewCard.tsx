@@ -1,8 +1,9 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { IconClockHour3, IconSquareCheck } from '@tabler/icons-react';
 import { Card, CardSection, Flex, Pill, rem, Stack, Tabs, Text } from '@mantine/core';
 import { LearningCycleDocument } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 import { ReviewLearningCycleItem } from './ReviewLearningCycleItem';
+import { StartReviewModal } from './StartReviewModal';
 
 // --- 定数と型定義の再エクスポート (可読性の向上) ---
 
@@ -15,7 +16,7 @@ interface HomeReviewCardProps {
   groupedCycles: Record<number, DateGroupedCycles>;
   todayReviewCyclesCount: number;
   todayReviewedCyclesCount: number;
-  onStartReview: (reviewCycle: LearningCycleDocument, isCompleted: boolean) => void;
+  onStartReview: (reviewCycle: LearningCycleDocument | null) => void;
 }
 
 // --- スタイル定義 (コンポーネント外で定義) ---
@@ -60,6 +61,8 @@ export const HomeReviewCard: React.FC<HomeReviewCardProps> = ({
   todayReviewedCyclesCount,
   onStartReview,
 }) => {
+  const [reviewTarget, setReviewTarget] = useState<null | LearningCycleDocument>(null);
+
   // groupedCyclesのキーをソートし、string[]として保持 (ソートロジック修正済み)
   const dateKeys = useMemo(
     () =>
@@ -88,6 +91,12 @@ export const HomeReviewCard: React.FC<HomeReviewCardProps> = ({
   const [activeTab, setActiveTab] = useState<string | null>(
     dateKeys.length > 0 ? dateKeys[0] : null
   );
+
+  useEffect(() => {
+    if (dateKeys.length > 0) {
+      setActiveTab((prev) => (prev === null ? dateKeys[0] : prev));
+    }
+  }, [dateKeys]);
 
   const remainingTasks = todayReviewCyclesCount;
   const totalTasks = todayReviewCyclesCount + todayReviewedCyclesCount;
@@ -122,11 +131,15 @@ export const HomeReviewCard: React.FC<HomeReviewCardProps> = ({
         isCompleted={isCompleted}
         plant={cycle.plant}
         subject={cycle.subject}
+        textbookName={cycle.textbookName}
         unitNames={cycle.units.map((unit) => unit.name)}
         problemCount={cycle.problems.length}
-        // testDurationMsを分に変換
         testDurationMin={Math.floor((cycle.testDurationMs || 0) / 60000)}
-        onStartReview={() => onStartReview(cycle, isCompleted)}
+        onCheckDetail={() => {
+          if (!isCompleted) {
+            setReviewTarget(cycle);
+          }
+        }}
       />
     ));
   };
@@ -244,6 +257,26 @@ export const HomeReviewCard: React.FC<HomeReviewCardProps> = ({
           )}
         </CardSection>
       </Tabs>
+      <StartReviewModal
+        subject={reviewTarget?.subject ?? 'japanese'}
+        textbookName={reviewTarget?.textbookName ?? ''}
+        units={(reviewTarget?.units ?? []).map((unit) => unit.name)}
+        problems={
+          reviewTarget
+            ? reviewTarget.problems.map((problem) => ({
+                unitName: reviewTarget.units.find((unit) => unit.id === problem.unitId)?.name ?? '',
+                categoryName:
+                  reviewTarget.categories.find((category) => category.id === problem.categoryId)
+                    ?.name ?? '',
+                problemNumber: problem.problemNumber,
+                problemIndex: problem.index,
+              }))
+            : []
+        }
+        opened={reviewTarget !== null}
+        onClose={() => setReviewTarget(null)}
+        onStartReview={() => onStartReview(reviewTarget)}
+      />
     </Card>
   );
 };

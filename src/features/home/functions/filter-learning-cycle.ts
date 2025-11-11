@@ -107,10 +107,13 @@ export const groupCyclesByAllDateDifferences = (
   // 2. Today Reviewed Cycles (nextReviewDateとの差) を分類
   // 要件: nextReviewDate - today = dayDiff
   filteredCycles.todayReviewedCycles.forEach((cycle) => {
-    if (!cycle.nextReviewDate) return;
+    if (!cycle.nextReviewDate || cycle.sessions.length < 2) return;
 
+    // TODO
+    // 単に最新の2つを比較しているだけなので、本来は「n日前に今日を次の取り組み日とした」のnを取得する必要がある
+    const sortedSessions = cycle.sessions.sort((a, b) => b.attemptedAt - a.attemptedAt);
     // getDaysDifference(timestampB, timestampA) を利用
-    const dayDiff = getDaysDifference(cycle.nextReviewDate, now);
+    const dayDiff = getDaysDifference(sortedSessions[1].attemptedAt, sortedSessions[0].attemptedAt);
 
     getOrCreateDayGroup(dayDiff).todayReviewedCycles.push(cycle);
   });
