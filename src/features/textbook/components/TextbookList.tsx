@@ -6,7 +6,8 @@ import { TextbookItem } from './textbookItem/TextbookItem';
 
 interface TextbookListProps {
   textbookItems: TextbookDocument[];
-  sizeRatio: number;
+  transformScale: number;
+  plantSizeRatio: number;
   displayPlant?: boolean;
   onClick: (item: TextbookDocument) => void;
 }
@@ -14,7 +15,8 @@ interface TextbookListProps {
 export const TextbookList: React.FC<TextbookListProps> = ({
   textbookItems,
   displayPlant = true,
-  sizeRatio,
+  transformScale,
+  plantSizeRatio,
   onClick,
 }) => {
   return (
@@ -23,7 +25,8 @@ export const TextbookList: React.FC<TextbookListProps> = ({
         <TextbookItem
           key={index}
           widthPer={90}
-          sizeRatio={sizeRatio}
+          transformScale={transformScale}
+          plantSizeRatio={plantSizeRatio}
           displayPlant={displayPlant}
           onClick={() => onClick(item)}
           textbookName={item.name}

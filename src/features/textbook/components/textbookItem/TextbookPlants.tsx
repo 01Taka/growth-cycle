@@ -1,16 +1,17 @@
 import React from 'react';
 import { Flex } from '@mantine/core';
+import { Plant } from '@/shared/types/plant-shared-types';
 import { Subject } from '@/shared/types/subject-types';
 import { PlantImageItem } from '../../../plants/components/PlantImageItem';
-import { TextbookPlant } from '../shared-props-types';
 
 interface TextbookPlantsProps {
   subject: Subject;
-  plants: TextbookPlant[];
+  plants: Plant[];
   maxSize: number;
   widthPer: number;
   displayPlant: boolean;
-  sizeRatio: number;
+  plantSizeRatio: number;
+  transformScale: number;
 }
 
 const TextbookPlants: React.FC<TextbookPlantsProps> = ({
@@ -19,7 +20,8 @@ const TextbookPlants: React.FC<TextbookPlantsProps> = ({
   maxSize,
   widthPer,
   displayPlant,
-  sizeRatio,
+  transformScale,
+  plantSizeRatio,
 }) => {
   return (
     <Flex
@@ -28,7 +30,7 @@ const TextbookPlants: React.FC<TextbookPlantsProps> = ({
         width: '100%',
         height: maxSize,
         transition: 'transform 0.5s ease-out', // 1秒間で滑らかに変化
-        transform: `scale(${sizeRatio})`, // 倍率を適用
+        transform: `scale(${transformScale})`, // 倍率を適用
         transformOrigin: 'center bottom', // 中央を中心に拡大・縮小
       }}
     >
@@ -36,15 +38,14 @@ const TextbookPlants: React.FC<TextbookPlantsProps> = ({
         plants.map((plant, index) => (
           <PlantImageItem
             key={index}
-            type="adult"
+            plant={plant}
             subject={subject}
-            imageIndex={plant.plantIndex}
-            width={plant.size}
-            height={plant.size}
+            width={plant.size * plantSizeRatio}
+            height={plant.size * plantSizeRatio}
             style={{
               position: 'absolute',
               // positionX (0~1)をパーセンテージ (0%~100%) に変換して left に設定
-              left: `${plant.positionX * widthPer}%`,
+              left: `${plant.textbookPositionX * widthPer}%`,
               bottom: 0,
             }}
           />

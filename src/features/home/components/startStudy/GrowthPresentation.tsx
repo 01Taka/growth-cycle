@@ -1,6 +1,7 @@
 import React from 'react';
 import { FaRocket, FaSeedling } from 'react-icons/fa'; // React Iconsから必要なアイコンをインポート
 import { Button, Card, createTheme, Group, rem, Stack, Text } from '@mantine/core';
+import { Plant } from '@/shared/types/plant-shared-types';
 import { Subject } from '@/shared/types/subject-types';
 import { StudyCountView } from './StudyCountView';
 
@@ -8,7 +9,7 @@ import { StudyCountView } from './StudyCountView';
  * プレゼンテーションコンポーネントのProps型定義
  */
 interface GrowthPresentationProps {
-  learnings: { subject: Subject }[];
+  learnings: { subject: Subject; plant: Plant }[];
   onStartStudy: () => void; // 「勉強スタート」ボタンクリック時のハンドラ
 }
 

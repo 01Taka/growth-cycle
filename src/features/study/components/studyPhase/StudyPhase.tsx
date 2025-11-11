@@ -2,7 +2,7 @@ import React from 'react';
 import { Stack } from '@mantine/core';
 import { SingleTimerData } from '@/shared/hooks/multi-timer/multi-timer-types';
 import { SubjectColorMap } from '@/shared/theme/subjectColorType';
-import { ImportPlantsType } from '@/shared/types/plant-shared-types';
+import { ImportPlantsType, Plant } from '@/shared/types/plant-shared-types';
 import { Subject } from '@/shared/types/subject-types';
 import { StudyHeader } from '../main/StudyHeader';
 import { StudyActionButtons } from './StudyActionButtons';
@@ -16,11 +16,7 @@ interface StudyPhaseProps {
     textbookName: string;
     units: string[];
   };
-  plant: {
-    subject: Subject;
-    type: ImportPlantsType;
-    imageIndex: number;
-  };
+  plant: Plant | null;
   timer: SingleTimerData;
   theme: SubjectColorMap;
   switchState: () => void;
@@ -54,7 +50,7 @@ export const StudyPhase: React.FC<StudyPhaseProps> = ({
         onStartTest={onStartTest}
         onShowTextRange={onShowTextRange}
       />
-      <StudyPhasePlantDisplay {...plant} />
+      {plant && <StudyPhasePlantDisplay subject={header.subject} plant={plant} />}
     </Stack>
   );
 };

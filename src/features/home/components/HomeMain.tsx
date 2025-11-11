@@ -12,6 +12,7 @@ import { GrowthPresentation } from './startStudy/GrowthPresentation';
 interface HomeMainProps {}
 
 export const HomeMain: React.FC<HomeMainProps> = ({}) => {
+  const navigate = useNavigate();
   const { learningCycles: learningCycles, fetchLearningCycles } = useLearningCycleStore(
     (state) => state
   );
@@ -32,12 +33,15 @@ export const HomeMain: React.FC<HomeMainProps> = ({}) => {
     []
   );
 
-  const navigate = useNavigate();
+  const learnings = todayStartedCycles.map((cycle) => ({
+    subject: cycle.subject,
+    plant: cycle.plant,
+  }));
 
-  const learnings = todayStartedCycles.map((cycle) => ({ subject: cycle.subject }));
-
-  const handleStartReview = (cycle: LearningCycleDocument) => {
-    navigate(`/study?cycleId=${cycle.id}&phase=test`);
+  const handleStartReview = (cycle: LearningCycleDocument, isCompleted: boolean) => {
+    if (!isCompleted) {
+      navigate(`/study?cycleId=${cycle.id}&phase=test`);
+    }
   };
 
   return (

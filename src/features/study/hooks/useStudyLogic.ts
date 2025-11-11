@@ -113,7 +113,6 @@ export const useStudyLogic = ({
 
   // 6. 必要なすべての値を返す
   return {
-    subject,
     header,
     theme,
     problems,

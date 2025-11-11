@@ -1,20 +1,16 @@
 import React from 'react';
 import { Box, rem } from '@mantine/core';
 import { PlantImageItem } from '@/features/plants/components/PlantImageItem';
-import { ImportPlantsType } from '@/shared/types/plant-shared-types';
+import { Plant } from '@/shared/types/plant-shared-types';
 import { Subject } from '@/shared/types/subject-types';
 
 interface StudyPlantProps {
-  subject: Subject | null;
-  type: ImportPlantsType;
-  index: number;
+  learning: { subject: Subject; plant: Plant } | null;
   width?: number; // 全体の幅を制御するためのオプション
 }
 
 export const StudyPlant: React.FC<StudyPlantProps> = ({
-  subject,
-  type,
-  index,
+  learning,
   width = 60, // デフォルトの幅を設定 (rem単位で使うため数値)
 }) => {
   // 土台の幅を rem 単位に変換
@@ -36,11 +32,10 @@ export const StudyPlant: React.FC<StudyPlantProps> = ({
     >
       {/* 1. PlantImageItem (双葉) */}
       <Box style={{ width: soilWidth, height: soilWidth }}>
-        {subject && (
+        {learning && (
           <PlantImageItem
-            subject={subject}
-            type={type}
-            imageIndex={index}
+            subject={learning.subject}
+            plant={learning.plant}
             width={soilWidth}
             height={soilWidth}
           />

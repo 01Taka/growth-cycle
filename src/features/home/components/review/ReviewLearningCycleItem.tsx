@@ -3,7 +3,7 @@ import { Card, Flex, Image, Stack, Text } from '@mantine/core';
 import StarEffect from '@/assets/images/star.png';
 import { PlantImageItem } from '@/features/plants/components/PlantImageItem';
 import { useSubjectColorMap } from '@/shared/hooks/useSubjectColor';
-import { PlantShape } from '@/shared/types/plant-shared-types';
+import { Plant } from '@/shared/types/plant-shared-types';
 import { Subject } from '@/shared/types/subject-types';
 import { AuraEffect } from './AuraEffect';
 import { GiveWaterButton } from './GiveWaterButton';
@@ -11,7 +11,7 @@ import { UnitPill } from './UnitPill';
 
 export interface ReviewLearningCycleItemProps {
   isCompleted: boolean;
-  plantShape: PlantShape;
+  plant: Plant;
   subject: Subject;
   unitNames: string[];
   problemCount: number;
@@ -21,7 +21,7 @@ export interface ReviewLearningCycleItemProps {
 
 export const ReviewLearningCycleItem: React.FC<ReviewLearningCycleItemProps> = ({
   isCompleted,
-  plantShape,
+  plant,
   subject,
   unitNames,
   problemCount,
@@ -66,8 +66,7 @@ export const ReviewLearningCycleItem: React.FC<ReviewLearningCycleItemProps> = (
 
           <PlantImageItem
             subject={subject}
-            type="adult"
-            imageIndex={0}
+            plant={plant}
             width={45}
             height={64}
             style={{ position: 'relative', zIndex: 1000 }}

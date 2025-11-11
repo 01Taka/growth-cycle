@@ -15,7 +15,7 @@ interface HomeReviewCardProps {
   groupedCycles: Record<number, DateGroupedCycles>;
   todayReviewCyclesCount: number;
   todayReviewedCyclesCount: number;
-  onStartReview: (reviewCycle: LearningCycleDocument) => void;
+  onStartReview: (reviewCycle: LearningCycleDocument, isCompleted: boolean) => void;
 }
 
 // --- スタイル定義 (コンポーネント外で定義) ---
@@ -120,13 +120,13 @@ export const HomeReviewCard: React.FC<HomeReviewCardProps> = ({
       <ReviewLearningCycleItem
         key={`${isCompleted ? 'reviewed' : 'review'}-${key}-${index}`}
         isCompleted={isCompleted}
-        plantShape={cycle.plantShape}
+        plant={cycle.plant}
         subject={cycle.subject}
         unitNames={cycle.units.map((unit) => unit.name)}
         problemCount={cycle.problems.length}
         // testDurationMsを分に変換
         testDurationMin={Math.floor((cycle.testDurationMs || 0) / 60000)}
-        onStartReview={() => onStartReview(cycle)}
+        onStartReview={() => onStartReview(cycle, isCompleted)}
       />
     ));
   };

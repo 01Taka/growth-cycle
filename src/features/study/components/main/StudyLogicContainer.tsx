@@ -69,7 +69,6 @@ export const StudyLogicContainer: React.FC<StudyLogicContainerProps> = ({
   });
 
   const {
-    subject,
     header,
     theme,
     problems,
@@ -147,11 +146,7 @@ export const StudyLogicContainer: React.FC<StudyLogicContainerProps> = ({
           <StudyPhase
             isReadyTest={studyTimer.remainingTime <= 0}
             header={header}
-            plant={{
-              subject: subject,
-              type: 'adult',
-              imageIndex: 2,
-            }}
+            plant={learningCycle?.plant ?? null}
             timer={studyTimer}
             theme={theme}
             switchState={studyTimer.switchState}

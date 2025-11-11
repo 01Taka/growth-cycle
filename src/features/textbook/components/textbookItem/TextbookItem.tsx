@@ -7,7 +7,8 @@ import TextbookPlants from './TextbookPlants';
 export const TextbookItem: React.FC<
   TextbookItemProps & {
     widthPer: number;
-    sizeRatio: number;
+    transformScale: number;
+    plantSizeRatio: number;
     displayPlant: boolean;
     onClick: () => void;
   }
@@ -19,7 +20,8 @@ export const TextbookItem: React.FC<
   plants,
   maxSize,
   widthPer,
-  sizeRatio,
+  transformScale,
+  plantSizeRatio,
   displayPlant,
   onClick,
 }) => {
@@ -31,7 +33,8 @@ export const TextbookItem: React.FC<
         maxSize={maxSize}
         widthPer={widthPer}
         displayPlant={displayPlant}
-        sizeRatio={sizeRatio}
+        transformScale={transformScale}
+        plantSizeRatio={plantSizeRatio}
       />
 
       <TextbookContents

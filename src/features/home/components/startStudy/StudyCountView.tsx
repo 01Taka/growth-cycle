@@ -1,10 +1,11 @@
 import React from 'react';
 import { Flex, rem, Text } from '@mantine/core';
+import { Plant } from '@/shared/types/plant-shared-types';
 import { Subject } from '@/shared/types/subject-types';
 import { StudyPlant } from './StudyPlant';
 
 interface StudyCountViewProps {
-  learnings: { subject: Subject }[];
+  learnings: { subject: Subject; plant: Plant }[];
   maxLearningNum: number;
 }
 
@@ -16,12 +17,7 @@ export const StudyCountView: React.FC<StudyCountViewProps> = ({ learnings, maxLe
       </Text>
       <Flex gap={10}>
         {[...Array(maxLearningNum).keys()].map((index) => (
-          <StudyPlant
-            key={index}
-            subject={learnings[index]?.subject ?? null}
-            type="bud"
-            index={0}
-          />
+          <StudyPlant key={index} learning={learnings[index] ?? null} />
         ))}
       </Flex>
     </Flex>

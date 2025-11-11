@@ -11,6 +11,8 @@ import { TextbookList } from './TextbookList';
 
 interface TextbookMainProps {}
 
+const PLANT_SIZE_RATIO = 28;
+
 export const TextbookMain: React.FC<TextbookMainProps> = () => {
   const navigate = useNavigate();
 
@@ -58,7 +60,7 @@ export const TextbookMain: React.FC<TextbookMainProps> = () => {
     if (error) {
       return (
         <Center style={{ height: 'calc(100vh - 200px)' }}>
-          <Text color="red">{error}</Text>
+          <Text style={{ color: 'red' }}>{error}</Text>
         </Center>
       );
     }
@@ -67,7 +69,8 @@ export const TextbookMain: React.FC<TextbookMainProps> = () => {
     return (
       <TextbookList
         textbookItems={filterData}
-        sizeRatio={displayPlant ? 1 : 0}
+        transformScale={displayPlant ? 1 : 0}
+        plantSizeRatio={PLANT_SIZE_RATIO}
         onClick={onSelectTextbook}
       />
     );

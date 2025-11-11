@@ -1,3 +1,4 @@
+import { Plant } from '@/shared/types/plant-shared-types';
 import { Subject } from '@/shared/types/subject-types';
 
 export interface TextbookPlant {
@@ -11,6 +12,6 @@ export interface TextbookItemProps {
   textbookName: string;
   totalPlants: number;
   daysSinceLastAttempt: number | null;
-  plants: TextbookPlant[];
+  plants: Plant[];
   maxSize: number;
 }
