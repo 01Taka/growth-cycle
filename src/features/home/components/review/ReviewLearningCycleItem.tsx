@@ -3,17 +3,30 @@ import { Card, Flex, Image, Stack, Text } from '@mantine/core';
 import StarEffect from '@/assets/images/star.png';
 import { PlantImageItem } from '@/features/plants/components/PlantImageItem';
 import { useSubjectColorMap } from '@/shared/hooks/useSubjectColor';
+import { PlantShape } from '@/shared/types/plant-shared-types';
+import { Subject } from '@/shared/types/subject-types';
 import { AuraEffect } from './AuraEffect';
 import { GiveWaterButton } from './GiveWaterButton';
-import { ReviewLearningCycleItemProps } from './shared-types';
 import { UnitPill } from './UnitPill';
+
+export interface ReviewLearningCycleItemProps {
+  isCompleted: boolean;
+  plantShape: PlantShape;
+  subject: Subject;
+  unitNames: string[];
+  problemCount: number;
+  testDurationMin: number;
+  onStartReview: () => void;
+}
 
 export const ReviewLearningCycleItem: React.FC<ReviewLearningCycleItemProps> = ({
   isCompleted,
-  plantIndex,
+  plantShape,
   subject,
   unitNames,
+  problemCount,
   testDurationMin,
+  onStartReview,
 }) => {
   const subjectTheme = useSubjectColorMap(subject);
 
@@ -54,7 +67,7 @@ export const ReviewLearningCycleItem: React.FC<ReviewLearningCycleItemProps> = (
           <PlantImageItem
             subject={subject}
             type="adult"
-            imageIndex={plantIndex}
+            imageIndex={0}
             width={45}
             height={64}
             style={{ position: 'relative', zIndex: 1000 }}
@@ -114,16 +127,19 @@ export const ReviewLearningCycleItem: React.FC<ReviewLearningCycleItemProps> = (
                 whiteSpace: 'nowrap',
               }}
             >
-              目標: {testDurationMin}分
+              {problemCount}問 / 目標: {testDurationMin}分
             </Text>
-            <GiveWaterButton
-              isCompleted={isCompleted}
-              color={isCompleted ? subjectTheme.accent : subjectTheme.textRevers}
-              bgColor={isCompleted ? subjectTheme.disabled : subjectTheme.accent}
-              borderColor={isCompleted ? subjectTheme.accent : undefined}
-            />
           </Flex>
         </Stack>
+        <GiveWaterButton
+          label={isCompleted ? '復習完了' : '復習開始'}
+          labelColor={subjectTheme.text}
+          isCompleted={isCompleted}
+          color={isCompleted ? subjectTheme.accent : subjectTheme.textRevers}
+          bgColor={isCompleted ? subjectTheme.disabled : subjectTheme.accent}
+          borderColor={isCompleted ? subjectTheme.accent : undefined}
+          onClick={onStartReview}
+        />
       </Flex>
     </Card>
   );

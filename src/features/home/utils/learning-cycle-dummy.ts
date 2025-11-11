@@ -1,7 +1,7 @@
 import { LearningCycleDocument } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 import { generateFirestoreId } from '@/shared/data/idb/generate-path';
 import { IDB_PATH } from '@/shared/data/idb/idb-path';
-import { getDateAfterDays } from '@/shared/utils/datetime/datetime-utils';
+import { getDateAfterDaysBoundary } from '@/shared/utils/datetime/datetime-utils';
 
 // ユーティリティ関数: 乱数に応じて要素をランダムに選択
 const getRandomElement = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
@@ -65,7 +65,12 @@ export const generateDummyLearningCycle = (
     { length: sessionCount },
     (_, sessionIndex) => {
       // セッション間の時間を設定
-      const attemptedAt = cycleStartAt + ((now - cycleStartAt) / sessionCount) * (sessionIndex + 1);
+      const lastAttemptedAt = Math.max(
+        now - getRandomInt(0, 10 * 24 * 60 * 60 * 1000),
+        cycleStartAt
+      );
+      const attemptedAt =
+        cycleStartAt + ((lastAttemptedAt - cycleStartAt) / sessionCount) * (sessionIndex + 1);
 
       const results: LearningCycleDocument['sessions'][0]['results'] = problems.map((problem) => {
         const category = categories.find((c) => c.id === problem.categoryId)!;
@@ -101,6 +106,11 @@ export const generateDummyLearningCycle = (
 
   const id = generateFirestoreId();
 
+  const nextReviewRandom = Math.random();
+  const nextReviewDate = getDateAfterDaysBoundary(
+    nextReviewRandom > 1 / 3 ? 0 : nextReviewRandom > 2 / 3 ? 1 : 7
+  );
+
   return {
     id,
     path: `${IDB_PATH.learningCycles}/${id}`,
@@ -109,16 +119,16 @@ export const generateDummyLearningCycle = (
     learningDurationMs: getRandomInt(1, 10) * 3600000, // 1〜10時間
     testDurationMs: problemCount * 60000, // 問題数 x 1分
     problems: problems,
-    isReviewTarget: Math.random() > 0.9,
+    isReviewTarget: Math.random() > 0.1,
     textbookName: `${subject.charAt(0).toUpperCase() + subject.slice(1)} ${testMode === 'memory' ? '用語集' : '問題集'}`,
     subject: subject,
     cycleStartAt: cycleStartAt,
     units: units,
     categories: categories,
     sessions: sessions,
-    nextReviewDate: getDateAfterDays(Math.random() > 0.5 ? 1 : 7),
+    nextReviewDate,
     latestAttemptedAt: latestAttemptedAt,
-    plant: {
+    plantShape: {
       seedType: '',
       size: 0,
       plantType: '',

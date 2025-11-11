@@ -1,156 +1,249 @@
-import React, { useState } from 'react';
-import {
-  Card,
-  CardSection,
-  Flex,
-  Pill,
-  Stack,
-  Tabs, // 👈 Tabs コンポーネントをインポート
-  Text,
-} from '@mantine/core';
+import React, { useMemo, useState } from 'react';
+import { IconClockHour3, IconSquareCheck } from '@tabler/icons-react';
+import { Card, CardSection, Flex, Pill, rem, Stack, Tabs, Text } from '@mantine/core';
+import { LearningCycleDocument } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 import { ReviewLearningCycleItem } from './ReviewLearningCycleItem';
-import { ReviewLearningCycleItemProps } from './shared-types';
 
-// Tabの切り替えで使用する識別子
-type ReviewPeriod = 'yesterday' | 'lastWeek';
+// --- 定数と型定義の再エクスポート (可読性の向上) ---
 
-interface HomeReviewCardProps {
-  totalYesterdayReviewNum: number;
-  totalLastWeekReviewNum: number;
-  completedYesterdayReviewNum: number;
-  completedLastWeekReviewNum: number;
-  yesterdayItems: ReviewLearningCycleItemProps[];
-  lastWeekItems: ReviewLearningCycleItemProps[];
+interface DateGroupedCycles {
+  todayReviewCycles: LearningCycleDocument[];
+  todayReviewedCycles: LearningCycleDocument[];
 }
 
+interface HomeReviewCardProps {
+  groupedCycles: Record<number, DateGroupedCycles>;
+  todayReviewCyclesCount: number;
+  todayReviewedCyclesCount: number;
+  onStartReview: (reviewCycle: LearningCycleDocument) => void;
+}
+
+// --- スタイル定義 (コンポーネント外で定義) ---
+const COLORS = {
+  // 変更なし: 全体の背景色。より白くするとモダンになるが、トーンを維持
+  cardBg: '#F5F0E6', // 👈 変更: 背景を少し明るくし、コントラストを改善
+  pillBg: '#ffb84e',
+
+  // 変更なし: カードの枠線。アクセントとして機能
+  cardBorder: '#EA8E00',
+
+  // 変更: メインのアクセントカラー（復習予定、アクティブタブ）。より鮮やかで目立つ色に
+  orangeButton: '#ed8e00', // 👈 変更: アクセント色をより鮮明なオレンジに (元: #f8b449)
+
+  // 変更: 一般的な文字色や非アクティブな色。コントラストを上げるため、より濃い色に
+  textDark: '#2B2B2B', // 👈 変更: 暗い文字色をより濃くし、背景との視認性を向上 (元: #454545)
+
+  // 変更なし: 完了を示す色
+  completedGreen: '#4CAF50', // 👈 変更: 一般的なグリーンカラーで視認性を向上 (元: 'green')
+};
+
+const STRINGS = {
+  headerTitle: '🗓️ 今日の復習',
+  remainingTasksLabel: '残りタスク:',
+  noReviewData: '復習予定のデータがありません。',
+  noReviewedData: '復習済みのデータがありません。',
+  noTabsData: '表示する復習データがありません。',
+};
+
+// --- ヘルパー関数: 日付差を日本語のラベルに変換 (修正済み) ---
+const getDateLabel = (dayDiff: number): string => {
+  if (dayDiff === 0) return '今日';
+  if (dayDiff === 1) return '昨日';
+  if (dayDiff === -1) return '明日';
+  if (dayDiff > 0) return `${dayDiff}日前`; // 正の値は過去
+  return `${Math.abs(dayDiff)}日後`; // 負の値は未来
+};
+
 export const HomeReviewCard: React.FC<HomeReviewCardProps> = ({
-  totalYesterdayReviewNum,
-  totalLastWeekReviewNum,
-  completedYesterdayReviewNum,
-  completedLastWeekReviewNum,
-  yesterdayItems,
-  lastWeekItems,
+  groupedCycles,
+  todayReviewCyclesCount,
+  todayReviewedCyclesCount,
+  onStartReview,
 }) => {
-  // 選択されているタブの状態を管理するためのstateを定義
-  // 初期値は 'yesterday' (昨日の復習) に設定
-  const [activeTab, setActiveTab] = useState<ReviewPeriod>('yesterday');
+  // groupedCyclesのキーをソートし、string[]として保持 (ソートロジック修正済み)
+  const dateKeys = useMemo(
+    () =>
+      Object.keys(groupedCycles)
+        .map(Number)
+        .sort((a, b) => {
+          // 1. 0（今日）を最優先
+          if (a === 0) return -1;
+          if (b === 0) return 1;
 
-  // Styles for the main card and header elements
-  const cardBgColor = '#DED3C2'; // Light beige/tan for the main card
-  const cardBorderColor = '#EA8E00';
-  const orangeButtonColor = '#f8b449'; // The specific orange tone for the buttons
+          // 2. 正の値（過去）を小さい順（新しい順: 1日前, 2日前...）に並べる
+          if (a > 0 && b > 0) return a - b;
 
-  // 現在の合計残りタスク数
-  const remainingTasks =
-    totalLastWeekReviewNum +
-    totalYesterdayReviewNum -
-    (completedYesterdayReviewNum + completedLastWeekReviewNum);
+          // 3. 負の値（未来）を大きい順（近い順: 明日(-1), 明後日(-2)...）に並べる
+          if (a < 0 && b < 0) return b - a;
 
-  // -------------------------------------------------------------
-  // タブの切り替え時に呼び出される関数 (ボタンのクリックハンドラとして流用)
-  const handleTabChange = (value: string | null) => {
-    // Mantine TabsのonChangeはstring | nullを返す
-    // ここでは 'yesterday' または 'lastWeek' の値であることを保証
-    if (value === 'yesterday' || value === 'lastWeek') {
-      setActiveTab(value);
+          // 4. 正の値 vs 負の値: 正の値（過去）を優先
+          if (a > 0) return -1;
+          return 1;
+        })
+        .map(String),
+    [groupedCycles]
+  );
+
+  // 初回のアクティブタブを設定
+  const [activeTab, setActiveTab] = useState<string | null>(
+    dateKeys.length > 0 ? dateKeys[0] : null
+  );
+
+  const remainingTasks = todayReviewCyclesCount;
+  const totalTasks = todayReviewCyclesCount + todayReviewedCyclesCount;
+  const progressString = `${todayReviewedCyclesCount} / ${totalTasks}`;
+
+  // 🔨 統合ヘルパー関数: 復習アイテムのレンダリング
+  const renderReviewItems = (key: string, isCompleted: boolean): React.ReactNode => {
+    const dayDiff = parseInt(key);
+    const cycleData = groupedCycles[dayDiff];
+
+    if (!cycleData) {
+      return (
+        <Text c="dimmed" p="md">
+          {isCompleted ? STRINGS.noReviewedData : STRINGS.noReviewData}
+        </Text>
+      );
     }
+
+    const cycles = isCompleted ? cycleData.todayReviewedCycles : cycleData.todayReviewCycles;
+
+    if (cycles.length === 0) {
+      return (
+        <Text c="dimmed" p="md">
+          {isCompleted ? STRINGS.noReviewedData : STRINGS.noReviewData}
+        </Text>
+      );
+    }
+
+    return cycles.map((cycle, index) => (
+      <ReviewLearningCycleItem
+        key={`${isCompleted ? 'reviewed' : 'review'}-${key}-${index}`}
+        isCompleted={isCompleted}
+        plantShape={cycle.plantShape}
+        subject={cycle.subject}
+        unitNames={cycle.units.map((unit) => unit.name)}
+        problemCount={cycle.problems.length}
+        // testDurationMsを分に変換
+        testDurationMin={Math.floor((cycle.testDurationMs || 0) / 60000)}
+        onStartReview={() => onStartReview(cycle)}
+      />
+    ));
   };
-  // -------------------------------------------------------------
+
+  const currentCycleData = activeTab ? groupedCycles[parseInt(activeTab)] : null;
+  const reviewCount = currentCycleData?.todayReviewCycles.length || 0;
+  const reviewedCount = currentCycleData?.todayReviewedCycles.length || 0;
 
   return (
     <Card
       shadow="sm"
       padding="md"
       radius="lg"
-      bg={cardBgColor}
-      style={{ margin: '10px', border: `3px solid ${cardBorderColor}` }}
+      bg={COLORS.cardBg}
+      style={{ margin: '10px', border: `3px solid ${COLORS.cardBorder}` }}
     >
-      <CardSection withBorder={false} p="md">
-        <Stack>
-          {/* Header Section: 今日の復習 and 残り N タスク */}
+      {/* --- ヘッダーと進捗表示 --- */}
+      <CardSection p="md">
+        <Stack gap="xs">
+          <Text fw={700} size="xl" c={COLORS.textDark}>
+            {STRINGS.headerTitle}
+          </Text>
           <Flex justify="space-between" align="center">
-            <Text size="xl" fw={700} style={{ display: 'flex', alignItems: 'center' }}>
-              <span style={{ marginRight: 8 }}>📚</span>
-              今日の復習
+            <Text fw={600} size="md" c={COLORS.textDark}>
+              {STRINGS.remainingTasksLabel}
+              <Text span c={COLORS.orangeButton} size="xl" fw={700} ml={5}>
+                {remainingTasks}
+              </Text>
             </Text>
-            <Pill
-              size="lg"
-              radius="xl"
-              bg="#8c775d" // Darker brown/grey background for the pill
-              c="white" // White text color
-              style={{ fontWeight: 700 }}
-            >
-              残り {remainingTasks} タスク
+            <Pill size="md" radius="xl" variant="filled" bg={COLORS.pillBg} color={COLORS.textDark}>
+              進捗: {progressString}
             </Pill>
           </Flex>
-
-          {/* Review Tabs Section: 昨日の復習 and 先週の復習 */}
-          <Tabs
-            value={activeTab} // 現在のstateと連携
-            onChange={handleTabChange} // タブ切り替え時にstateを更新
-            color={orangeButtonColor} // タブのアクティブカラー
-            variant="pills" // Pill型のタブスタイル
-            radius="md"
-            defaultValue="yesterday"
-          >
-            {/* Tab.List: タブのヘッダー部分 */}
-            <Tabs.List grow>
-              {/* Tab for '昨日の復習' */}
-              <Tabs.Tab
-                value="yesterday"
-                size="lg"
-                style={{
-                  height: 'auto',
-                  padding: '10px 15px',
-                  whiteSpace: 'normal',
-                  lineHeight: 1.2,
-                  // アクティブでないタブの背景色を調整 (オプション)
-                  backgroundColor: activeTab === 'yesterday' ? orangeButtonColor : 'white',
-                  color: activeTab === 'yesterday' ? 'white' : 'black',
-                }}
-              >
-                昨日の復習 {completedYesterdayReviewNum} / {totalYesterdayReviewNum}
-              </Tabs.Tab>
-
-              {/* Tab for '先週の復習' */}
-              <Tabs.Tab
-                value="lastWeek"
-                size="lg"
-                style={{
-                  height: 'auto',
-                  padding: '10px 15px',
-                  whiteSpace: 'normal',
-                  lineHeight: 1.2,
-                  // アクティブでないタブの背景色を調整 (オプション)
-                  backgroundColor: activeTab === 'lastWeek' ? orangeButtonColor : 'white',
-                  color: activeTab === 'lastWeek' ? 'white' : 'black',
-                }}
-              >
-                先週の復習 {completedLastWeekReviewNum} / {totalLastWeekReviewNum}
-              </Tabs.Tab>
-            </Tabs.List>
-
-            {/* Tab.Panel: タブの中身部分 */}
-            <Tabs.Panel value="yesterday" pt="md">
-              {/* 昨日のアイテムリスト */}
-              <Stack style={{ width: '100%' }}>
-                {yesterdayItems.map((item, index) => (
-                  <ReviewLearningCycleItem key={index} {...item} />
-                ))}
-              </Stack>
-            </Tabs.Panel>
-
-            <Tabs.Panel value="lastWeek" pt="md">
-              {/* 先週のアイテムリスト */}
-              <Stack style={{ width: '100%' }}>
-                {lastWeekItems.map((item, index) => (
-                  <ReviewLearningCycleItem key={index} {...item} />
-                ))}
-              </Stack>
-            </Tabs.Panel>
-          </Tabs>
         </Stack>
       </CardSection>
+
+      {/* --- タブとコンテンツ --- */}
+      <Tabs color={COLORS.orangeButton} value={activeTab} onChange={setActiveTab} variant="outline">
+        <Tabs.List grow>
+          {dateKeys.map((key) => {
+            const dayDiff = parseInt(key);
+            const dataForDay = groupedCycles[dayDiff];
+
+            // データが存在しない日（キー）をスキップ
+            if (!dataForDay) return null;
+
+            const total =
+              dataForDay.todayReviewCycles.length + dataForDay.todayReviewedCycles.length;
+
+            if (total === 0) return null;
+
+            return (
+              <Tabs.Tab
+                key={key}
+                value={key}
+                fw={600}
+                style={
+                  activeTab === key
+                    ? {
+                        backgroundColor: COLORS.orangeButton, // アクティブ時の背景色
+                        color: COLORS.cardBg, // アクティブ時の文字色（背景色に合わせて反転）
+                        borderRadius: '4px 4px 0 0', // 角丸の調整
+                      }
+                    : {}
+                }
+                c={activeTab === key ? COLORS.cardBg : COLORS.textDark} // 文字色を制御
+              >
+                {getDateLabel(dayDiff)} ({total})
+              </Tabs.Tab>
+            );
+          })}
+        </Tabs.List>
+
+        <CardSection mt="md" p="md">
+          {activeTab ? (
+            <Stack gap="lg">
+              {/* 復習予定 (Review) */}
+              <Stack gap="xs">
+                <Text
+                  size="lg"
+                  fw={700}
+                  c={COLORS.orangeButton}
+                  style={{
+                    borderLeft: `4px solid ${COLORS.orangeButton}`,
+                    paddingLeft: rem(8),
+                  }}
+                >
+                  <IconClockHour3 style={{ verticalAlign: 'middle', marginRight: rem(4) }} />
+                  復習予定 ({reviewCount})
+                </Text>
+                <Stack gap="xs">{renderReviewItems(activeTab, false)}</Stack>
+              </Stack>
+
+              {/* 復習済み (Reviewed) */}
+              <Stack gap="xs">
+                <Text
+                  size="lg"
+                  fw={700}
+                  c={COLORS.completedGreen}
+                  style={{
+                    borderLeft: `4px solid ${COLORS.completedGreen}`,
+                    paddingLeft: rem(8),
+                  }}
+                >
+                  <IconSquareCheck style={{ verticalAlign: 'middle', marginRight: rem(4) }} />
+                  復習済み ({reviewedCount})
+                </Text>
+                <Stack gap="xs">{renderReviewItems(activeTab, true)}</Stack>
+              </Stack>
+            </Stack>
+          ) : (
+            <Text c="dimmed" p="md" ta="center">
+              {STRINGS.noTabsData}
+            </Text>
+          )}
+        </CardSection>
+      </Tabs>
     </Card>
   );
 };

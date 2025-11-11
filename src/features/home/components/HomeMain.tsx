@@ -1,48 +1,52 @@
 import React, { useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { LearningCycleDocument } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 import { useLearningCycleStore } from '@/shared/stores/useLearningCycleStore';
 import {
-  convertLearningCyclesToReviewItemMap,
-  createReviewCountGetter,
-  createReviewItemGetter,
-  filterTodayLearningCycles,
-} from '../functions/convert-learning-cycle';
-import { generateMultipleLearningCycles } from '../utils/learning-cycle-dummy';
+  filterLearningCycles,
+  groupCyclesByAllDateDifferences,
+} from '../functions/filter-learning-cycle';
 import { HomeReviewCard } from './review/HomeReviewCard';
 import { GrowthPresentation } from './startStudy/GrowthPresentation';
 
 interface HomeMainProps {}
 
 export const HomeMain: React.FC<HomeMainProps> = ({}) => {
-  const { fetchLearningCycles } = useLearningCycleStore((state) => state);
+  const { learningCycles: learningCycles, fetchLearningCycles } = useLearningCycleStore(
+    (state) => state
+  );
 
-  const learningCycles = useMemo(() => generateMultipleLearningCycles(10), []);
+  // const learningCycles = useMemo(() => generateMultipleLearningCycles(5), []);
 
   useEffect(() => {
     fetchLearningCycles();
   }, [fetchLearningCycles]);
 
-  const reviewPropsMap = useMemo(
-    () => convertLearningCyclesToReviewItemMap(learningCycles),
+  const { todayReviewCycles, todayReviewedCycles, todayStartedCycles } = useMemo(
+    () => filterLearningCycles(learningCycles),
     [learningCycles]
+  );
+
+  const groupedCycles = useMemo(
+    () => groupCyclesByAllDateDifferences({ todayReviewCycles, todayReviewedCycles }),
+    []
   );
 
   const navigate = useNavigate();
 
-  const todayCycles = filterTodayLearningCycles(learningCycles);
-  const learnings = todayCycles.map((cycle) => ({ subject: cycle.subject }));
-  const getItem = createReviewItemGetter(reviewPropsMap);
-  const getCount = createReviewCountGetter(reviewPropsMap);
+  const learnings = todayStartedCycles.map((cycle) => ({ subject: cycle.subject }));
+
+  const handleStartReview = (cycle: LearningCycleDocument) => {
+    navigate(`/study?cycleId=${cycle.id}&phase=test`);
+  };
 
   return (
     <div>
       <HomeReviewCard
-        totalYesterdayReviewNum={getCount(-1).total}
-        completedYesterdayReviewNum={getCount(-1).completed}
-        totalLastWeekReviewNum={getCount(-7).total}
-        completedLastWeekReviewNum={getCount(-7).completed}
-        yesterdayItems={getItem(-1)}
-        lastWeekItems={getItem(-7)}
+        groupedCycles={groupedCycles}
+        todayReviewCyclesCount={todayReviewCycles.length}
+        todayReviewedCyclesCount={todayReviewedCycles.length}
+        onStartReview={handleStartReview}
       />
       <GrowthPresentation learnings={learnings} onStartStudy={() => navigate('/textbooks')} />
     </div>

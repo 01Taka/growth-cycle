@@ -17,7 +17,7 @@ import {
 import { generateIdbPath } from '@/shared/data/idb/generate-path';
 import { IDB_PATH } from '@/shared/data/idb/idb-path';
 import { idbStore } from '@/shared/data/idb/idb-store';
-import { getDateAfterDays } from '@/shared/utils/datetime/datetime-utils';
+import { getDateAfterDaysBoundary } from '@/shared/utils/datetime/datetime-utils';
 import { ProblemAttemptResult } from '../types/problem-types';
 
 const problemsToTestResults = (problems: ProblemAttemptResult[]): TestResult[] => {
@@ -45,7 +45,7 @@ const getNextReviewDate = (attemptCount: number, lastAttemptedAt: number): strin
   }
   // 3回目以降の復習ロジックはMVPではまだ未定義のため、一旦null
 
-  return dateAfter ? getDateAfterDays(dateAfter, lastAttemptedAt) : null;
+  return dateAfter ? getDateAfterDaysBoundary(dateAfter, lastAttemptedAt) : null;
 };
 
 export const handleRecordSession = async (
