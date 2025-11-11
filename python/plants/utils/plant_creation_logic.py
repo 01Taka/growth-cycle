@@ -1,14 +1,8 @@
 import os
 import json
 from typing import Dict, Any, Union, List
-from module_config_utils import create_new_module
-
-# --- グローバル定数定義 ---
-
-# Plantの設定を保存するJSONファイルパス
-PLANTS_CONFIG_JSON_PATH = 'src/json/plantsConfig/plants_config.json'
-# Seedの設定を更新するJSONファイルパス
-SEEDS_CONFIG_JSON_PATH = 'src/json/plantsConfig/seeds_config.json'
+from utils.module_config_utils import create_new_module
+from config import PLANTS_CONFIG_JSON_PATH, SEEDS_CONFIG_JSON_PATH
 
 # --- データ構造の定義 ---
 PlantOption = Dict[str, Union[str, int]]

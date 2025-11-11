@@ -1,0 +1,26 @@
+{
+    "SCIENCE_TULIPB": {
+        "modules": {
+            "Stem": {
+                "Stem_V0": {
+                    "moduleRarity": "R",
+                    "weight": 100
+                },
+                "Stem_V1": {
+                    "moduleRarity": "XSR",
+                    "weight": 100
+                },
+                "Stem_V2": {
+                    "moduleRarity": "SSR",
+                    "weight": 100
+                }
+            },
+            "Flower": {
+                "Flower_SR": {
+                    "moduleRarity": "SR",
+                    "weight": 50
+                }
+            }
+        }
+    }
+}

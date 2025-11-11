@@ -62,7 +62,7 @@ export const convertLearningCycleToAttempts = (cycle: LearningCycle): ProblemAtt
         allAttempts.push({
           scoringStatus: result.scoringStatus,
           selfEvaluation: result.selfEvaluation,
-          timeSpentMs: result.timeTakenMs, // timeTakenMsをtimeSpentMsにマップ
+          timeSpentMs: result.timeSpentMs, // timeTakenMsをtimeSpentMsにマップ
           attemptAt: attemptTime,
           unitName: unitName,
           categoryName: categoryName,

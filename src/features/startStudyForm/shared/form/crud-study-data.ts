@@ -1,4 +1,5 @@
 import * as z from 'zod';
+import { generatePlantShapeWithConfigLoad } from '@/features/plants/functions/plant-utils';
 import {
   LearningCycle,
   LearningCycleSchema,
@@ -176,7 +177,8 @@ export const createLearningCycle = async (
     defaultTimePerProblem: number;
     defaultProblemFormat: ProblemNumberFormat;
     isReviewTarget: boolean;
-  }
+  },
+  seedType: string = 'science'
 ) => {
   // 1. フォームのバリデーションと早期リターン
   if (!form.testMode || form.studyTimeMin === null || form.testTimeMin === null) {
@@ -213,6 +215,12 @@ export const createLearningCycle = async (
     newTextbook.categories
   );
 
+  const plantShape = await generatePlantShapeWithConfigLoad(seedType);
+
+  if (!plantShape) {
+    throw new Error('Failed to generate plantShape');
+  }
+
   // 7. LearningCycleオブジェクトの構築
   const now = Date.now();
   const newLearningCycleData: LearningCycle = {
@@ -230,6 +238,12 @@ export const createLearningCycle = async (
     latestAttemptedAt: now,
     isReviewTarget: settings.isReviewTarget,
     nextReviewDate: settings.nextReviewDate,
+    plant: {
+      ...plantShape,
+      currentStage: 0,
+      lastGrownAt: now,
+      textbookPositionX: Math.random(),
+    },
   };
 
   // 8. LearningCycleのバリデーション

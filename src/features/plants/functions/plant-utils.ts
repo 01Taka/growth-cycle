@@ -1,7 +1,6 @@
-import { MODULE_SETTINGS } from '../constants/module-settings';
-import { PLANT_SETTINGS } from '../constants/plant-settings';
-import { SEED_SETTINGS } from '../constants/seed-settings';
-import { ModuleSetting, ModuleStructure, Plant, PlantModule } from '../types/plant-types';
+import { PlantModule, PlantShape } from '@/shared/types/plant-shared-types';
+import { ModuleSetting, ModuleStructure, PlantConfigs } from '../types/plant-types';
+import { loadConfigInstance } from './config-loader';
 import { weightedRandomSelection } from './weighted-lottery-utils';
 
 // --- 静的カタログの定義とテスト用モック ---
@@ -31,13 +30,18 @@ const getPlantKey = ({ seedType, plantType }: { seedType: string; plantType: str
 /**
  * Plantオブジェクトから、レンダリングに必要なすべてのモジュール設定（画像パス含む）を取得する。
  * Plantの動的情報（modules）と静的な設定（MODULE_SETTINGS）を結合する。
- * @param plant 完全なPlantオブジェクト（Firestoreから取得したデータ）
+ * @param configs ロードされた設定データ
+ * @param plant 完全なPlantオブジェクト
+ * @param defaultImgPath デフォルトのプレースホルダー画像パス
  * @returns レンダリングに必要なModuleSettingオブジェクトの配列
  */
 export const getModuleSettings = (
-  plant: Plant,
+  configs: PlantConfigs,
+  plant: PlantShape,
   defaultImgPath: string = ''
 ): (ModuleSetting & PlantModule)[] => {
+  const MODULE_SETTINGS = configs.MODULE_SETTINGS;
+
   return Object.values(plant.modules).map((module) => {
     // 1. グローバルキーを生成
     const key = getModuleKey({
@@ -68,10 +72,16 @@ export const getModuleSettings = (
 /**
  * 渡されたseedTypeに基づき、新しいPlantオブジェクトを生成する。
  * 2段階の重み付き抽選（PlantType -> Modules）を実行する。
+ * @param configs ロードされた設定データ
  * @param seedType 使用する種のタイプ (例: 'math')
  * @returns 生成されたPlantオブジェクト、またはnull
  */
-export const generatePlant = (seedType: string): Plant | null => {
+export const generatePlantShape = (
+  configs: PlantConfigs, // 新しい引数
+  seedType: string
+): PlantShape | null => {
+  const { SEED_SETTINGS, PLANT_SETTINGS, MODULE_SETTINGS } = configs;
+
   // 1. Seed設定の確認
   const seedSetting = SEED_SETTINGS[seedType];
   if (!seedSetting) {
@@ -150,7 +160,7 @@ export const generatePlant = (seedType: string): Plant | null => {
     plantOption.minSize / 100;
 
   // 6. 最終的なPlantオブジェクトの生成
-  const plant: Plant = {
+  const plant: PlantShape = {
     size,
     seedType,
     plantType,
@@ -161,119 +171,7 @@ export const generatePlant = (seedType: string): Plant | null => {
   return plant;
 };
 
-// seeds/plants/parts/modules
-
-const getModuleImageDirectoryPath = ({
-  seedType,
-  plantType,
-  partType,
-  moduleType,
-}: ModuleStructure) => {
-  const ROOT_DIR_KEY = 'images';
-  const SEEDS_DIR_KEY = 'seeds';
-  const PLANTS_DIR_KEY = 'plants';
-  const PARTS_DIR_KEY = 'parts';
-  const MODULES_DIR_KEY = 'modules';
-
-  const directoryPathKeys = [
-    ROOT_DIR_KEY,
-    SEEDS_DIR_KEY,
-    seedType,
-    PLANTS_DIR_KEY,
-    plantType,
-    PARTS_DIR_KEY,
-    partType,
-    MODULES_DIR_KEY,
-    moduleType,
-  ];
-  return directoryPathKeys.join('/');
-};
-
-const createNewModule = (
-  { seedType, plantType, partType, moduleType }: ModuleStructure,
-  zIndex: number,
-  image: any
-) => {
-  const directoryPath = getModuleImageDirectoryPath({ seedType, plantType, partType, moduleType });
-  const MODULES_CONFIG_JSON_PATH = '';
-  const moduleKey = getModuleKey({ seedType, plantType, partType, moduleType });
-  /**
-   * TODO
-   * directoryPathの存在を確認
-   * MODULES_CONFIG_JSON_PATHのjsonファイルの存在を確認
-   * jsonにmoduleKeyが含まれていないことを確認
-   * imageをdirectoryPathに保存
-   * jsonに moduleKey: { imgPath: directoryPath, zIndex }の値を追加
-   */
-};
-
-const createNewPlant = (
-  seedType: string,
-  newPlantType: string,
-  plantData: { minSize: number; maxSize: number; rarity: string; weight: number },
-  data: {
-    partType: string;
-    moduleType: string;
-    moduleRarity: string;
-    weight: number;
-    zIndex: number;
-    image: any;
-  }[]
-) => {
-  const SEEDS_CONFIG_JSON_PATH = '';
-  const PLANTS_CONFIG_JSON_PATH = '';
-  const MODULES_CONFIG_JSON_PATH = '';
-
-  const plantKey = getPlantKey({ seedType, plantType: newPlantType });
-
-  const directoryPaths = data.map((value) =>
-    getModuleImageDirectoryPath({
-      seedType,
-      plantType: newPlantType,
-      partType: value.partType,
-      moduleType: value.moduleType,
-    })
-  );
-
-  const moduleKeys = data.map((value) =>
-    getModuleKey({
-      seedType,
-      plantType: newPlantType,
-      partType: value.partType,
-      moduleType: value.moduleType,
-    })
-  );
-
-  const createModules = () => {
-    data.forEach((value) =>
-      createNewModule(
-        {
-          seedType,
-          plantType: newPlantType,
-          partType: value.partType,
-          moduleType: value.moduleType,
-        },
-        value.zIndex,
-        value.image
-      )
-    );
-  };
-
-  /**
-   * TODO
-   * SEEDS_CONFIG_JSON_PATHのjsonの存在を確認。
-   * PLANTS_CONFIG_JSON_PATHのjsonの存在を確認。
-   * MODULES_CONFIG_JSON_PATHのjsonの存在を確認。
-   * seedType."plants".plantTypeがseedsJsonに含まれていることを確認
-   * plantKeyがplantsJsonに含まれないことを確認
-   * すべてのmoduleKeysがmoduleJsonに含まれないことを確認
-   * 問題があればエラーをスロー
-   * directoryPathsに該当するディレクトリのうち存在しないものを作成
-   * createModulesを呼ぶ
-   * エラーがあったら中断
-   * seedsJsonの seedType."plants".plantTypeの値を plantDataに設定
-   * dataをpartTypeをキーとして、値にmoduleType: { moduleRarity, weight }をもつオブジェクト群に変換
-   * plantsJsonの plantKey."modules"の値を上記のpartTypeをキーとするオブジェクト群の値をとするオブジェクトを追加
-   *
-   */
+export const generatePlantShapeWithConfigLoad = async (seedType: string) => {
+  const config = await loadConfigInstance();
+  return generatePlantShape(config, seedType);
 };

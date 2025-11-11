@@ -118,6 +118,13 @@ export const generateDummyLearningCycle = (
     sessions: sessions,
     nextReviewDate: getDateAfterDays(Math.random() > 0.5 ? 1 : 7),
     latestAttemptedAt: latestAttemptedAt,
+    plant: {
+      seedType: '',
+      size: 0,
+      plantType: '',
+      plantRarity: '',
+      modules: {},
+    },
   };
 };
 

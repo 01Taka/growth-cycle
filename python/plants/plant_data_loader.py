@@ -1,17 +1,12 @@
 import os
 import json
 from typing import Dict, Any, List, Union
+from config import CONFIG_FILE_PATH, IMAGE_BASE_DIR
 
 # 依存するコアロジックをインポート
 # plant_creation_logic.py は、さらに module_config_utils.py に依存しています
-from plant_creation_logic import create_new_plant
+from utils.plant_creation_logic import create_new_plant
 
-# --- グローバル定数定義 (パス) ---
-
-# 新しいPlant Typeの設定が格納されたJSONファイルのパス (CWDからの相対パス)
-PYTHON_DATA_PATH = 'python/plants/new_plants.json' 
-# 画像アセットが格納されているディレクトリのベースパス (CWDからの相対パス)
-IMAGE_BASE_DIR = 'python/plants/images'
 
 # --- データ構造の定義 (ローダーが読み込むJSON形式) ---
 
@@ -41,16 +36,16 @@ def load_and_create_plant(allow_overwrite: bool = False) -> None:
 
     try:
         # 1. 設定JSONファイルの読み込み
-        with open(PYTHON_DATA_PATH, 'r', encoding='utf-8') as f:
+        with open(CONFIG_FILE_PATH, 'r', encoding='utf-8') as f:
             plant_loader_data = json.load(f)
-        print(f"[ACTION] Successfully loaded JSON from: {PYTHON_DATA_PATH}")
+        print(f"[ACTION] Successfully loaded JSON from: {CONFIG_FILE_PATH}")
 
     except FileNotFoundError:
-        print(f"[FATAL ERROR] JSON file not found: {PYTHON_DATA_PATH}")
+        print(f"[FATAL ERROR] JSON file not found: {CONFIG_FILE_PATH}")
         print("Please ensure the file exists in the specified relative path.")
         return
     except json.JSONDecodeError:
-        print(f"[FATAL ERROR] Failed to decode JSON from: {PYTHON_DATA_PATH}")
+        print(f"[FATAL ERROR] Failed to decode JSON from: {CONFIG_FILE_PATH}")
         print("Please check the JSON file format for errors.")
         return
     except Exception as e:

@@ -1,4 +1,4 @@
-import z from 'zod';
+import { z } from 'zod';
 
 export interface DocumentBase {
   id: string; // ドキュメントの一意なID (IndexedDBのキー)

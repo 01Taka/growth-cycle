@@ -2,18 +2,8 @@ import os
 import json
 from typing import Dict, Any
 
-# --- グローバル定数定義 ---
+from config import MODULES_CONFIG_JSON_PATH, ROOT_DIR_KEY, SEEDS_DIR_KEY, PLANTS_DIR_KEY, PARTS_DIR_KEY, MODULES_DIR_KEY
 
-# モジュール設定ファイル（JSON）のパスをシミュレーション
-# 実際の実行環境に合わせてこのパスを修正する必要があります
-MODULES_CONFIG_JSON_PATH = 'src/json/plantsConfig/modules_config.json'
-
-# パス構成のディレクトリキー (get_module_image_directory_pathで使用)
-ROOT_DIR_KEY = 'src/assets/images/plantModules'
-SEEDS_DIR_KEY = 'seeds'
-PLANTS_DIR_KEY = 'plants'
-PARTS_DIR_KEY = 'parts'
-MODULES_DIR_KEY = 'modules'
 
 # -------------------------
 

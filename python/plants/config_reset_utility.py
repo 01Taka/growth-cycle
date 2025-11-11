@@ -2,10 +2,11 @@ import json
 import os
 import argparse
 from typing import Dict, Any, List, Union
+from config import CONFIG_FILE_PATH
 
 # --- グローバル定数 ---
 # リセット対象のJSONファイルのパス
-CONFIG_FILE_PATH = 'python/plants/new_plants.json'
+
 
 def create_default_module_data(index: int) -> Dict[str, Union[str, int]]:
     """

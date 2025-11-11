@@ -1,42 +1,42 @@
 {
-    "seed_type": "science",
-    "plant_type": "TulipB",
-    "min_size": 150,
-    "max_size": 200,
-    "rarity": "XXX",
-    "weight": 75,
-    "modules": {
-        "Stem": [
-            {
-                "moduleType": "Stem_V0",
-                "moduleRarity": "R",
-                "weight": 200,
-                "zIndex": 0,
-                "image_filename": "stem_v0.png"
-            },
-            {
-                "moduleType": "Stem_V1",
-                "moduleRarity": "XSR",
-                "weight": 100,
-                "zIndex": 10,
-                "image_filename": "stem_v1.png"
-            },
-            {
-                "moduleType": "Stem_V2",
-                "moduleRarity": "SSR",
-                "weight": 10,
-                "zIndex": 20,
-                "image_filename": "stem_v2.png"
-            }
-        ],
-        "Flower": [
-            {
-                "moduleType": "Flower_SR",
-                "moduleRarity": "SR",
-                "weight": 50,
-                "zIndex": 20,
-                "image_filename": "flower_sr.png"
-            }
-        ]
-    }
+  "seed_type": "science",
+  "plant_type": "TulipB",
+  "min_size": 150,
+  "max_size": 200,
+  "rarity": "XXX",
+  "weight": 75,
+  "modules": {
+    "Stem": [
+      {
+        "moduleType": "Stem_V0",
+        "moduleRarity": "R",
+        "weight": 100,
+        "zIndex": 0,
+        "image_filename": "stem_v0.png"
+      },
+      {
+        "moduleType": "Stem_V1",
+        "moduleRarity": "XSR",
+        "weight": 100,
+        "zIndex": 10,
+        "image_filename": "stem_v1.png"
+      },
+      {
+        "moduleType": "Stem_V2",
+        "moduleRarity": "SSR",
+        "weight": 100,
+        "zIndex": 20,
+        "image_filename": "stem_v2.png"
+      }
+    ],
+    "Flower": [
+      {
+        "moduleType": "Flower_SR",
+        "moduleRarity": "SR",
+        "weight": 50,
+        "zIndex": 20,
+        "image_filename": "flower_sr.png"
+      }
+    ]
+  }
 }

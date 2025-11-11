@@ -2,17 +2,7 @@ import json
 import os
 import shutil
 from typing import Dict, Any, List
-
-# --- グローバル定数 (ユーザー指定のパス) ---
-MODULES_CONFIG_JSON_PATH = 'src/json/plantsConfig/modules_config.json'
-PLANTS_CONFIG_JSON_PATH = 'src/json/plantsConfig/plants_config.json'
-SEEDS_CONFIG_JSON_PATH = 'src/json/plantsConfig/seeds_config.json'
-
-# 出力先パスの指定
-OUTPUT_FILE_PATH = 'python/plants/new_plants.json'
-
-# 画像のコピー先ディレクトリ
-IMAGE_BASE_DIR = 'python/plants/images'
+from config import SEEDS_CONFIG_JSON_PATH, PLANTS_CONFIG_JSON_PATH, MODULES_CONFIG_JSON_PATH, IMAGE_BASE_DIR, CONFIG_FILE_PATH
 
 # --- ヘルパー関数 ---
 
@@ -204,7 +194,7 @@ def reverse_engineer_new_plants_json(
 if __name__ == '__main__':
     print("\n-----------------------------------------------------")
     print("設定ファイルの逆生成を実行します。")
-    print(f"JSON結果は '{OUTPUT_FILE_PATH}' に出力されます。")
+    print(f"JSON結果は '{CONFIG_FILE_PATH}' に出力されます。")
     print(f"画像コピー先は '{IMAGE_BASE_DIR}' です。")
     print("-----------------------------------------------------")
     
@@ -222,7 +212,7 @@ if __name__ == '__main__':
         result_data, modules_config = result_tuple
         
         # 1. JSONファイルをファイルに出力
-        write_json_output(result_data, OUTPUT_FILE_PATH)
+        write_json_output(result_data, CONFIG_FILE_PATH)
         
         # 2. 画像ディレクトリのクリアを処理
         handle_image_directory_cleanup(IMAGE_BASE_DIR)

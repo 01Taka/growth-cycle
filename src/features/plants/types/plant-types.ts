@@ -1,26 +1,4 @@
 /**
- * 植物を構成する個々のパーツ（モジュール）の定義
- * * Plant.modules 内では、part名はRecordのキーとして重複して格納されている
- */
-export interface PlantModule {
-  part: string; // どの部位か ("stem", "flower"など)
-  moduleType: string; // 具体的なバリエーションID (例: "thick_v1")
-  moduleRarity: string; // このモジュールのレアリティ (R, SRなど)
-}
-
-/**
- * 完全に成長した植物の個体データ
- */
-export interface Plant {
-  seedType: string;
-  size: number;
-  plantType: string;
-  plantRarity: string;
-  // PlantModuleを、part名をキーとして格納する辞書形式のレコード
-  modules: Record<string, PlantModule>;
-}
-
-/**
  * モジュールを特定するための基本構造
  */
 export interface ModuleStructure {
@@ -70,4 +48,13 @@ export interface PlantOption {
 export interface SeedSetting {
   // plantTypeをキーとする辞書
   plants: Record<string, PlantOption>; // 抽選される可能性がある植物
+}
+
+/**
+ * すべての設定データを格納するコンテナ型
+ */
+export interface PlantConfigs {
+  SEED_SETTINGS: Record<string, SeedSetting>;
+  PLANT_SETTINGS: Record<string, PlantSetting>;
+  MODULE_SETTINGS: Record<string, ModuleSetting>;
 }

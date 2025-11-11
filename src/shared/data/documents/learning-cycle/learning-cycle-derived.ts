@@ -1,4 +1,4 @@
-import z from 'zod';
+import { z } from 'zod';
 import { LearningCycleSchema } from './learning-cycle-document';
 
 export const LearningCycleClientDataSchema = LearningCycleSchema.pick({
