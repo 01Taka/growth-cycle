@@ -48,7 +48,6 @@ export const StartStudyMain: React.FC<StartStudyMainProps> = ({}) => {
 
       try {
         const cycleId = await createLearningCycle(textbook.id, value, {
-          nextReviewDate: new Date().toISOString().split('T')[0],
           defaultProblemFormat: 'number',
           defaultTimePerProblem: 0,
           isReviewTarget: true,

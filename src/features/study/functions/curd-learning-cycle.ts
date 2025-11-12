@@ -54,29 +54,6 @@ const problemsToTestResults = (problems: ProblemAttemptResult[]): TestResult[] =
   return problems;
 };
 
-const getNextReviewDate = (attemptCount: number, lastAttemptedAt: number): string | null => {
-  if (attemptCount <= 0) {
-    // attemptCountが負の値の場合
-    throw new Error(`Invalid attemptCount: ${attemptCount}. attemptCount must be non-negative.`);
-  }
-
-  let dateAfter: number | null = null;
-  // attemptCount === 1 は初回学習（0日目）後の1回目復習のトリガー
-  if (attemptCount === 1) {
-    dateAfter = 1; // 1日後
-  }
-  // attemptCount === 2 は1回目復習後の2回目復習のトリガー
-  // 1回目復習から6日後、取り組み日から合計7日後
-  else if (attemptCount === 2) {
-    // ここは間隔維持のため、前回セッションの日付lastAttemptedAtが重要
-    // MVPロジックとして、前回からの間隔(6日)を固定にする
-    dateAfter = 6;
-  }
-  // 3回目以降の復習ロジックはMVPではまだ未定義のため、一旦null
-
-  return dateAfter ? getDateAfterDaysBoundary(dateAfter, lastAttemptedAt) : null;
-};
-
 export const handleRecordSession = async (
   textbookId: string,
   learningCycleId: string,
@@ -123,7 +100,6 @@ export const handleRecordSession = async (
 
   const existingSessions = learningCycle.sessions;
   const now = Date.now();
-  const nextAttemptCount = existingSessions.length + 1; // 今回の試行回数
 
   const newPlant: Plant = {
     ...learningCycle.plant,
@@ -151,11 +127,9 @@ export const handleRecordSession = async (
   };
 
   // 4. 次回復習日の計算（lastAttemptedAtは今回のセッション時刻nowを使用）
-  const nextReviewDate = getNextReviewDate(nextAttemptCount, now);
 
   const updatedLearningCycle: Partial<LearningCycle> = {
     sessions: [...existingSessions, newSession],
-    nextReviewDate,
     latestAttemptedAt: now,
     plant: newPlant,
   };

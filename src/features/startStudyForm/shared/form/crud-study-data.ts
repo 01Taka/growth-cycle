@@ -19,6 +19,7 @@ import { generateFirestoreId, generateIdbPath } from '@/shared/data/idb/generate
 import { IDB_PATH } from '@/shared/data/idb/idb-path';
 import { idbStore } from '@/shared/data/idb/idb-store';
 import { Plant, PlantShape } from '@/shared/types/plant-shared-types';
+import { getDateAfterDaysBoundary } from '@/shared/utils/datetime/datetime-utils';
 import { safeArrayToRecord } from '@/shared/utils/object/object-utils';
 import { range } from '@/shared/utils/range';
 import { RangeWithId } from '../range/range-form-types';
@@ -183,6 +184,11 @@ const getNewPlant = (plantShape: PlantShape, now: number): Plant => {
   };
 };
 
+const getFixedReviewDates = (now: number): string[] => {
+  const REVIEW_INTERVAL_DAYS = [1, 7];
+  return REVIEW_INTERVAL_DAYS.map((interval) => getDateAfterDaysBoundary(interval, now));
+};
+
 // --- メイン関数 ---
 
 /**
@@ -192,7 +198,6 @@ export const createLearningCycle = async (
   textbookId: string,
   form: StartStudyFormValues,
   settings: {
-    nextReviewDate: string;
     defaultTimePerProblem: number;
     defaultProblemFormat: ProblemNumberFormat;
     isReviewTarget: boolean;
@@ -274,7 +279,7 @@ export const createLearningCycle = async (
     cycleStartAt: now,
     latestAttemptedAt: now,
     isReviewTarget: settings.isReviewTarget,
-    nextReviewDate: settings.nextReviewDate,
+    fixedReviewDates: getFixedReviewDates(now),
     plant,
   };
 

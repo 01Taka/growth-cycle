@@ -63,3 +63,14 @@ export const isToday = (date: string | number | Date): boolean => {
   // 調整された今日の日付と比較
   return getToday() === formattedTargetDate;
 };
+
+/**
+ * 配列内に「カスタム境目に基づく今日」と同じ日付の要素が含まれるかどうかを判定します。
+ *
+ * @param dates 比較対象の日付の配列（文字列、数値、Dateオブジェクトの配列）
+ * @returns 配列に今日と同じ日付が含まれていれば true
+ */
+export const containsToday = (dates: (string | number | Date)[]): boolean => {
+  // 配列のいずれかの要素が isToday(element) の条件を満たすかを確認します。
+  return dates.some((date) => isToday(date));
+};

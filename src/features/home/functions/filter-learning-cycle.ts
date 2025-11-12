@@ -1,6 +1,7 @@
+import { format } from 'date-fns';
 import { LearningCycleDocument } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 import { getDaysDifference } from '@/shared/utils/datetime/datetime-compare-utils';
-import { isToday } from '@/shared/utils/datetime/datetime-utils';
+import { containsToday, isToday } from '@/shared/utils/datetime/datetime-utils';
 
 interface FilterOptions {
   todayReview: boolean;
@@ -41,17 +42,17 @@ export const filterLearningCycles = (
     // includeNotReviewTargetがfalseなら、isReviewTargetがtrueの場合のみ含める
     const shouldInclude = (includeOption: boolean) => includeOption || isReviewTarget;
 
-    // 1. 本日レビュー予定 (Today Review Cycles) の判定
-    if (cycle.nextReviewDate && isToday(cycle.nextReviewDate)) {
-      if (shouldInclude(includeNotReviewTarget.todayReview)) {
-        acc.todayReviewCycles.push(cycle);
-      }
-    }
+    if (containsToday(cycle.fixedReviewDates ?? [])) {
+      const sessionDatesSet = new Set(
+        cycle.sessions.map((session) => format(session.attemptedAt, 'yyyy-MM-dd'))
+      );
+      const isReviewed = cycle.fixedReviewDates.some((date) => sessionDatesSet.has(date));
 
-    // 2. 本日レビュー済み (Today Reviewed Cycles) の判定
-    if (cycle.latestAttemptedAt && isToday(cycle.latestAttemptedAt)) {
-      // 初回のときはReviewとみなさないので除外
-      if (shouldInclude(includeNotReviewTarget.todayReviewed) && cycle.sessions.length > 1) {
+      if (!isReviewed && shouldInclude(includeNotReviewTarget.todayReview)) {
+        // 1. 本日レビュー予定 (Today Review Cycles) の判定
+        acc.todayReviewCycles.push(cycle);
+      } else if (isReviewed && shouldInclude(includeNotReviewTarget.todayReviewed)) {
+        // 2. 本日レビュー済み (Today Reviewed Cycles) の判定
         acc.todayReviewedCycles.push(cycle);
       }
     }
@@ -94,28 +95,17 @@ export const groupCyclesByAllDateDifferences = (
   };
 
   // 1. Today Review Cycles (latestAttemptedAtとの差) を分類
-  // 要件: today - latestAttemptedAt = dayDiff
   filteredCycles.todayReviewCycles.forEach((cycle) => {
-    if (!cycle.latestAttemptedAt) return;
-
-    // getDaysDifference(timestampB, timestampA) を利用
-    const dayDiff = getDaysDifference(now, cycle.latestAttemptedAt);
-
+    if (!cycle.cycleStartAt) return;
+    const dayDiff = getDaysDifference(now, cycle.cycleStartAt);
     getOrCreateDayGroup(dayDiff).todayReviewCycles.push(cycle);
   });
 
   // 2. Today Reviewed Cycles (nextReviewDateとの差) を分類
-  // 要件: nextReviewDate - today = dayDiff
   filteredCycles.todayReviewedCycles.forEach((cycle) => {
-    if (!cycle.nextReviewDate || cycle.sessions.length < 2) return;
-
-    // TODO
-    // 単に最新の2つを比較しているだけなので、本来は「n日前に今日を次の取り組み日とした」のnを取得する必要がある
-    const sortedSessions = cycle.sessions.sort((a, b) => b.attemptedAt - a.attemptedAt);
-    // getDaysDifference(timestampB, timestampA) を利用
-    const dayDiff = getDaysDifference(sortedSessions[1].attemptedAt, sortedSessions[0].attemptedAt);
-
-    getOrCreateDayGroup(dayDiff).todayReviewedCycles.push(cycle);
+    if (!cycle.cycleStartAt) return;
+    const dayDiff = getDaysDifference(now, cycle.cycleStartAt);
+    getOrCreateDayGroup(dayDiff).todayReviewCycles.push(cycle);
   });
 
   return result;
