@@ -73,7 +73,7 @@ export type LatestAttemptNecessityReason =
   | 'definiteMistake' // 2: 間違い + 確信なし/未評価
   | 'uncertainCorrect' // 2: 正解 + 不安
   | 'imperfectCorrect' // 1: 正解 + 不完全
-  | 'noNeed' // 0: 正解 + 確信あり/未評価 または未評価
+  | 'understood' // 0: 正解 + 確信あり/未評価 または未評価
   | 'noAttempt'; // 0: 試行ログなし
 
 /**

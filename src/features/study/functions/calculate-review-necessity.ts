@@ -1,7 +1,7 @@
+import { calculateReviewNecessity } from '@/shared/utils/calc-necessity';
 import {
   AttemptLog,
   FinalReviewNecessityResult,
-  LatestAttemptNecessityReason,
   LatestAttemptNecessityResult,
   RecentWeightedNecessityReason,
   RecentWeightedNecessityResult,
@@ -22,41 +22,25 @@ export function calculateReviewNecessityFromLatestAttempt(
   }
 
   const { selfEvaluation, scoringStatus } = latestAttempt;
-  let level: number = 0;
-  let reason: LatestAttemptNecessityReason = 'noNeed'; // scoringStatusが 'unrated' の場合のデフォルト
+  const { level, reason, alternativeLevel } = calculateReviewNecessity(
+    selfEvaluation,
+    scoringStatus
+  );
 
-  if (scoringStatus === 'correct') {
-    // ✅ 正解のとき:
-    switch (selfEvaluation) {
-      case 'unrated':
-      case 'confident':
-        level = 0;
-        reason = 'noNeed'; // 確信あり/未評価なら不要
-        break;
-      case 'imperfect':
-        level = 1;
-        reason = 'imperfectCorrect'; // 不完全なら少し必要
-        break;
-      case 'notSure':
-        level = 2;
-        reason = 'uncertainCorrect'; // 不安なら復習推奨
-        break;
-    }
-  } else if (scoringStatus === 'incorrect') {
-    // ❌ 間違いのとき:
-    if (selfEvaluation === 'confident') {
-      level = 3;
-      reason = 'overconfidenceError'; // 確信があったのに間違い（最優先確認）
-    } else {
-      level = 2;
-      reason = 'definiteMistake'; // 間違い（復習推奨）
-    }
+  if (level === -1) {
+    return {
+      level: alternativeLevel,
+      reason: 'noAttempt',
+    };
   }
 
-  // scoringStatusが 'unrated' の場合は、初期値の level=0, reason='noNeed' のまま
+  if (reason === 'mistakeImperfect' || reason === 'mistakeNotSure') {
+    return { level, reason: 'definiteMistake' };
+  }
 
-  return { level, reason };
+  return { level, reason: reason };
 }
+
 /**
  * 💡 ロジック 2 (改善版): 直近2回の試行における「自己評価に基づく確認必要度」が
  * 「2以上（復習必要性が高い）」であったかどうかに重みを付けて算出 (最大 3)

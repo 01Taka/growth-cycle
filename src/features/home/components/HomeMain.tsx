@@ -1,5 +1,9 @@
 import React, { useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { TotalXPModal } from '@/features/xp/components/TotalXPModal';
+import { calculateMaxTotalXP } from '@/features/xp/functions/calculate-max-xp';
+import { calculateTotalXP } from '@/features/xp/functions/calculateXP';
+import { XPResults } from '@/features/xp/types/xp-types';
 import { LearningCycleDocument } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 import { useLearningCycleStore } from '@/shared/stores/useLearningCycleStore';
 import {
@@ -44,6 +48,21 @@ export const HomeMain: React.FC<HomeMainProps> = ({}) => {
     }
   };
 
+  const learningCycle = learningCycles[0];
+
+  const xpResults = useMemo(
+    () =>
+      learningCycle
+        ? (calculateTotalXP({
+            sessions: learningCycle.sessions,
+            testDurationMs: learningCycle.testDurationMs,
+            learningDurationMs: learningCycle.learningDurationMs,
+            nextPlantStage: learningCycle.plant.currentStage,
+          }) as XPResults)
+        : null,
+    [learningCycle]
+  );
+
   return (
     <div>
       <HomeReviewCard
@@ -53,6 +72,7 @@ export const HomeMain: React.FC<HomeMainProps> = ({}) => {
         onStartReview={handleStartReview}
       />
       <GrowthPresentation learnings={learnings} onStartStudy={() => navigate('/textbooks')} />
+      {xpResults && <TotalXPModal opened onClose={() => {}} results={xpResults} />}
     </div>
   );
 };

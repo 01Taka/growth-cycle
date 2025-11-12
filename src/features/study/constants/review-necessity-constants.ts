@@ -105,7 +105,7 @@ export const REVIEW_NECESSITY_REASON_LABELS: {
   imperfectCorrect: '不安正解', // (短縮前: 正解だが不完全)
 
   /** 0: 正解 + 確信あり/未評価 または未評価 */
-  noNeed: '問題なし', // (短縮前: 確認不要)
+  understood: '問題なし', // (短縮前: 確認不要)
 
   /** 0: 試行ログなし */
   noAttempt: '記録なし', // (短縮前: 試行記録なし)
