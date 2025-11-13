@@ -8,8 +8,8 @@ import {
   LearningCycleSchema,
 } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 import {
+  LearningCycleSession,
   TestResult,
-  TestSession,
 } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import {
   Textbook,
@@ -102,7 +102,7 @@ export const handleRecordSession = async (
     );
   }
 
-  const newSession: TestSession = {
+  const newSession: LearningCycleSession = {
     isFixedReviewSession: checkIsFixedReviewSession(learningCycle),
     gainedXp: 0,
     attemptedAt: now,

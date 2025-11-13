@@ -4,9 +4,9 @@ import { SubjectSchema } from '@/shared/types/subject-types';
 import { IDBDocumentSchema } from '../../idb/idb-types';
 import {
   CategoryDetailSchema,
+  LearningCycleSessionSchema,
   ProblemDetailSchema,
   TestModeSchema,
-  TestSessionSchema,
   UnitDetailSchema,
 } from './learning-cycle-support';
 
@@ -33,7 +33,7 @@ export const LearningCycleSchema = z
     categories: z.array(CategoryDetailSchema).default([]).describe('i18n:cycle.categories'),
 
     // --- 使用するごとに更新されるデータ ---
-    sessions: z.array(TestSessionSchema).default([]).describe('i18n:cycle.sessions'),
+    sessions: z.array(LearningCycleSessionSchema).default([]).describe('i18n:cycle.sessions'),
     fixedReviewDates: z.array(z.iso.date()).default([]),
     latestAttemptedAt: TimestampSchema.default(nowTimestamp).describe(
       'i18n:cycle.latest_attempted_at'

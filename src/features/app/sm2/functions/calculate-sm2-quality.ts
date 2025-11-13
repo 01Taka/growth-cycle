@@ -1,28 +1,13 @@
-// 仮定: 既存の関数をインポート
-
-/**
- * 時間によるQualityスコア補正に関するパラメータ群。
- * Level 0とLevel 1で異なる遅延閾値を定義します。
- */
-export const SM2_TIME_PARAMS = {
-  FAST_THRESHOLD: 0.7, // 基準時間の70%未満 → 速い
-  SLOW_THRESHOLD_Q5: 1.0, // Level 0 (Q5) の減点閾値: 基準時間以上
-  SLOW_THRESHOLD_Q4: 1.3, // Level 1 (Q4) の減点閾値: 基準時間の130%以上
-  ADJUSTMENT_STEP: 1, // 調整幅 (±1)
-  MIN_QUALITY_AFTER_ADJ: 3, // 調整後の最小値
-  MAX_QUALITY_AFTER_ADJ: 5, // 調整後の最大値
-  TIME_RATIO_LIMIT: 5.0, // timeRatioの上限 (5倍)
-};
-
-/**
- * 復習必要度レベル → SM-2 Qualityスコア対応表。
- */
-export const SM2_QUALITY_MAP = new Map<ReviewNecessityStage, number>([
-  [0, 5], // 理解済み (Level 0)
-  [1, 4], // 不完全正解 (Level 1)
-  [2, 2], // 不安定/部分忘却 (Level 2)
-  [3, 0], // 忘却 (Level 3)
-]);
+import {
+  ProblemScoringStatus,
+  TestSelfEvaluation,
+} from '@/shared/data/documents/learning-cycle/learning-cycle-support';
+import { calculateReviewNecessity } from '../../review-necessity/functions/calc-necessity';
+import {
+  ReviewNecessityResult,
+  ReviewNecessityStage,
+} from '../../review-necessity/types/review-necessity-types';
+import { SM2_QUALITY_MAP, SM2_TIME_PARAMS } from '../constants/sm2-constants';
 
 /**
  * 時間によるQualityスコア調整を行う。
@@ -77,64 +62,8 @@ export function calculateSM2Quality(
     necessityResult.level === -1 ? necessityResult.alternativeLevel : necessityResult.level;
 
   // Mapから基本Qualityを取得。存在しない場合は0をデフォルトとする。
-  const baseQuality = SM2_QUALITY_MAP.get(level) ?? 0;
+  const baseQuality = SM2_QUALITY_MAP[level] ?? 0;
 
   // --- 時間補正を適用 ---
   return adjustQualityByTime(baseQuality, timeSpentMs, refTimeMs);
-}
-
-// --------------------------------------------------------------------------------
-// ⚠️ 実行用ダミーデータと既存関数の定義 (このファイル内では実際には動作しないが、ロジックを示す)
-// --------------------------------------------------------------------------------
-
-// 既存の型定義をダミーで作成
-type ProblemScoringStatus = 'correct' | 'incorrect' | 'unrated';
-type TestSelfEvaluation = 'confident' | 'imperfect' | 'notSure' | 'unrated';
-type ReviewNecessityStage = 0 | 1 | 2 | 3;
-type EvaluatedLabel =
-  | 'overconfidenceError'
-  | 'mistakeNotSure'
-  | 'mistakeImperfect'
-  | 'uncertainCorrect'
-  | 'imperfectCorrect'
-  | 'understood';
-type UnratedLabel =
-  | 'fullyUnrated'
-  | 'scoreUnratedConfident'
-  | 'scoreUnratedImperfect'
-  | 'scoreUnratedNotSure'
-  | 'selfUnratedCorrect'
-  | 'selfUnratedIncorrect';
-type EvaluatedResult = {
-  level: ReviewNecessityStage;
-  reason: EvaluatedLabel;
-  alternativeLevel: ReviewNecessityStage;
-};
-type UnratedResult = { level: -1; reason: UnratedLabel; alternativeLevel: ReviewNecessityStage };
-type ReviewNecessityResult = EvaluatedResult | UnratedResult;
-
-// 既存の calculateReviewNecessity 関数 (ここではダミーロジックを簡略化)
-function calculateReviewNecessity(
-  selfEvaluation: TestSelfEvaluation,
-  scoringStatus: ProblemScoringStatus
-): ReviewNecessityResult {
-  // 完全に評価済みのケース (ロジック4) のみを簡略化して再現
-  if (scoringStatus === 'correct') {
-    if (selfEvaluation === 'confident')
-      return { level: 0, reason: 'understood', alternativeLevel: 0 } as EvaluatedResult;
-    if (selfEvaluation === 'imperfect')
-      return { level: 1, reason: 'imperfectCorrect', alternativeLevel: 1 } as EvaluatedResult;
-    if (selfEvaluation === 'notSure')
-      return { level: 2, reason: 'uncertainCorrect', alternativeLevel: 2 } as EvaluatedResult;
-  }
-  if (scoringStatus === 'incorrect') {
-    if (selfEvaluation === 'confident')
-      return { level: 3, reason: 'overconfidenceError', alternativeLevel: 3 } as EvaluatedResult;
-    if (selfEvaluation === 'imperfect')
-      return { level: 2, reason: 'mistakeImperfect', alternativeLevel: 2 } as EvaluatedResult;
-    if (selfEvaluation === 'notSure')
-      return { level: 2, reason: 'mistakeNotSure', alternativeLevel: 2 } as EvaluatedResult;
-  }
-  // 未評価のケースはここでは全てレベル3/Quality 0と見なす (簡略化のため)
-  return { level: 3, reason: 'overconfidenceError', alternativeLevel: 3 } as EvaluatedResult;
 }

@@ -85,7 +85,7 @@ export const TestResultSchema = z
 
 export type TestResult = z.infer<typeof TestResultSchema>;
 
-export const TestSessionSchema = z
+export const LearningCycleSessionSchema = z
   .object({
     gainedXp: z.number().min(0).default(0),
     isFixedReviewSession: z.boolean().default(false),
@@ -94,7 +94,7 @@ export const TestSessionSchema = z
   })
   .describe('i18n:session.test_session');
 
-export type TestSession = z.infer<typeof TestSessionSchema>;
+export type LearningCycleSession = z.infer<typeof LearningCycleSessionSchema>;
 
 export const ProblemDetailSchema = z
   .object({

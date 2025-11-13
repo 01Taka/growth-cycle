@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Flex, Stack } from '@mantine/core';
+import { runCustomSM2Test } from '@/features/app/sm2/functions/sm2_test_runner';
 import { TotalXPModal } from '@/features/app/xp/components/TotalXPModal';
 import { XpIconPill } from '@/features/app/xp/components/XpIconPill';
 import { calculateTotalXPWithLearningCycle } from '@/features/app/xp/functions/calculateXP';
@@ -44,6 +45,10 @@ export const HomeMain: React.FC<HomeMainProps> = ({}) => {
     () => filterLearningCycles(learningCycles),
     [learningCycles]
   );
+
+  useEffect(() => {
+    runCustomSM2Test(10, 10, 7);
+  }, []);
 
   const groupedCycles = useMemo(
     () => groupCyclesByAllDateDifferences({ todayReviewCycles, todayReviewedCycles }),

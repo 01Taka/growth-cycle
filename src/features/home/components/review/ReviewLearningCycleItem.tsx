@@ -1,12 +1,10 @@
 import React from 'react';
-import { Card, Flex, Image, MantineStyleProp, Overlay, Stack, Text } from '@mantine/core';
+import { Card, Flex, Stack, Text } from '@mantine/core';
 import StarEffect from '@/assets/images/star.png';
-import { PlantImageItem } from '@/features/plants/components/PlantImageItem';
+import { PlantWithEffect } from '@/features/plants/components/PlantWithEffect';
 import { useSubjectColorMap } from '@/shared/hooks/useSubjectColor';
 import { Plant } from '@/shared/types/plant-shared-types';
 import { Subject } from '@/shared/types/subject-types';
-import { toRGBA } from '@/shared/utils/color/color-convert-utils';
-import { AuraEffect } from './AuraEffect';
 import { GiveWaterButton } from './GiveWaterButton';
 import { UnitPill } from './UnitPill';
 
@@ -21,8 +19,6 @@ export interface ReviewLearningCycleItemProps {
   onCheckDetail: () => void;
 }
 
-const PLANT_SIZE = 64;
-
 export const ReviewLearningCycleItem: React.FC<ReviewLearningCycleItemProps> = ({
   isCompleted,
   plant,
@@ -34,13 +30,6 @@ export const ReviewLearningCycleItem: React.FC<ReviewLearningCycleItemProps> = (
   onCheckDetail,
 }) => {
   const subjectTheme = useSubjectColorMap(subject);
-
-  const absoluteCenter: MantineStyleProp = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-  };
 
   // Cardの幅をレスポンシブ対応（親要素に応じて最大幅100%）
   return (
@@ -54,56 +43,20 @@ export const ReviewLearningCycleItem: React.FC<ReviewLearningCycleItemProps> = (
     >
       <Flex gap={'xs'}>
         {/* 左側の画像エリア: 幅を固定値 (64px) に設定 */}
-        <Stack w={PLANT_SIZE} miw={PLANT_SIZE} align="center" style={{ position: 'relative' }}>
-          {isCompleted && (
-            <Text
-              style={{
-                fontWeight: 'bold',
-                textAlign: 'center',
-                width: 70,
-                height: 25,
-                color: subjectTheme.text,
-                background: toRGBA(subjectTheme.accent, 0.7),
-                position: 'absolute',
-                borderRadius: 99,
-                opacity: 0.9,
-                bottom: 0,
-                zIndex: 3,
-              }}
-            >
-              完了
-            </Text>
-          )}
-
-          {/* PlantImageItem を Stack の中央に配置するため、Stack に align="center" を設定 */}
-          <PlantImageItem
-            subject={subject}
-            plant={plant}
-            width={PLANT_SIZE}
-            height={PLANT_SIZE}
-            style={{
-              ...absoluteCenter,
-              zIndex: 1,
-            }}
-          />
-          {!isCompleted && (
-            <AuraEffect
-              color={subjectTheme.border}
-              size={PLANT_SIZE}
-              blurRadius={18}
-              opacity={0.9}
-              style={absoluteCenter}
-            />
-          )}
-          {isCompleted && (
-            <Image
-              src={StarEffect}
-              alt={'star'}
-              fit="contain"
-              style={{ ...absoluteCenter, width: PLANT_SIZE, height: PLANT_SIZE, zIndex: 2 }}
-            />
-          )}
-        </Stack>
+        <PlantWithEffect
+          plant={plant}
+          subject={subject}
+          label={isCompleted ? '完了' : undefined}
+          auraEffect={
+            isCompleted
+              ? undefined
+              : {
+                  blurRadius: 18,
+                  opacity: 0.9,
+                }
+          }
+          imagePath={isCompleted ? StarEffect : undefined}
+        />
 
         {/* 右側のコンテンツエリア: flex: 1 で残りの幅を占有するように設定 */}
         <Stack

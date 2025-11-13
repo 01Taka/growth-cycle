@@ -12,8 +12,8 @@ import {
   Text,
   Transition,
 } from '@mantine/core';
+import { DirtMound } from '@/features/plants/components/DirtMound';
 import { PlantImageItem } from '@/features/plants/components/PlantImageItem';
-import { DirtMound } from '@/features/study/components/shared/DirtMound';
 import { LearningCycleDocument } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 import { useSubjectColorMap } from '@/shared/hooks/useSubjectColor';
 import { SubjectColorMap } from '@/shared/theme/subjectColorType';

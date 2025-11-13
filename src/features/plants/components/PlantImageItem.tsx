@@ -36,7 +36,7 @@ export const PlantImageItem: React.FC<PlantImageItemProps> = ({
   isRemSize = false,
   style,
 }) => {
-  const type = (plant?.currentStage ?? 0) > 1 ? 'adult' : 'bud';
+  const type = (plant?.currentStage ?? 0) > 0 ? 'adult' : 'bud';
 
   const plantTypeValue = +plant?.plantType;
 

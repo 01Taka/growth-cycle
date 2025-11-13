@@ -1,12 +1,12 @@
 import { LearningCycleDocument } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
-import { TestSession } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
+import { LearningCycleSession } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { WEIGHTS } from '../constants/ex-weights';
 import { PLANT_GROWTH_PX_MAP } from '../constants/plant-growth-xp';
 import { XPResults } from '../types/xp-types';
 import { calculateXPCorrectness } from './correctness';
 import { calculateXPQuality } from './quality';
 
-export type XPSession = Pick<TestSession, 'results' | 'attemptedAt'>;
+export type XPSession = Pick<LearningCycleSession, 'results' | 'attemptedAt'>;
 
 export const calculateTotalXPWithLearningCycle = (
   learningCycle: LearningCycleDocument,
@@ -130,10 +130,10 @@ export function calculateXPPlantGrowth(nextPlantStage: number | null) {
   return nextPlantStage ? (PLANT_GROWTH_PX_MAP[nextPlantStage] ?? 0) : 0;
 }
 /**
- * TestSessionの配列から、平均正解率（パーセンテージ）を計算します。
+ * LearningCycleSessionの配列から、平均正解率（パーセンテージ）を計算します。
  * unratedの問題を試行問題数に含め、不正解として扱うかどうかをフラグで制御します。
  *
- * @param sessions TestSessionの配列
+ * @param sessions LearningCycleSessionの配列
  * @param includeUnratedAsIncorrect unratedの問題を試行問題数に含め、不正解（incorrect）として扱う場合は true
  * @returns 平均正解率（0から100のパーセンテージ）。試行問題がない場合は0を返します。
  */

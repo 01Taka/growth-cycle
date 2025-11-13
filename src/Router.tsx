@@ -1,5 +1,6 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { HomePage } from './pages/Home.page';
+import { LearningHistoryPage } from './pages/LearningHistory.page';
 import { StartStudyPage } from './pages/StartStudy.page';
 import { StudyPage } from './pages/Study.page';
 import { TextBookPage } from './pages/Textbook.page';
@@ -17,6 +18,10 @@ const router = createBrowserRouter([
   {
     path: '/create-textbook',
     element: <TextbookCreatePage />,
+  },
+  {
+    path: '/history',
+    element: <LearningHistoryPage />,
   },
   {
     path: '/start-study',
