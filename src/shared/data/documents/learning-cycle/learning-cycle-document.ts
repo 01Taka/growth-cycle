@@ -29,8 +29,8 @@ export const LearningCycleSchema = z
     textbookName: z.string().min(1).default('').describe('i18n:cycle.textbook_name'),
     subject: SubjectSchema.describe('i18n:cycle.subject'),
     cycleStartAt: TimestampSchema.default(nowTimestamp).describe('i18n:cycle.cycle_start_at'),
-    units: z.array(UnitDetailSchema).min(1).default([]).describe('i18n:cycle.units'),
-    categories: z.array(CategoryDetailSchema).min(1).default([]).describe('i18n:cycle.categories'),
+    units: z.array(UnitDetailSchema).default([]).describe('i18n:cycle.units'),
+    categories: z.array(CategoryDetailSchema).default([]).describe('i18n:cycle.categories'),
 
     // --- 使用するごとに更新されるデータ ---
     sessions: z.array(TestSessionSchema).default([]).describe('i18n:cycle.sessions'),

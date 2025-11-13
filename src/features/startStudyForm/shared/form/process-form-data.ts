@@ -1,8 +1,12 @@
+import { range } from '@mantine/hooks';
 import {
   CategoryDetail,
+  ProblemDetail,
   ProblemNumberFormat,
   UnitDetail,
 } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
+import { safeArrayToRecord } from '@/shared/utils/object/object-utils';
+import { RangeWithId } from '../range/range-form-types';
 import {
   NewCategory,
   NewUnit,
@@ -46,7 +50,7 @@ export function processProblemMetadata(
   // 3. testRangeを反復処理し、統合リストを作成
   testRange.forEach((item) => {
     // --- ユニット (Unit) の処理 ---
-    if (!processedUnitNames.has(item.unitName)) {
+    if (item.unitName && !processedUnitNames.has(item.unitName)) {
       processedUnitNames.add(item.unitName);
 
       const existingUnit = unitMap.get(item.unitName);
@@ -68,7 +72,7 @@ export function processProblemMetadata(
     }
 
     // --- カテゴリ (Category) の処理 ---
-    if (!processedCategoryNames.has(item.categoryName)) {
+    if (item.categoryName && !processedCategoryNames.has(item.categoryName)) {
       processedCategoryNames.add(item.categoryName);
 
       const existingCategory = categoryMap.get(item.categoryName);
@@ -95,3 +99,63 @@ export function processProblemMetadata(
 
   return { units: newUnits, categories: newCategories };
 }
+
+/**
+ * フォームの範囲情報から問題リストと使用されたユニット/カテゴリのメタデータを生成する
+ */
+export const createProblemsAndUsedMetadata = (
+  problemsWithRanges: {
+    unitName: string;
+    categoryName: string;
+    ranges: RangeWithId[];
+  }[],
+  existingUnits: UnitDetail[],
+  existingCategories: CategoryDetail[]
+) => {
+  const problems: ProblemDetail[] = [];
+  const usedUnitIds: Set<string> = new Set();
+  const usedCategoryIds: Set<string> = new Set();
+
+  const unitMap = safeArrayToRecord(existingUnits, 'name');
+  const categoryMap = safeArrayToRecord(existingCategories, 'name');
+
+  let index = 0;
+  for (const section of problemsWithRanges) {
+    const unit = unitMap[section.unitName] || null;
+    const category = categoryMap[section.categoryName] || null;
+
+    if (unit) usedUnitIds.add(unit.id);
+    if (category) usedCategoryIds.add(category.id);
+
+    for (const rangeValue of section.ranges) {
+      // range関数のendのデフォルト値ロジックを維持
+      const end = rangeValue.end ?? rangeValue.start;
+      for (const problemNumber of range(rangeValue.start, end + 1)) {
+        problems.push({
+          index: index++, // indexをインクリメント
+          problemNumber,
+          unitId: unit ? unit.id : null,
+          categoryId: category ? category.id : null,
+        });
+      }
+    }
+  }
+
+  const unitIdMap = safeArrayToRecord(existingUnits, 'id');
+  const categoryIdMap = safeArrayToRecord(existingCategories, 'id');
+
+  // IDBから取得したTextbookのデータ構造（UnitDetail, CategoryDetail）をそのまま利用
+  const usedUnits = Array.from(usedUnitIds).map((id) => unitIdMap[id]);
+  const usedCategories = Array.from(usedCategoryIds).map((id) => categoryIdMap[id]);
+
+  // undefinedチェックのガード。
+  if (usedUnits.some((u) => !u) || usedCategories.some((c) => !c)) {
+    throw new Error('問題メタデータ生成中に使用済みユニットまたはカテゴリの取得に失敗しました。');
+  }
+
+  return {
+    problems,
+    usedUnits: usedUnits as UnitDetail[],
+    usedCategories: usedCategories as CategoryDetail[],
+  };
+};

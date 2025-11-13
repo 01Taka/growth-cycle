@@ -6,15 +6,25 @@ import { XPResults } from '../types/xp-types';
 import { calculateXPCorrectness } from './xp/correctness';
 import { calculateXPQuality } from './xp/quality';
 
-export const calculateTotalXPWithLearningCycle = (learningCycle: LearningCycleDocument) => {
-  const learningDurationMs =
-    learningCycle.sessions.length === 1 ? learningCycle.learningDurationMs : 0;
+export type XPSession = Pick<TestSession, 'results' | 'attemptedAt'>;
+
+export const calculateTotalXPWithLearningCycle = (
+  learningCycle: LearningCycleDocument,
+  newSession?: XPSession,
+  nextPlantStage?: number | null | undefined // nullの場合だけ成長しない
+) => {
+  const sessions =
+    newSession && learningCycle.sessions
+      ? [...learningCycle.sessions, newSession]
+      : (learningCycle.sessions ?? []);
+  const learningDurationMs = sessions.length === 1 ? learningCycle.learningDurationMs : 0;
 
   return calculateTotalXP({
-    sessions: learningCycle.sessions,
+    sessions,
     testDurationMs: learningCycle.testDurationMs,
     learningDurationMs,
-    nextPlantStage: learningCycle.plant.currentStage,
+    nextPlantStage:
+      nextPlantStage === undefined ? learningCycle.plant.currentStage : nextPlantStage,
   });
 };
 
@@ -24,10 +34,10 @@ export function calculateTotalXP({
   learningDurationMs,
   nextPlantStage,
 }: {
-  sessions: TestSession[];
+  sessions: XPSession[];
   testDurationMs: number;
   learningDurationMs: number;
-  nextPlantStage: number;
+  nextPlantStage: number | null; // 成長しない場合null
 }): XPResults | null {
   // 🚨 1. sessionsが空のチェック (既存)
   if (!sessions || sessions.length === 0) {
@@ -116,8 +126,8 @@ export function calculateXPLearningTime(learningDurationMs: number) {
   return learningDurationMs / 60000;
 }
 
-export function calculateXPPlantGrowth(nextPlantStage: number) {
-  return PLANT_GROWTH_PX_MAP[nextPlantStage] ?? 0;
+export function calculateXPPlantGrowth(nextPlantStage: number | null) {
+  return nextPlantStage ? (PLANT_GROWTH_PX_MAP[nextPlantStage] ?? 0) : 0;
 }
 /**
  * TestSessionの配列から、平均正解率（パーセンテージ）を計算します。
@@ -128,7 +138,7 @@ export function calculateXPPlantGrowth(nextPlantStage: number) {
  * @returns 平均正解率（0から100のパーセンテージ）。試行問題がない場合は0を返します。
  */
 function calculateAverageCorrectnessRate(
-  sessions: TestSession[],
+  sessions: XPSession[],
   includeUnratedAsIncorrect: boolean
 ): number {
   let totalCorrect = 0;
@@ -174,7 +184,7 @@ function calculateUtils({
   sessions,
   learningDurationMs,
 }: {
-  sessions: TestSession[];
+  sessions: XPSession[];
   learningDurationMs: number;
 }) {
   const sortedSessions = sessions.sort((a, b) => a.attemptedAt - b.attemptedAt);

@@ -41,7 +41,7 @@ export const TextbookFormMain: React.FC<TextbookFormMainProps> = () => {
     { value: 'socialStudies', label: '社会' },
   ];
 
-  const theme = useSubjectColorMap(form.values.subject);
+  const theme = useSubjectColorMap(form.values.subject ?? 'unselected');
 
   const unitNames = useMemo(
     () => form.values.units.map((unit) => unit.text).filter((name) => !!name),

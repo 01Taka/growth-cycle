@@ -16,6 +16,7 @@ import { PlantImageItem } from '@/features/plants/components/PlantImageItem';
 import { DirtMound } from '@/features/study/components/shared/DirtMound';
 import { LearningCycleDocument } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 import { useSubjectColorMap } from '@/shared/hooks/useSubjectColor';
+import { SubjectColorMap } from '@/shared/theme/subjectColorType';
 import { XPResults } from '../types/xp-types';
 
 // --- 型定義 (TotalXPModalで使用される最新のインターフェース) ---
@@ -25,7 +26,7 @@ const TRANSITION_DURATION = 500;
 const ITEM_DELAY = 150;
 
 // XP増加のアニメーションを担うカスタムコンポーネント
-const AnimatedXP = ({ targetXP }: { targetXP: number }) => {
+const AnimatedXP = ({ targetXP, theme }: { targetXP: number; theme: SubjectColorMap }) => {
   const [currentXP, setCurrentXP] = useState(0);
 
   useEffect(() => {
@@ -50,7 +51,7 @@ const AnimatedXP = ({ targetXP }: { targetXP: number }) => {
   }, [targetXP]);
 
   return (
-    <Text component="span" fz={rem(80)} fw={700} c="teal.6" style={{ lineHeight: 1 }}>
+    <Text component="span" fz={rem(80)} fw={700} c={theme.accent} style={{ lineHeight: 1 }}>
       {currentXP.toLocaleString()}
     </Text>
   );
@@ -129,10 +130,10 @@ export function TotalXPModal({ opened, onClose, results, learningCycle }: TotalX
       <Stack align="center" gap="xl">
         <Card bg={theme.bgCard} w={'100%'} radius={'lg'}>
           <Stack align="center" gap={4}>
-            <Text fz="lg" c="dimmed">
+            <Text fz="lg" c={theme.text}>
               獲得した合計XP
             </Text>
-            <AnimatedXP targetXP={totalXP} />
+            <AnimatedXP targetXP={totalXP} theme={theme} />
           </Stack>
 
           <Group

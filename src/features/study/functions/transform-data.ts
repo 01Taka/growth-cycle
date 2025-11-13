@@ -1,3 +1,4 @@
+import { DEFAULT_LABELS } from '@/shared/constants/document-constants';
 import { LearningCycle } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 import { LearningProblemBase, ProblemAttemptResult } from '../types/problem-types';
 
@@ -15,8 +16,8 @@ export const transformData = (data: LearningCycle): LearningProblemBase[] => {
   const categoryMap = new Map(categories.map((category) => [category.id, category.name]));
 
   problems.map((problem) => {
-    const unitName = unitMap.get(problem.unitId) || 'Unit: ???';
-    const categoryName = categoryMap.get(problem.categoryId) || 'Category: ???';
+    const unitName = unitMap.get(problem.unitId || '') || data.textbookName;
+    const categoryName = categoryMap.get(problem.categoryId || '') || DEFAULT_LABELS.category;
 
     transformedAttempts.push({
       unitName: unitName,
@@ -55,8 +56,9 @@ export const convertLearningCycleToAttempts = (cycle: LearningCycle): ProblemAtt
 
       if (problemDetail) {
         // 問題の詳細情報を使用して、ユニット名とカテゴリ名を取得
-        const unitName = unitMap.get(problemDetail.unitId) || 'Unknown Unit';
-        const categoryName = categoryMap.get(problemDetail.categoryId) || 'Unknown Category';
+        const unitName = unitMap.get(problemDetail.unitId || '') || cycle.textbookName;
+        const categoryName =
+          categoryMap.get(problemDetail.categoryId || '') || DEFAULT_LABELS.category;
 
         // 4. ProblemAttemptResultオブジェクトを作成し、配列に追加
         allAttempts.push({

@@ -20,7 +20,7 @@ export const StudyHeader: React.FC<StudyHeaderProps> = ({
   units,
   defaultTextNameLabel,
 }) => {
-  const theme = useSubjectColorMap(subject);
+  const theme = useSubjectColorMap(subject ?? 'unselected');
 
   // 表示するユニットを制限
   const visibleUnits = units.slice(0, MAX_UNITS_VISIBLE);
@@ -34,7 +34,7 @@ export const StudyHeader: React.FC<StudyHeaderProps> = ({
   return (
     <Stack align="center">
       <Text size={rem(20)} style={{ color: theme.accent }} fw={500}>
-        {subject.toLocaleUpperCase()}
+        {subject?.toLocaleUpperCase()}
       </Text>
       <Text
         size={rem(25)}

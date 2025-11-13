@@ -71,6 +71,9 @@ export const CreateTextFormCard: React.FC<CreateTextFormCardProps> = ({
               <Text fw={700}>基本情報</Text>
               <Select
                 {...form.getInputProps('subject')}
+                onChange={(value, option) => {
+                  if (value !== null) form.getInputProps('subject').onChange(value, option);
+                }}
                 label="教科"
                 data={subjects}
                 placeholder="教科を選択"

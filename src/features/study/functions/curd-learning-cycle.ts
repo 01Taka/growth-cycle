@@ -1,3 +1,4 @@
+import { calculateTotalXPWithLearningCycle } from '@/features/xp/functions/calculateXP';
 import {
   LearningCycle,
   LearningCycleDocument,
@@ -18,7 +19,7 @@ import { generateIdbPath } from '@/shared/data/idb/generate-path';
 import { IDB_PATH } from '@/shared/data/idb/idb-path';
 import { idbStore } from '@/shared/data/idb/idb-store';
 import { Plant, PLANT_MAX_STAGE, PlantSchema } from '@/shared/types/plant-shared-types';
-import { getDateAfterDaysBoundary } from '@/shared/utils/datetime/datetime-utils';
+import { containsToday, isToday } from '@/shared/utils/datetime/datetime-utils';
 import { ProblemAttemptResult } from '../types/problem-types';
 
 /**
@@ -52,6 +53,16 @@ function replaceOrAddObject<T extends { id: any }>(array: T[], id: any, replacem
 const problemsToTestResults = (problems: ProblemAttemptResult[]): TestResult[] => {
   // 現在は構造が同じなのでそのまま返すだけでよい
   return problems;
+};
+
+const checkIsFixedReviewSession = (pastLearningCycle: LearningCycle) => {
+  if (containsToday(pastLearningCycle.fixedReviewDates)) {
+    const todayAttemptSessions = pastLearningCycle.sessions.filter((session) =>
+      isToday(session.attemptedAt)
+    );
+    return !todayAttemptSessions.find((session) => session.isFixedReviewSession);
+  }
+  return false;
 };
 
 export const handleRecordSession = async (
@@ -117,9 +128,15 @@ export const handleRecordSession = async (
   }
 
   const newSession: TestSession = {
+    isFixedReviewSession: checkIsFixedReviewSession(learningCycle),
+    gainedXp: 0,
     attemptedAt: now,
     results: problemsToTestResults(problems),
   };
+
+  const xp = calculateTotalXPWithLearningCycle(learningCycle, newSession, newPlant.currentStage);
+
+  newSession.gainedXp = xp?.floatTotalXP ?? 0;
 
   const updatedTextbook: Partial<Textbook> = {
     lastAttemptedAt: now,

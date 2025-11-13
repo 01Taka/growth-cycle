@@ -1,6 +1,6 @@
-import { TestSession } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { calculateReviewNecessity } from '@/shared/utils/calc-necessity';
 import { XP_QUALITY_WEIGHTS } from '../../constants/ex-weights';
+import { XPSession } from '../calculateXP';
 
 /**
  * 集中時間の効果量スコアを計算する (0.0 から 1.0 に正規化)。
@@ -40,7 +40,7 @@ export function calculateQualityScore({
   totalProblems,
   totalTestTimeSpendMs,
 }: {
-  session: TestSession;
+  session: XPSession;
   totalProblems: number;
   totalTestTimeSpendMs: number;
 }): number {
@@ -121,7 +121,7 @@ export function calculateXPQuality({
   totalTestTimeSpendMs,
   totalTestTimeSpendMin,
 }: {
-  session: TestSession;
+  session: XPSession;
   totalProblems: number;
   totalTestTimeSpendMs: number;
   totalTestTimeSpendMin: number;

@@ -6,7 +6,6 @@ import {
 } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 import {
   CategoryDetail,
-  ProblemDetail,
   ProblemNumberFormat,
   UnitDetail,
 } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
@@ -20,11 +19,10 @@ import { IDB_PATH } from '@/shared/data/idb/idb-path';
 import { idbStore } from '@/shared/data/idb/idb-store';
 import { Plant, PlantShape } from '@/shared/types/plant-shared-types';
 import { getDateAfterDaysBoundary } from '@/shared/utils/datetime/datetime-utils';
-import { safeArrayToRecord } from '@/shared/utils/object/object-utils';
-import { range } from '@/shared/utils/range';
-import { RangeWithId } from '../range/range-form-types';
+import { MAX_PROBLEMS_NUMBER } from './form-constants';
 import { StartStudyFormProblemMetadata, StartStudyFormValues } from './form-types';
-import { processProblemMetadata } from './process-form-data';
+import { countTotalNumbersInRangeForms } from './form-utils';
+import { createProblemsAndUsedMetadata, processProblemMetadata } from './process-form-data';
 
 // --- ヘルパー関数: Textbook関連 ---
 
@@ -107,73 +105,6 @@ const updateTextbook = async (
 
 // --- ヘルパー関数: 問題生成関連 ---
 
-/**
- * フォームの範囲情報から問題リストと使用されたユニット/カテゴリのメタデータを生成する
- */
-const createProblemsAndUsedMetadata = (
-  problemsWithRanges: {
-    unitName: string;
-    categoryName: string;
-    ranges: RangeWithId[];
-  }[],
-  existingUnits: UnitDetail[],
-  existingCategories: CategoryDetail[]
-) => {
-  const problems: ProblemDetail[] = [];
-  const usedUnitIds: Set<string> = new Set();
-  const usedCategoryIds: Set<string> = new Set();
-
-  const unitMap = safeArrayToRecord(existingUnits, 'name');
-  const categoryMap = safeArrayToRecord(existingCategories, 'name');
-
-  let index = 0;
-  for (const section of problemsWithRanges) {
-    const unit = unitMap[section.unitName];
-    const category = categoryMap[section.categoryName];
-
-    if (!unit || !category) {
-      // 致命的なエラー: Textbook更新で追加されたはずのIDが見つからない
-      throw new Error(
-        `問題メタデータ生成中にユニットまたはカテゴリが見つかりません。 UnitName: ${section.unitName}, CategoryName: ${section.categoryName}`
-      );
-    }
-
-    usedUnitIds.add(unit.id);
-    usedCategoryIds.add(category.id);
-
-    for (const rangeValue of section.ranges) {
-      // range関数のendのデフォルト値ロジックを維持
-      const end = rangeValue.end ?? rangeValue.start;
-      for (const problemNumber of range(rangeValue.start, end + 1)) {
-        problems.push({
-          index: index++, // indexをインクリメント
-          problemNumber,
-          unitId: unit.id,
-          categoryId: category.id,
-        });
-      }
-    }
-  }
-
-  const unitIdMap = safeArrayToRecord(existingUnits, 'id');
-  const categoryIdMap = safeArrayToRecord(existingCategories, 'id');
-
-  // IDBから取得したTextbookのデータ構造（UnitDetail, CategoryDetail）をそのまま利用
-  const usedUnits = Array.from(usedUnitIds).map((id) => unitIdMap[id]);
-  const usedCategories = Array.from(usedCategoryIds).map((id) => categoryIdMap[id]);
-
-  // undefinedチェックのガード。
-  if (usedUnits.some((u) => !u) || usedCategories.some((c) => !c)) {
-    throw new Error('問題メタデータ生成中に使用済みユニットまたはカテゴリの取得に失敗しました。');
-  }
-
-  return {
-    problems,
-    usedUnits: usedUnits as UnitDetail[],
-    usedCategories: usedCategories as CategoryDetail[],
-  };
-};
-
 const getNewPlant = (plantShape: PlantShape, now: number): Plant => {
   return {
     ...plantShape,
@@ -218,12 +149,15 @@ export const createLearningCycle = async (
     return;
   }
 
-  const validRanges = form.testRange.filter(
-    (range) => !!range.categoryName.trim() && !!range.unitName.trim() && range.ranges.length > 0
-  );
+  const validRanges = form.testRange.filter((range) => range.ranges.length > 0);
 
   if (validRanges.length === 0) {
     console.error('range cannot be empty');
+    return;
+  }
+
+  if (countTotalNumbersInRangeForms(validRanges) > MAX_PROBLEMS_NUMBER) {
+    console.error('ranges are too big');
     return;
   }
 
@@ -283,9 +217,11 @@ export const createLearningCycle = async (
     plant,
   };
 
+  let parsedLearningCycle = null;
+
   // 8. LearningCycleのバリデーション
   try {
-    LearningCycleSchema.parse(newLearningCycleData);
+    parsedLearningCycle = LearningCycleSchema.parse(newLearningCycleData);
   } catch (error) {
     if (error instanceof z.ZodError) {
       throw new Error(`LearningCycleバリデーション失敗 (Zod): ${error.message}`);
@@ -295,7 +231,7 @@ export const createLearningCycle = async (
 
   // 9. IDBに新しいLearningCycleを追加
   try {
-    return await idbStore.add(newLearningCyclePath, newLearningCycleData);
+    return await idbStore.add(newLearningCyclePath, parsedLearningCycle);
   } catch (error) {
     throw new Error(`IDBへのLearningCycle追加に失敗しました (Path: ${newLearningCyclePath})`);
   }

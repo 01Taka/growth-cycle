@@ -7,11 +7,13 @@ import { SubjectColorMap } from '@/shared/theme/subjectColorType';
 import { Creations } from '@/shared/types/creatable-form-items-types';
 import { FormInputProps } from '@/shared/types/mantine-form-types';
 import { STUDY_TIME_BUTTON_CONFIGS } from '../shared/components-constants/study-time-buttons-config';
+import { MAX_PROBLEMS_NUMBER } from '../shared/form/form-constants';
 import {
   StartStudyFormComponent,
   StartStudyFormCreatableItems,
   StartStudyFormValues,
 } from '../shared/form/form-types';
+import { countTotalNumbersInRangeForms } from '../shared/form/form-utils';
 import { TestRangeForm } from './rangeForm/TestRangeForm';
 import { StudyTimeForm } from './studyTimeForm/StudyTimeForm';
 import { TestModeForm } from './testModeForm/TestModeForm';
@@ -44,9 +46,11 @@ export const StartStudyForm: React.FC<StartStudyFormProps> = ({
       studyTimeMin: (value) => (value === null ? '勉強時間を選択してください' : null),
       testMode: (value) => (value === null ? 'テストモードを選択してください' : null),
       testRange: (value) => {
-        const validRanges = value.filter(
-          (range) => !!range.categoryName && !!range.unitName && range.ranges.length > 0
-        );
+        const validRanges = value.filter((range) => range.ranges.length > 0);
+        const count = countTotalNumbersInRangeForms(validRanges);
+        if (count > MAX_PROBLEMS_NUMBER) {
+          return `問題数が多すぎます。${count}/${MAX_PROBLEMS_NUMBER}(${count - MAX_PROBLEMS_NUMBER}over)`;
+        }
         return validRanges.length > 0 ? null : '範囲を入力してください';
       },
       testTimeMin: (value) => (value === null ? 'テスト時間を入力してください' : null),

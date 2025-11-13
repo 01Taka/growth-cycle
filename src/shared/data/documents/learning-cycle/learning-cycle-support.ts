@@ -87,6 +87,8 @@ export type TestResult = z.infer<typeof TestResultSchema>;
 
 export const TestSessionSchema = z
   .object({
+    gainedXp: z.number().min(0).default(0),
+    isFixedReviewSession: z.boolean(),
     attemptedAt: z.number().describe('i18n:session.attempted_at'),
     results: z.array(TestResultSchema).describe('i18n:session.results_list'),
   })
@@ -97,8 +99,8 @@ export type TestSession = z.infer<typeof TestSessionSchema>;
 export const ProblemDetailSchema = z
   .object({
     index: z.number().int().min(0).describe('i18n:problem.index'),
-    unitId: z.string().min(1).describe('i18n:shared.unit_id'),
-    categoryId: z.string().min(1).describe('i18n:shared.category_id'),
+    unitId: z.string().min(1).nullable().describe('i18n:shared.unit_id'),
+    categoryId: z.string().min(1).nullable().describe('i18n:shared.category_id'),
     problemNumber: z.number().int().min(1).describe('i18n:problem.number'),
   })
   .describe('i18n:problem.detail');
