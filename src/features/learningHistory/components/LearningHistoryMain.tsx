@@ -1,79 +1,94 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Box, Stack } from '@mantine/core';
-import { calculateSM2ReviewScheduleForCycle } from '@/features/app/sm2/functions/calculate-sm2-schedule';
 import { generateDummyLearningCycles } from '@/features/home/utils/learning-cycle-dummy';
-import { LearningCycle } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 import { useLearningCycleStore } from '@/shared/stores/useLearningCycleStore';
-import { getDaysDifference } from '@/shared/utils/datetime/datetime-compare-utils';
+import { filterItems, sortItems } from '../functions/sort-and-filter';
+import { transformCycleToItemData } from '../functions/transform-cycle-item';
+import { HistorySortType } from '../types/learning-history-types';
+import { LearningHistoryHeader } from './LearningHistoryHeader';
 import { LearningHistoryItem } from './LearningHistoryItem';
 
 interface LearningHistoryMainProps {}
 
-const handleCycleToItem = (learningCycle: LearningCycle, onCheckDetail: () => void) => {
-  return {
-    plant: learningCycle.plant,
-    subject: learningCycle.subject,
-    textbookName: learningCycle.textbookName,
-    unitNames: Object.values(learningCycle.units).map((unit) => unit.name),
-    problemCount: learningCycle.problems.length,
-    testDurationMin: Math.floor(learningCycle.testDurationMs / 60000),
-    isCompleted: false,
-    onCheckDetail,
-  };
-};
-
+// メインコンポーネントはデータの取得、変換、状態管理、レンダリングを担う
 export const LearningHistoryMain: React.FC<LearningHistoryMainProps> = ({}) => {
   const { learningCycles: _, fetchLearningCycles } = useLearningCycleStore();
 
+  // ダミーデータの生成 (useMemoを使用して不要な再計算を防ぐ)
   const learningCycles = useMemo(() => {
-    return generateDummyLearningCycles(20);
+    // 実際にFirestoreから取得する際は、この行を削除します
+    return [...generateDummyLearningCycles(20)];
   }, []);
 
   useEffect(() => {
+    // 実際のデータフェッチ
     fetchLearningCycles();
   }, [fetchLearningCycles]);
 
+  // --- ステート管理 ---
+  // 詳細表示の開閉状態を管理
+  const [openedDetailId, setOpenedDetailId] = useState<string | null>(null);
+  // 💡 ソート基準
+  const [sortBy, setSortBy] = useState<HistorySortType>('fixation');
+  // 💡 教科フィルター
+  const [subjectFilter, setSubjectFilter] = useState<string | null>(null);
+
+  // onCheckDetailアクションの定義
+  const handleCheckDetail = useCallback((cycleId: string) => {
+    setOpenedDetailId((prevId) => (prevId === cycleId ? null : cycleId));
+  }, []);
+
+  // --- データ変換とメモ化 ---
+
+  // 1. 全学習サイクルのデータ変換結果をメモ化（パフォーマンス対策）
+  const memoizedItemData = useMemo(() => {
+    return learningCycles.map((cycle) => ({
+      cycleId: cycle.id,
+      data: transformCycleToItemData(cycle),
+    }));
+  }, [learningCycles]);
+
+  // 💡 ヘッダーに渡すための教科名のリスト
+  const learningCycleSubjects = useMemo(() => {
+    return learningCycles.map((cycle) => cycle.subject);
+  }, [learningCycles]);
+
+  // 2. フィルタリングとソートのロジック
+  const filteredAndSortedItemData = useMemo(() => {
+    // A. フィルタリング（教科）
+    const filteredData = filterItems(memoizedItemData, subjectFilter); // B. ソート（並べ替え）
+    const finalData = sortItems(filteredData, sortBy);
+    return finalData;
+  }, [memoizedItemData, subjectFilter, sortBy]);
+
   return (
-    <Stack gap="xs" align="center">
-      {learningCycles.map((cycle) => {
-        const record = calculateSM2ReviewScheduleForCycle(cycle);
-        const dates = Object.values(record).map((date) => date);
-        const sortedDates = dates.sort((a, b) => b - a);
-        const dateDiffs = sortedDates.map((date) => getDaysDifference(date));
+    <Stack gap="xl" align="center" w="100%" p="md">
+      <LearningHistoryHeader
+        learningCycleSubjects={learningCycleSubjects}
+        subjectFilter={subjectFilter}
+        setSubjectFilter={setSubjectFilter}
+        sortBy={sortBy}
+        setSortBy={setSortBy}
+      />
 
-        const getDifferenceToNextFixedReview = () => {
-          const diff = Math.min(
-            ...cycle.fixedReviewDates.map((date) => {
-              const diff = getDaysDifference(date);
-              return diff >= 0 ? diff : Number.MAX_SAFE_INTEGER;
-            })
+      {/* リストの表示 */}
+      <Stack gap="xs" align="center" w="100%">
+        {filteredAndSortedItemData.map(({ cycleId, data }, index) => {
+          const openedDetail =
+            openedDetailId === cycleId || (openedDetailId === null && index === 0);
+
+          return (
+            <Box w={'95%'} key={cycleId}>
+              <LearningHistoryItem
+                {...data}
+                openedDetail={openedDetail}
+                toggleOpenedDetail={() => handleCheckDetail(cycleId)}
+                onStartReview={() => {}}
+              />
+            </Box>
           );
-          return diff === Number.POSITIVE_INFINITY ? null : diff;
-        };
-
-        const differenceToNextFixedReview = getDifferenceToNextFixedReview();
-        const totalProblemCount = dateDiffs.length;
-        const fixation = dateDiffs.filter((diff) => diff > 0).length / totalProblemCount;
-
-        return (
-          <Box w={'95%'}>
-            <LearningHistoryItem
-              key={cycle.id}
-              plant={cycle.plant}
-              subject={cycle.subject}
-              fixation={fixation}
-              unitNames={cycle.units.map((unit) => 'LONG UNIT NAME')}
-              textbookName={cycle.textbookName}
-              differenceFromLastAttempt={getDaysDifference(cycle.latestAttemptedAt)}
-              dateDifferencesFromReview={dateDiffs}
-              testTargetProblemCount={totalProblemCount}
-              estimatedTestTimeMin={15}
-              differenceToNextFixedReview={differenceToNextFixedReview}
-              onCheckDetail={() => {}}
-            />
-          </Box>
-        );
-      })}
+        })}
+      </Stack>
     </Stack>
   );
 };

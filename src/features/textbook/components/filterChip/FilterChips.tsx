@@ -1,5 +1,6 @@
 import React from 'react';
 import { Flex, Grid } from '@mantine/core';
+import { SUBJECT_LABEL_MAP } from '@/shared/constants/document-constants';
 import { Subject } from '@/shared/types/subject-types';
 import { FilterChip } from './FilterChip';
 
@@ -17,14 +18,6 @@ export const FilterChips: React.FC<FilterChipsProps> = ({ selectedSubjects, onCl
     'socialStudies',
     'unselected',
   ];
-  const SubjectLabels: Record<Subject | 'unselected', string> = {
-    japanese: '国語',
-    math: '数学',
-    english: '英語',
-    science: '理科',
-    socialStudies: '社会',
-    unselected: 'すべて',
-  };
 
   return (
     <Grid
@@ -37,7 +30,7 @@ export const FilterChips: React.FC<FilterChipsProps> = ({ selectedSubjects, onCl
         <Grid.Col span="content" key={subject}>
           <FilterChip
             subject={subject}
-            label={SubjectLabels[subject]}
+            label={SUBJECT_LABEL_MAP[subject]}
             checked={
               (subject === 'unselected' && selectedSubjects.length === 0) ||
               selectedSubjects.includes(subject as Subject)

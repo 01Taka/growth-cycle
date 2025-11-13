@@ -21,6 +21,7 @@ import { Plant } from '@/shared/types/plant-shared-types';
 import { Subject } from '@/shared/types/subject-types';
 import { getColorByRatio } from '../functions/history-grade-color-utils';
 import { useAggregatedSections } from '../hooks/useAggregatedSections';
+import { AggregatedSection } from '../types/learning-history-types';
 
 interface LearningHistoryItemProps {
   plant: Plant;
@@ -28,12 +29,15 @@ interface LearningHistoryItemProps {
   textbookName: string;
   unitNames: string[];
   fixation: number;
-  dateDifferencesFromReview: number[];
   differenceToNextFixedReview: number | null;
   differenceFromLastAttempt: number;
   testTargetProblemCount: number;
   estimatedTestTimeMin: number;
-  onCheckDetail: () => void;
+  openedDetail: boolean;
+  aggregatedSections: AggregatedSection[];
+  actionColor: string;
+  toggleOpenedDetail: () => void;
+  onStartReview: () => void;
 }
 
 export const LearningHistoryItem: React.FC<LearningHistoryItemProps> = ({
@@ -42,17 +46,16 @@ export const LearningHistoryItem: React.FC<LearningHistoryItemProps> = ({
   textbookName,
   unitNames,
   fixation,
-  dateDifferencesFromReview,
   differenceToNextFixedReview,
   differenceFromLastAttempt,
   testTargetProblemCount,
   estimatedTestTimeMin,
-  onCheckDetail,
+  openedDetail,
+  aggregatedSections,
+  actionColor,
+  toggleOpenedDetail,
+  onStartReview,
 }) => {
-  const [openedDetail, setOpenedDetail] = useState(false);
-
-  const actionColor = getColorByRatio(fixation);
-
   const neutralTheme = {
     // 枠線は薄いグレー（科目色ではなく統一）
     border: '#767676ff',
@@ -68,8 +71,6 @@ export const LearningHistoryItem: React.FC<LearningHistoryItemProps> = ({
 
   const isWaitingFixedReview = differenceToNextFixedReview !== null;
 
-  const aggregatedSections = useAggregatedSections(dateDifferencesFromReview);
-
   return (
     <Card
       shadow="sm"
@@ -77,13 +78,12 @@ export const LearningHistoryItem: React.FC<LearningHistoryItemProps> = ({
       p="md"
       bg={theme.bgScreen}
       radius={16}
-      onClick={onCheckDetail}
       style={{
         border: `2px solid ${theme.border}`,
         cursor: 'pointer',
       }}
     >
-      <Flex align="center" h={80}>
+      <Flex align="center" h={80} onClick={toggleOpenedDetail}>
         {/* 左側: 定着度とPlant Icon */}
         <Stack gap={0} h={'100%'}>
           <Stack align="center" gap={0} h={'100%'} pos={'relative'}>
@@ -165,7 +165,6 @@ export const LearningHistoryItem: React.FC<LearningHistoryItemProps> = ({
                 style={{
                   border: `3px solid ${actionColor}`,
                 }}
-                onClick={() => setOpenedDetail((prev) => !prev)}
               >
                 <IconRun size={26} />
               </ActionIcon>
@@ -284,6 +283,7 @@ export const LearningHistoryItem: React.FC<LearningHistoryItemProps> = ({
             bg={actionColor}
             c={'white'}
             style={{ transition: 'background-color 0.2s' }}
+            onClick={onStartReview}
           >
             復習開始
           </Button>
