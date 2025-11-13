@@ -7,7 +7,7 @@ export const WEIGHTS = {
   W_QUALITY: 1000.0, // 勉強の質スコア (0-1) のXP重み
   MAX_LEANING_DURATION_MS: 3 * 60 * 60 * 1000, // 勉強時間の最大値(最大3時間)
   MAX_TEST_DURATION_MS: 3 * 60 * 60 * 1000, // テスト時間の最大値(最大3時間)
-};
+} as const;
 
 /**
  * XP_正答率 (xpCorrectness) 計算に必要な定数
@@ -32,7 +32,7 @@ export const XP_CORRECTNESS_WEIGHTS = {
   QUICK_ANSWER_CAP_RATIO: 0.8, // 俊足ボーナスの対象となる所要時間の最小割合 (20%の時間削減が上限)
   MIN_MULTIPLIER_BASE: 1.0, // 倍率のベース値 (1.0 + ボーナス)
   MIN_BONUS_VALUE: 0.0, // ボーナスや係数の最小値
-};
+} as const;
 
 /**
  * XP_質 (baseXpQuality) 計算に必要な定数
@@ -60,4 +60,4 @@ export const XP_QUALITY_WEIGHTS = {
   // --- B. 最終 XP 計算 (労力倍率) 関連 ---
   EFFORT_K: 0.7, // 労力倍率の指数 K (0 < k < 1)
   EFFORT_MAX_MULTIPLIER: 16.0, // 労力倍率の上限 (maxTime)
-};
+} as const;

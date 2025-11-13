@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Button, Stack } from '@mantine/core'; // テスト用UI
+import { Stack } from '@mantine/core'; // テスト用UI
 import { LocalStorageMultiTimerPersistenceProvider } from '@/shared/hooks/multi-timer/localStoragePersistenceProvider';
 import { useStudyLogic } from '../../hooks/useStudyLogic';
 import { useSyncedLocalStorage } from '../../hooks/useSyncedLocalStorage';

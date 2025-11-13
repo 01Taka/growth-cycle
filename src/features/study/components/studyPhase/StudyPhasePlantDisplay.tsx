@@ -3,7 +3,7 @@ import { Stack } from '@mantine/core';
 import { PlantImageItem } from '@/features/plants/components/PlantImageItem';
 import { Plant } from '@/shared/types/plant-shared-types';
 import { Subject } from '@/shared/types/subject-types';
-import { DirtMound } from './DirtMound';
+import { DirtMound } from '../shared/DirtMound';
 
 interface StudyPhasePlantDisplayProps {
   subject: Subject;

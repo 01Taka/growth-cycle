@@ -1,9 +1,22 @@
+import { LearningCycleDocument } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 import { TestSession } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { WEIGHTS } from '../constants/ex-weights';
 import { PLANT_GROWTH_PX_MAP } from '../constants/plant-growth-xp';
 import { XPResults } from '../types/xp-types';
 import { calculateXPCorrectness } from './xp/correctness';
 import { calculateXPQuality } from './xp/quality';
+
+export const calculateTotalXPWithLearningCycle = (learningCycle: LearningCycleDocument) => {
+  const learningDurationMs =
+    learningCycle.sessions.length === 1 ? learningCycle.learningDurationMs : 0;
+
+  return calculateTotalXP({
+    sessions: learningCycle.sessions,
+    testDurationMs: learningCycle.testDurationMs,
+    learningDurationMs,
+    nextPlantStage: learningCycle.plant.currentStage,
+  });
+};
 
 export function calculateTotalXP({
   sessions,

@@ -6,7 +6,7 @@ export interface XPResults {
 
   correctnessXpBase: number;
   correctnessBonusScore: number;
-  correctnessBonusType: string;
+  correctnessBonusType: 'highScore' | 'growth' | 'none';
   correctnessSpeedMultiplier: number;
 
   xpLearningTime: number;

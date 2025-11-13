@@ -1,8 +1,11 @@
 import React, { useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useParameter } from 'storybook/internal/preview-api';
 import { TotalXPModal } from '@/features/xp/components/TotalXPModal';
-import { calculateMaxTotalXP } from '@/features/xp/functions/calculate-max-xp';
-import { calculateTotalXP } from '@/features/xp/functions/calculateXP';
+import {
+  calculateTotalXP,
+  calculateTotalXPWithLearningCycle,
+} from '@/features/xp/functions/calculateXP';
 import { XPResults } from '@/features/xp/types/xp-types';
 import { LearningCycleDocument } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 import { useLearningCycleStore } from '@/shared/stores/useLearningCycleStore';
@@ -20,6 +23,9 @@ export const HomeMain: React.FC<HomeMainProps> = ({}) => {
   const { learningCycles: learningCycles, fetchLearningCycles } = useLearningCycleStore(
     (state) => state
   );
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const resultCycleId = searchParams.get('resultCycleId');
 
   // const learningCycles = useMemo(() => generateMultipleLearningCycles(5), []);
 
@@ -48,20 +54,20 @@ export const HomeMain: React.FC<HomeMainProps> = ({}) => {
     }
   };
 
-  const learningCycle = learningCycles[0];
+  const resultCycle = useMemo(() => {
+    return learningCycles.find((cycle) => cycle.id === resultCycleId);
+  }, [resultCycleId, learningCycles]);
 
   const xpResults = useMemo(
-    () =>
-      learningCycle
-        ? (calculateTotalXP({
-            sessions: learningCycle.sessions,
-            testDurationMs: learningCycle.testDurationMs,
-            learningDurationMs: learningCycle.learningDurationMs,
-            nextPlantStage: learningCycle.plant.currentStage,
-          }) as XPResults)
-        : null,
-    [learningCycle]
+    () => (resultCycle ? (calculateTotalXPWithLearningCycle(resultCycle) as XPResults) : null),
+    [resultCycle]
   );
+
+  const handleCloseResultModal = () => {
+    const newSearchParams = new URLSearchParams(searchParams.toString());
+    newSearchParams.delete('resultCycleId');
+    setSearchParams(newSearchParams);
+  };
 
   return (
     <div>
@@ -72,7 +78,14 @@ export const HomeMain: React.FC<HomeMainProps> = ({}) => {
         onStartReview={handleStartReview}
       />
       <GrowthPresentation learnings={learnings} onStartStudy={() => navigate('/textbooks')} />
-      {xpResults && <TotalXPModal opened onClose={() => {}} results={xpResults} />}
+      {xpResults && resultCycle && (
+        <TotalXPModal
+          opened={!!resultCycle}
+          onClose={() => handleCloseResultModal()}
+          results={xpResults}
+          learningCycle={resultCycle}
+        />
+      )}
     </div>
   );
 };

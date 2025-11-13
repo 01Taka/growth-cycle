@@ -140,7 +140,7 @@ export const useStudyData = (): StudyData => {
         try {
           await handleRecordSession(textbook.id, learningCycle.id, args.problems);
           await fetchLearningCycles(); // storeのデータを更新する
-          navigate('/');
+          navigate(`/?resultCycleId=${learningCycle.id}`);
         } catch (error) {
           console.error(error);
         }

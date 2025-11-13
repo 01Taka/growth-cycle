@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { IconCheck, IconClockHour4, IconLeaf, IconStar, IconTrophy } from '@tabler/icons-react';
 import {
-  Badge,
-  Box,
   Button,
+  Card,
   Divider,
   Group,
   Modal,
@@ -12,30 +11,14 @@ import {
   Stack,
   Text,
   Transition,
-  useMantineTheme,
 } from '@mantine/core';
+import { PlantImageItem } from '@/features/plants/components/PlantImageItem';
+import { DirtMound } from '@/features/study/components/shared/DirtMound';
+import { LearningCycleDocument } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
+import { useSubjectColorMap } from '@/shared/hooks/useSubjectColor';
+import { XPResults } from '../types/xp-types';
 
 // --- 型定義 (TotalXPModalで使用される最新のインターフェース) ---
-
-export interface XPResults {
-  correctRate: number;
-
-  qualityScore: number;
-  qualityEffortDurationScore: number;
-
-  correctnessXpBase: number;
-  correctnessBonusScore: number;
-  correctnessBonusType: string;
-  correctnessSpeedMultiplier: number;
-
-  xpLearningTime: number; // 修正: xpTime の代わりに利用
-  xpPlantGrowth: number;
-  xpQuality: number; // 修正: xpQualityを学習効率・自己評価の質として利用
-  xpCorrectness: number;
-
-  floatTotalXP: number;
-  totalXP: number;
-}
 
 // --- コンポーネント定数 ---
 const TRANSITION_DURATION = 500;
@@ -76,36 +59,38 @@ const AnimatedXP = ({ targetXP }: { targetXP: number }) => {
 interface TotalXPModalProps {
   opened: boolean;
   onClose: () => void;
+  learningCycle: LearningCycleDocument;
   results: XPResults;
 }
 
-export function TotalXPModal({ opened, onClose, results }: TotalXPModalProps) {
-  const theme = useMantineTheme();
+export function TotalXPModal({ opened, onClose, results, learningCycle }: TotalXPModalProps) {
+  const theme = useSubjectColorMap(learningCycle.subject);
   const { totalXP, floatTotalXP, xpPlantGrowth } = results;
+
+  const correctnessLabel = `正答率XP ${results.correctnessBonusType === 'none' ? '' : `(${results.correctnessBonusType === 'growth' ? '成長+' : '高得点+'}${results.correctnessBonusScore}, 速度×${results.correctnessSpeedMultiplier})`}`;
 
   // 1. XP要素のリストを最新のXPResults構造に合わせて再定義
   const rawXpFactors = [
     {
-      label: 'XP_学習時間 (投入時間)',
+      label: '学習時間XP',
       value: results.xpLearningTime, // 修正: xpTime -> xpLearningTime
       icon: <IconClockHour4 size={20} />,
       color: 'blue',
     },
     {
-      label: 'XP_正答率 (成果)',
+      label: correctnessLabel,
       value: results.xpCorrectness,
       icon: <IconCheck size={20} />,
       color: 'green',
     },
     {
-      label: 'XP_質 (学習効率×テスト時間)',
+      label: `テスト効果XP (質${(results.qualityScore * 100).toFixed(0)}% × 時間${(results.qualityEffortDurationScore * 100).toFixed(0)}%)`,
       value: results.xpQuality,
       icon: <IconStar size={20} />,
       color: 'grape',
-      breakdown: `質スコア: ${(results.qualityScore * 100).toFixed(0)}% × 所要時間スコア: ${(results.qualityEffortDurationScore * 100).toFixed(0)}%`,
     },
     {
-      label: 'XP_植物成長',
+      label: '植物成長XP',
       value: xpPlantGrowth,
       icon: <IconLeaf size={20} />,
       color: 'lime',
@@ -126,7 +111,7 @@ export function TotalXPModal({ opened, onClose, results }: TotalXPModalProps) {
       onClose={onClose}
       title={
         <Group gap="xs">
-          <IconTrophy size={28} style={{ color: theme.colors.orange[6] }} />
+          <IconTrophy size={28} style={{ color: theme.text }} />
           <Text fz="xl" fw={600}>
             XP獲得結果と植物成長
           </Text>
@@ -142,38 +127,35 @@ export function TotalXPModal({ opened, onClose, results }: TotalXPModalProps) {
       }}
     >
       <Stack align="center" gap="xl">
-        {/* --- 1. 植物アニメーションスペース --- */}
-        <Box
-          w="100%"
-          h={rem(150)}
-          bg="green.0"
-          style={{
-            borderRadius: theme.radius.md,
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            overflow: 'hidden',
-            border: `1px solid ${theme.colors.green[3]}`,
-            position: 'relative',
-          }}
-        >
-          {/* 植物成長の表現（ここでは簡易的に） */}
-          <Text c="green.9" fz="lg" fw={700}>
-            🌱 植物が {xpPlantGrowth.toFixed(2)} だけ成長しました
-          </Text>
-        </Box>
-        <Divider style={{ width: '100%' }} />
+        <Card bg={theme.bgCard} w={'100%'} radius={'lg'}>
+          <Stack align="center" gap={4}>
+            <Text fz="lg" c="dimmed">
+              獲得した合計XP
+            </Text>
+            <AnimatedXP targetXP={totalXP} />
+          </Stack>
 
-        {/* --- 2. 最終XPの表示 --- */}
-        <Stack align="center" gap={4}>
-          <Text fz="lg" c="dimmed">
-            獲得した合計XP
-          </Text>
-          <AnimatedXP targetXP={totalXP} />
-          <Badge c="gray" variant="light" size="lg">
-            (内部計算値: {floatTotalXP.toFixed(2)})
-          </Badge>
-        </Stack>
+          <Group
+            w="100%"
+            h={rem(185)}
+            bg={theme.bgCard}
+            gap={0}
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              overflow: 'hidden',
+              position: 'relative',
+            }}
+          >
+            <PlantImageItem
+              plant={learningCycle.plant}
+              subject={learningCycle.subject}
+              style={{ position: 'absolute', bottom: 25 }}
+            />
+            <DirtMound style={{ position: 'absolute', bottom: 0 }} />
+          </Group>
+        </Card>
 
         <Divider style={{ width: '100%' }} />
 
@@ -196,7 +178,7 @@ export function TotalXPModal({ opened, onClose, results }: TotalXPModalProps) {
                 <div style={styles}>
                   <Group justify="space-between" mb={4} gap={0}>
                     <Group gap="xs">
-                      {React.cloneElement(factor.icon, { c: theme.colors[factor.color][6] })}
+                      {React.cloneElement(factor.icon, { c: theme.text })}
                       <Text fz="sm" fw={500}>
                         {factor.label}
                       </Text>
