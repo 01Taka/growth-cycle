@@ -12,4 +12,5 @@ export interface AggregatedSection {
   color: string;
   description: string;
   striped: boolean;
+  grade: number;
 }

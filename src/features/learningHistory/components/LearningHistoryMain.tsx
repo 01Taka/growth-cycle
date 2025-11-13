@@ -1,10 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Box, Stack } from '@mantine/core';
 import { calculateSM2ReviewScheduleForCycle } from '@/features/app/sm2/functions/calculate-sm2-schedule';
+import { generateDummyLearningCycles } from '@/features/home/utils/learning-cycle-dummy';
 import { LearningCycle } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 import { useLearningCycleStore } from '@/shared/stores/useLearningCycleStore';
 import { getDaysDifference } from '@/shared/utils/datetime/datetime-compare-utils';
-import { range } from '@/shared/utils/range';
 import { LearningHistoryItem } from './LearningHistoryItem';
 
 interface LearningHistoryMainProps {}
@@ -23,7 +23,11 @@ const handleCycleToItem = (learningCycle: LearningCycle, onCheckDetail: () => vo
 };
 
 export const LearningHistoryMain: React.FC<LearningHistoryMainProps> = ({}) => {
-  const { learningCycles, fetchLearningCycles } = useLearningCycleStore();
+  const { learningCycles: _, fetchLearningCycles } = useLearningCycleStore();
+
+  const learningCycles = useMemo(() => {
+    return generateDummyLearningCycles(20);
+  }, []);
 
   useEffect(() => {
     fetchLearningCycles();
@@ -58,11 +62,12 @@ export const LearningHistoryMain: React.FC<LearningHistoryMainProps> = ({}) => {
               plant={cycle.plant}
               subject={cycle.subject}
               fixation={fixation}
-              unitNames={cycle.units.map((unit) => unit.name)}
+              unitNames={cycle.units.map((unit) => 'LONG UNIT NAME')}
               textbookName={cycle.textbookName}
               differenceFromLastAttempt={getDaysDifference(cycle.latestAttemptedAt)}
               dateDifferencesFromReview={dateDiffs}
-              totalProblemCount={totalProblemCount}
+              testTargetProblemCount={totalProblemCount}
+              estimatedTestTimeMin={15}
               differenceToNextFixedReview={differenceToNextFixedReview}
               onCheckDetail={() => {}}
             />

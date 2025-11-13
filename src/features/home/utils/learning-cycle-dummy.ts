@@ -1,173 +1,192 @@
-// import { LearningCycleDocument } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
-// import { generateFirestoreId } from '@/shared/data/idb/generate-path';
-// import { IDB_PATH } from '@/shared/data/idb/idb-path';
-// import { getDateAfterDaysBoundary } from '@/shared/utils/datetime/datetime-utils';
+// NOTE: ユーザーの指示に基づき、_generatePlantShapeForMVPは同期関数として利用可能であると仮定します。
+// 実際の環境に合わせてインポートパスはそのままにしてあります。
+import { _generatePlantShapeForMVP } from '@/features/plants/functions/plant-utils';
+import { LearningCycleDocument } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
+import { LearningCycleSession } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
+import { generateFirestoreId } from '@/shared/data/idb/generate-path';
+import { Plant } from '@/shared/types/plant-shared-types';
 
-// // ユーティリティ関数: 乱数に応じて要素をランダムに選択
-// const getRandomElement = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
-// // ユーティリティ関数: 指定された範囲内の乱数を生成
-// const getRandomInt = (min: number, max: number): number =>
-//   Math.floor(Math.random() * (max - min + 1)) + min;
+const randomInt = (min: number, max: number) => {
+  // maxを範囲に含めるため +1 する
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};
 
-// /**
-//  * LearningCycleDocument型のダミーデータを生成する関数
-//  * @param problemCount 生成する問題の総数
-//  * @param sessionCount 生成するセッション（テスト実施）の数
-//  * @returns LearningCycleDocumentオブジェクト
-//  */
-// export const generateDummyLearningCycle = (
-//   problemCount: number = 5,
-//   sessionCount: number = 2
-// ): LearningCycleDocument => {
-//   const subjects: LearningCycleDocument['subject'][] = [
-//     'japanese',
-//     'math',
-//     'science',
-//     'socialStudies',
-//     'english',
-//   ];
-//   const testModes: LearningCycleDocument['testMode'][] = ['memory', 'skill'];
+/**
+ * ダミーのLearningCycleDocumentを生成します。
+ * @param numProblems 生成する問題の数
+ * @param numSessions 生成するセッションの数
+ * @returns LearningCycleDocument
+ */
+export function generateDummyLearningCycle(
+  numProblems: number = 5,
+  numSessions: number = 2
+): LearningCycleDocument {
+  const categories = [
+    {
+      id: 'cat1',
+      name: '計算問題',
+      timePerProblem: 30000,
+      problemNumberFormat: 'number' as const,
+    },
+    {
+      id: 'cat2',
+      name: '文章問題',
+      timePerProblem: 60000,
+      problemNumberFormat: 'alphabet' as const,
+    },
+  ];
 
-//   // --- 固定/基本設定 ---
-//   const subject = getRandomElement(subjects);
-//   const testMode = getRandomElement(testModes);
-//   const now = Date.now();
-//   const cycleStartAt = now - 30 * 24 * 60 * 60 * 1000 - getRandomInt(0, 7 * 24 * 60 * 60 * 1000); // 30日〜37日前に開始
+  const units = [
+    { id: 'unitA', name: '基礎' },
+    { id: 'unitB', name: '応用' },
+  ];
 
-//   // --- Unit/Category の定義 ---
-//   const units: LearningCycleDocument['units'] = [
-//     { id: 'UNIT-A', name: '基礎概念' },
-//     { id: 'UNIT-B', name: '応用発展' },
-//   ];
-//   const categories: LearningCycleDocument['categories'] = [
-//     { id: 'CAT-EASY', name: '易', timePerProblem: 20000, problemNumberFormat: 'number' },
-//     { id: 'CAT-NORMAL', name: '中', timePerProblem: 45000, problemNumberFormat: 'number' },
-//     { id: 'CAT-HARD', name: '難', timePerProblem: 90000, problemNumberFormat: 'alphabet' },
-//   ];
+  // 利用可能な教科のリスト
+  const subjects: LearningCycleDocument['subject'][] = [
+    'japanese',
+    'math',
+    'science',
+    'socialStudies',
+    'english',
+  ];
+  // ランダムな教科を選択
+  const randomSubject = subjects[Math.floor(Math.random() * subjects.length)];
 
-//   // --- Problems の生成 ---
-//   const problems: LearningCycleDocument['problems'] = Array.from(
-//     { length: problemCount },
-//     (_, index) => {
-//       const unit = getRandomElement(units);
-//       const category = getRandomElement(categories);
-//       return {
-//         index,
-//         unitId: unit.id,
-//         categoryId: category.id,
-//         problemNumber: index + 1,
-//       };
-//     }
-//   );
+  // 教科に対応した教科書名とIDのマップ
+  const textbookNameMap: Record<LearningCycleDocument['subject'], string> = {
+    japanese: '国語 読解力養成ドリル',
+    math: '中学数学 標準問題集',
+    science: '理科 系統学習テキスト',
+    socialStudies: '社会 歴史集中講座',
+    english: '英語 文法徹底マスター',
+  };
+  const randomTextbookName = textbookNameMap[randomSubject];
+  const randomTextbookId = `TBX_${randomSubject.toUpperCase()}${Math.random()
+    .toString(36)
+    .substring(2, 6)}`;
 
-//   // --- Sessions の生成 ---
-//   const sessions: LearningCycleDocument['sessions'] = Array.from(
-//     { length: sessionCount },
-//     (_, sessionIndex) => {
-//       // セッション間の時間を設定
-//       const lastAttemptedAt = Math.max(
-//         now - getRandomInt(0, 10 * 24 * 60 * 60 * 1000),
-//         cycleStartAt
-//       );
-//       const attemptedAt =
-//         cycleStartAt + ((lastAttemptedAt - cycleStartAt) / sessionCount) * (sessionIndex + 1);
+  // 1. 問題リストの生成
+  const problems = Array.from({ length: numProblems }, (_, i) => ({
+    index: i,
+    unitId: units[i % units.length].id,
+    categoryId: categories[i % categories.length].id,
+    problemNumber: i + 1,
+  }));
 
-//       const results: LearningCycleDocument['sessions'][0]['results'] = problems.map((problem) => {
-//         const category = categories.find((c) => c.id === problem.categoryId)!;
-//         const avgTime = category.timePerProblem;
+  // 2. セッションリストの生成
+  const sessions: LearningCycleSession[] = [];
+  const baseTimestamp = Date.now();
+  const MS_PER_DAY = 86400000;
+  const MAX_LATEST_DAYS_AGO = 14; // 最新セッションが現在から最大14日前
 
-//         // ランダムな結果
-//         const isCorrect = Math.random() < (problem.categoryId === 'CAT-EASY' ? 0.8 : 0.5); // 易しい問題は正答率高め
-//         const selfEvaluation: LearningCycleDocument['sessions'][0]['results'][0]['selfEvaluation'] =
-//           getRandomElement(['confident', 'imperfect', 'notSure']);
+  // 2-0. attemptedAtタイムスタンプをランダムに分散して生成
+  const attemptedAtTimestamps: number[] = [];
 
-//         const scoringStatus: LearningCycleDocument['sessions'][0]['results'][0]['scoringStatus'] =
-//           getRandomElement(['unrated', 'correct', 'incorrect']);
-//         const timeTakenMs = getRandomInt(avgTime * 0.5, avgTime * 1.5);
+  // 1. 最新のattemptedAtをランダムに決定 (0日〜14日前)
+  const daysAgoForLatest = randomInt(0, MAX_LATEST_DAYS_AGO); // 0〜14日
+  let currentTimestamp = baseTimestamp - daysAgoForLatest * MS_PER_DAY;
 
-//         return {
-//           problemIndex: problem.index,
-//           selfEvaluation: isCorrect ? 'confident' : selfEvaluation, // 正解なら自信ありに偏らせる
-//           isCorrect: isCorrect,
-//           timeSpentMs: timeTakenMs,
-//           scoringStatus,
-//         };
-//       });
+  // 最新のタイムスタンプを配列に追加
+  attemptedAtTimestamps.push(currentTimestamp);
 
-//       return {
-//         attemptedAt: attemptedAt,
-//         results: results,
-//       };
-//     }
-//   );
+  // 2. それ以前のセッションの日付をランダムな間隔で設定 (新しいものから古いものへ)
+  const MIN_GAP_DAYS = 1;
+  const MAX_GAP_DAYS = 10;
 
-//   const latestAttemptedAt =
-//     sessions.length > 0 ? sessions[sessions.length - 1].attemptedAt : cycleStartAt;
+  for (let i = 1; i < numSessions; i++) {
+    // セッション間のランダムな日数差 (1日〜3日)
+    const gapDays = randomInt(MIN_GAP_DAYS, MAX_GAP_DAYS);
 
-//   const id = generateFirestoreId();
+    // 単純な日単位の境界だけでなく、時刻もランダムにするために、1時間〜23時間のランダムな秒数を差分に加える
+    const randomSeconds = randomInt(3600, 82800) * 1000;
 
-//   const nextReviewRandom = Math.random();
-//   const nextReviewDate = getDateAfterDaysBoundary(
-//     nextReviewRandom > 1 / 3 ? 0 : nextReviewRandom > 2 / 3 ? 1 : 7
-//   );
+    currentTimestamp -= gapDays * MS_PER_DAY + randomSeconds;
+    attemptedAtTimestamps.push(currentTimestamp);
+  }
 
-//   return {
-//     id,
-//     path: `${IDB_PATH.learningCycles}/${id}`,
-//     textbookId: `TBK-${subject.toUpperCase()}-${getRandomInt(100, 999)}`,
-//     testMode: testMode,
-//     learningDurationMs: getRandomInt(1, 10) * 3600000, // 1〜10時間
-//     testDurationMs: problemCount * 60000, // 問題数 x 1分
-//     problems: problems,
-//     isReviewTarget: Math.random() > 0.1,
-//     textbookName: `${subject.charAt(0).toUpperCase() + subject.slice(1)} ${testMode === 'memory' ? '用語集' : '問題集'}`,
-//     subject: subject,
-//     cycleStartAt: cycleStartAt,
-//     units: units,
-//     categories: categories,
-//     sessions: sessions,
-//     nextReviewDate,
-//     latestAttemptedAt: latestAttemptedAt,
-//     plant: {
-//       seedType: '',
-//       size: 0,
-//       plantType: '',
-//       plantRarity: '',
-//       modules: {},
-//       id: generateFirestoreId(),
-//       currentStage: getRandomInt(0, 2),
-//       lastGrownAt: latestAttemptedAt,
-//       textbookPositionX: Math.random(),
-//     },
-//   };
-// };
+  // 時系列順に並び替え（古い日付が先頭、新しい日付が末尾）
+  attemptedAtTimestamps.reverse();
 
-// /**
-//  * 複数の LearningCycleDocument のダミーデータを生成する関数
-//  * @param count 生成するサイクルの総数
-//  * @param problemCount 各サイクルに含める問題の数 (generateDummyLearningCycle に渡される)
-//  * @param sessionCount 各サイクルに含めるセッションの数 (generateDummyLearningCycle に渡される)
-//  * @returns LearningCycleDocument の配列
-//  */
-// export const generateMultipleLearningCycles = (
-//   count: number,
-//   problemCount: number = 5,
-//   sessionCount: number = 2
-// ): LearningCycleDocument[] => {
-//   if (count <= 0) {
-//     return [];
-//   }
+  // 3. セッションリストの生成
+  for (let s = 0; s < numSessions; s++) {
+    const attemptedAt = attemptedAtTimestamps[s]; // ランダムに分散された日付
 
-//   const cycles: LearningCycleDocument[] = [];
+    // 2-1. セッション結果 (results) の生成
+    const results = problems.map((problem) => {
+      const isCorrect = Math.random() > 0.3; // 70%の確率で正解
+      const selfEvalOptions: LearningCycleSession['results'][number]['selfEvaluation'][] = [
+        'confident',
+        'imperfect',
+        // 'notSure', // 既存のコードを維持
+      ];
+      const selfEvaluation = selfEvalOptions[Math.floor(Math.random() * selfEvalOptions.length)];
 
-//   for (let i = 0; i < count; i++) {
-//     // 各サイクル生成時、問題数とセッション数を少しランダムに変動させ、よりリアルなデータにする
-//     const pCount = Math.max(1, problemCount + getRandomInt(-2, 2)); // 1問未満にならないように
-//     const sCount = Math.max(1, sessionCount + getRandomInt(-1, 1)); // 1セッション未満にならないように
+      return {
+        problemIndex: problem.index,
+        selfEvaluation: selfEvaluation,
+        scoringStatus: isCorrect ? ('correct' as const) : ('incorrect' as const),
+        timeSpentMs: Math.floor(Math.random() * 50000) + 10000, // 10秒〜60秒
+      };
+    });
 
-//     const cycle = generateDummyLearningCycle(pCount, sCount);
-//     cycles.push(cycle);
-//   }
+    // 2-2. セッションオブジェクトの生成
+    sessions.push({
+      gainedXp: results.filter((r) => r.scoringStatus === 'correct').length * 50,
+      isFixedReviewSession: s % 3 === 0, // 3回に1回は固定レビューとする
+      attemptedAt: attemptedAt,
+      results: results,
+    });
+  }
 
-//   return cycles;
-// }; | DEL |
+  // 3. Plant情報の生成
+  // _generatePlantShapeForMVP()が同期関数になったことを反映
+  const plantShape = _generatePlantShapeForMVP();
+  const plant: Plant = {
+    ...plantShape,
+    id: `plant-${Math.random().toString(36).substring(2, 9)}`,
+    currentStage: Math.floor(Math.random() * 4) + 1,
+    lastGrownAt: baseTimestamp - 86400000, // 1日前
+    textbookPositionX: Math.random() * 100,
+  };
+
+  const id = generateFirestoreId();
+  // 4. LearningCycleDocumentの生成
+  const dummyDocument: LearningCycleDocument = {
+    id,
+    path: `learningCycles/${id}`,
+    textbookId: randomTextbookId, // ランダムな教科ID
+    testMode: 'skill',
+    learningDurationMs: 3600000,
+    testDurationMs: 1800000,
+    problems: problems,
+    isReviewTarget: true,
+    textbookName: randomTextbookName, // ランダムな教科名
+    subject: randomSubject, // ★ランダムに選択された教科
+    cycleStartAt: sessions.length > 0 ? sessions[0].attemptedAt : baseTimestamp, // 最初のセッション日を開始日とする
+    units: units,
+    categories: categories,
+    sessions: sessions,
+    fixedReviewDates: [],
+    // 生成されたセッションリストの最新タイムスタンプを参照
+    latestAttemptedAt:
+      sessions.length > 0 ? sessions[sessions.length - 1].attemptedAt : baseTimestamp,
+    plant: plant,
+  };
+
+  return dummyDocument;
+}
+
+export const generateDummyLearningCycles = (
+  cycles: number,
+  numProblems: { min: number; max: number } = { min: 3, max: 20 },
+  numSessions: { min: number; max: number } = { min: 20, max: 50 }
+) => {
+  const results: LearningCycleDocument[] = [];
+  for (let index = 0; index < cycles; index++) {
+    const numP = randomInt(numProblems.min, numProblems.max);
+    const numS = randomInt(numSessions.min, numSessions.max);
+    const cycle = generateDummyLearningCycle(numP, numS);
+    results.push(cycle);
+  }
+  return results;
+};

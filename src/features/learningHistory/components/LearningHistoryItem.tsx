@@ -1,11 +1,26 @@
-import React, { useMemo } from 'react'; // useMemo をインポート
-import { Box, Card, Flex, Group, Pill, Progress, rem, Stack, Text, Tooltip } from '@mantine/core';
+import React, { useState } from 'react';
+import { IconRun } from '@tabler/icons-react';
+import {
+  ActionIcon,
+  Box,
+  Button,
+  Card,
+  Collapse,
+  Flex,
+  Group,
+  Pill,
+  Progress,
+  rem,
+  Stack,
+  Text,
+  Tooltip,
+} from '@mantine/core';
 import { PlantWithEffect } from '@/features/plants/components/PlantWithEffect';
-import { useSubjectColorMap } from '@/shared/hooks/useSubjectColor';
+import { UTIL_STYLES } from '@/shared/styles/shared-styles';
 import { Plant } from '@/shared/types/plant-shared-types';
 import { Subject } from '@/shared/types/subject-types';
-import { getGradeByDifference } from '../functions/history-grade-color-utils';
-import { AggregatedSection, DifferenceGrade } from '../types/learning-history-types';
+import { getColorByRatio } from '../functions/history-grade-color-utils';
+import { useAggregatedSections } from '../hooks/useAggregatedSections';
 
 interface LearningHistoryItemProps {
   plant: Plant;
@@ -16,7 +31,8 @@ interface LearningHistoryItemProps {
   dateDifferencesFromReview: number[];
   differenceToNextFixedReview: number | null;
   differenceFromLastAttempt: number;
-  totalProblemCount: number;
+  testTargetProblemCount: number;
+  estimatedTestTimeMin: number;
   onCheckDetail: () => void;
 }
 
@@ -26,70 +42,53 @@ export const LearningHistoryItem: React.FC<LearningHistoryItemProps> = ({
   textbookName,
   unitNames,
   fixation,
-  totalProblemCount,
   dateDifferencesFromReview,
   differenceToNextFixedReview,
   differenceFromLastAttempt,
+  testTargetProblemCount,
+  estimatedTestTimeMin,
   onCheckDetail,
 }) => {
-  const theme = useSubjectColorMap(subject);
+  const [openedDetail, setOpenedDetail] = useState(false);
+
+  const actionColor = getColorByRatio(fixation);
+
+  const neutralTheme = {
+    // 枠線は薄いグレー（科目色ではなく統一）
+    border: '#767676ff',
+    // 背景は白に近い色で統一
+    bgScreen: '#FFFFFF',
+    // テキストは濃い色で統一
+    text: '#333333',
+    // ピルの背景は非常に薄いグレー
+    bgChip: '#F5F5F5',
+  };
+  const theme = neutralTheme;
+  // ----------------------------------------------------
 
   const isWaitingFixedReview = differenceToNextFixedReview !== null;
 
-  const valuePerSection = totalProblemCount > 0 ? 100 / totalProblemCount : 0;
-
-  // 1. aggregatedSections の計算を useMemo でメモ化する
-  const aggregatedSections: AggregatedSection[] = useMemo(() => {
-    if (valuePerSection === 0) return [];
-
-    const gradeMap = new Map<number, { value: number; gradeInfo: DifferenceGrade }>();
-
-    dateDifferencesFromReview.forEach((diff) => {
-      const grade = getGradeByDifference(diff);
-
-      if (!grade) return;
-
-      const current = gradeMap.get(grade.grade) || { value: 0, gradeInfo: grade };
-      current.value += valuePerSection;
-      gradeMap.set(grade.grade, current);
-    });
-
-    // 2. Mapの値を配列に変換し、降順（grade: 5 -> 1）でソートする
-    const sectionsArray = Array.from(gradeMap.values())
-      .sort((a, b) => b.gradeInfo.grade - a.gradeInfo.grade)
-      .map((item) => ({
-        value: item.value,
-        color: item.gradeInfo.color,
-        description: item.gradeInfo.description,
-        striped: item.gradeInfo.grade === 1,
-        grade: item.gradeInfo.grade,
-      }));
-
-    return sectionsArray;
-  }, [dateDifferencesFromReview, valuePerSection]); // 依存配列: これらの値が変わったときだけ再計算する
+  const aggregatedSections = useAggregatedSections(dateDifferencesFromReview);
 
   return (
     <Card
+      shadow="sm"
       w="100%"
-      h={110} // 高さを少し上げる
-      p="md" // paddingを適切に設定
+      p="md"
       bg={theme.bgScreen}
       radius={16}
-      onClick={onCheckDetail} // クリックで詳細表示
+      onClick={onCheckDetail}
       style={{
-        border: `3px solid ${theme.border}`,
-        cursor: 'pointer', // クリック可能であることを示す
+        border: `2px solid ${theme.border}`,
+        cursor: 'pointer',
       }}
     >
-      <Flex align="center" h={'100%'}>
-        {/* 左側: Plant Icon */}
+      <Flex align="center" h={80}>
+        {/* 左側: 定着度とPlant Icon */}
         <Stack gap={0} h={'100%'}>
           <Stack align="center" gap={0} h={'100%'} pos={'relative'}>
-            <Text size={rem(12)} h={0} style={{ position: 'absolute', top: -6 }}>
-              定着度
-            </Text>
             <Text size="xl" fw={700} style={{ zIndex: 100 }}>
-              {isWaitingFixedReview ? '？' : Math.floor(fixation * 100)}%
+              {-differenceFromLastAttempt}日前
             </Text>
           </Stack>
           <Box h={'50%'}>
@@ -105,15 +104,38 @@ export const LearningHistoryItem: React.FC<LearningHistoryItemProps> = ({
         </Stack>
 
         {/* 中央・右側: Text & Progress */}
-        <Stack ml="md" w={'100%'} gap="xs">
+        <Stack ml="md" w={'100%'} gap={0} flex={1} miw={0}>
           {/* 上部: タイトルと情報 */}
           <Flex justify="space-between" align="start" w={'100%'}>
             {/* 左側 Stack: 教科書名とユニット名 */}
-            <Stack gap={4}>
-              <Text size="md" fw={600} c={theme.text} style={{ lineHeight: 1.2 }}>
+            <Stack
+              flex={1} // 👈 変更点: 残りのスペースをすべて使うようにする
+              gap={4}
+              justify="space-around"
+              h={'100%'}
+              miw={0}
+              mt={10}
+            >
+              <Text
+                size="md"
+                fw={600}
+                c={theme.text}
+                style={{
+                  lineHeight: 1.2,
+                  whiteSpace: 'nowrap',
+                  textOverflow: 'ellipsis',
+                }}
+              >
                 {textbookName}
               </Text>
-              <Flex gap={4}>
+              <Flex
+                gap={4}
+                style={{
+                  overflowX: 'auto',
+                  overflowY: 'hidden',
+                  whiteSpace: 'nowrap',
+                }}
+              >
                 {unitNames.map((unit, index) => (
                   <Pill
                     key={index}
@@ -133,34 +155,25 @@ export const LearningHistoryItem: React.FC<LearningHistoryItemProps> = ({
               </Flex>
             </Stack>
 
-            {/* 右側 Stack: 日数と問題数 */}
-            <Stack align="end" gap={4}>
-              {/* 復習からの経過日数 */}
-              <Pill
-                size="sm"
-                styles={{
-                  label: { color: theme.text, fontWeight: 700 },
-                  root: {
-                    backgroundColor: theme.bgChip,
-                    border: `1px solid ${theme.border}`,
-                  },
+            <Stack align="end" gap={4} w={80} style={{ flexShrink: 0 }}>
+              <ActionIcon
+                bg={openedDetail ? actionColor : theme.bgScreen}
+                c={openedDetail ? theme.bgScreen : 'gray'}
+                size={rem(40)} // 大きなサイズ
+                radius="xl" // 角丸を強くして円形に近いデザインに
+                aria-label="勉強を開始"
+                style={{
+                  border: `3px solid ${actionColor}`,
                 }}
+                onClick={() => setOpenedDetail((prev) => !prev)}
               >
-                復習から{differenceFromLastAttempt}日
-              </Pill>
-              {/* 総問題数 */}
-              <Pill
-                size="sm"
-                styles={{
-                  label: { color: theme.text, fontWeight: 700 },
-                  root: {
-                    backgroundColor: theme.bgChip,
-                    border: `1px solid ${theme.border}`,
-                  },
-                }}
-              >
-                {totalProblemCount}問
-              </Pill>
+                <IconRun size={26} />
+              </ActionIcon>
+              <Flex justify="end" gap={1}>
+                <Text>{testTargetProblemCount}問</Text>
+                <Text>/</Text>
+                <Text>{estimatedTestTimeMin}分</Text>
+              </Flex>
             </Stack>
           </Flex>
 
@@ -170,54 +183,112 @@ export const LearningHistoryItem: React.FC<LearningHistoryItemProps> = ({
               // 固定復習待ちの場合
               <Group
                 w={'100%'}
-                bg={'orange'}
+                bg={'#FF8C00'}
                 align="center"
                 justify="center"
-                style={{ borderRadius: 999 }}
+                h={rem(20)}
+                style={{ borderRadius: rem(10), minHeight: rem(20) }}
               >
-                <Text fw={700} c={'#333'}>
+                <Text fw={700} c={'#FFFFFF'}>
+                  {/* 見やすいようにテキスト色を白に */}
                   {differenceToNextFixedReview === 0
                     ? '今日復習'
                     : `復習待ち（${differenceToNextFixedReview}日後）`}
                 </Text>
               </Group>
             ) : (
-              <Progress.Root
-                size="xl"
-                radius="lg"
-                h={rem(20)}
-                style={{ position: 'relative', overflow: 'visible' }}
-              >
-                <>
-                  {aggregatedSections.map((section, index) => (
-                    // ツールチップで詳細情報を表示
-                    <Tooltip
-                      key={index}
-                      label={`${section.description} (${Math.round(section.value)}%)`}
-                      withArrow
-                    >
-                      <Progress.Section
-                        value={section.value}
-                        color={section.color}
-                        style={{
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          color: '#333',
-                          fontWeight: 500,
-                        }}
-                        striped={section.striped}
-                        animated={section.striped}
+              <Box w={'100%'} pos={'relative'}>
+                <Progress.Root
+                  size="xl"
+                  radius="lg"
+                  h={rem(20)}
+                  style={{ position: 'relative', overflow: 'visible' }}
+                >
+                  <>
+                    {aggregatedSections.map((section, index) => (
+                      // ツールチップで詳細情報を表示
+                      <Tooltip
+                        key={index}
+                        label={`${section.description} (${Math.round(section.value)}%)`}
+                        withArrow
                       >
-                        {section.value > 15 ? section.description : undefined}
-                      </Progress.Section>
-                    </Tooltip>
-                  ))}
-                </>
-              </Progress.Root>
+                        <Progress.Section
+                          value={section.value}
+                          color={section.color}
+                          style={{
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            color: '#333',
+                            fontWeight: 500,
+                          }}
+                          striped={section.striped}
+                          animated={section.striped}
+                        />
+                      </Tooltip>
+                    ))}
+                  </>
+                </Progress.Root>
+                <Flex
+                  align="center"
+                  gap={5}
+                  style={{
+                    ...UTIL_STYLES.absoluteCenter,
+                  }}
+                >
+                  <Text fw={600} c={'#333'} size="md">
+                    定着度:
+                  </Text>
+                  <Text fw={700} c={'#333'} size="xl">
+                    {Math.floor(fixation * 100)}%
+                  </Text>
+                </Flex>
+              </Box>
             )}
           </Box>
         </Stack>
       </Flex>
+
+      <Collapse in={openedDetail}>
+        <Flex
+          mt="md"
+          p="md"
+          bg="#F8F8F8"
+          style={{
+            borderRadius: '8px',
+          }}
+          align="center"
+          justify="space-between"
+        >
+          {/* 左側 Stack: 情報の整理 */}
+          <Stack gap={3}>
+            <Text size="md" fw={700} c={'#333'}>
+              問題数:
+              <Text span fw={700} c={actionColor}>
+                {testTargetProblemCount}
+              </Text>
+              問
+            </Text>
+            <Text size="md" fw={700} c={'#333'}>
+              推定時間:
+              <Text span fw={700} c={'#555'}>
+                {estimatedTestTimeMin}
+              </Text>
+              分
+            </Text>
+          </Stack>
+
+          {/* 右側 Button: アクションの強調 */}
+          <Button
+            size="md"
+            w={'45%'}
+            bg={actionColor}
+            c={'white'}
+            style={{ transition: 'background-color 0.2s' }}
+          >
+            復習開始
+          </Button>
+        </Flex>
+      </Collapse>
     </Card>
   );
 };

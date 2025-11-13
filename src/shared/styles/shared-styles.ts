@@ -1,5 +1,3 @@
-import { MantineStyleProp } from '@mantine/core';
-
 export const sharedStyle = {
   button: {
     borderRadius: 12,
@@ -14,11 +12,11 @@ export const sharedStyle = {
   },
 };
 
-export const UTIL_STYLES: Record<string, MantineStyleProp> = {
+export const UTIL_STYLES = {
   absoluteCenter: {
     position: 'absolute',
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
   },
-};
+} as const;

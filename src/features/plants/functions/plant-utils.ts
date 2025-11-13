@@ -171,7 +171,7 @@ export const generatePlantShape = (
   return plant;
 };
 
-const generatePlantShapeForMVP = () => {
+export const _generatePlantShapeForMVP = () => {
   const MIN_SIZE = 80;
   const MAX_SIZE = 120;
   const MAX_INDEX = 16;
@@ -193,10 +193,10 @@ const generatePlantShapeForMVP = () => {
   return plant;
 };
 
-export const generatePlantShapeWithConfigLoad = async (_seedType: string) => {
+export const generatePlantShapeWithConfigLoad = async (_seedType?: string) => {
   // TODO
   // 本番環境では切り替える
   // const config = await loadConfigInstance();
   // return generatePlantShape(config, seedType);
-  return generatePlantShapeForMVP();
+  return _generatePlantShapeForMVP();
 };
