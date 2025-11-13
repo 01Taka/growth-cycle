@@ -74,3 +74,35 @@ export function safeArrayToRecord<T extends object, K extends string | number | 
   // Partialを外し、完全なRecord型として返す
   return resultRecord as Record<K, T>;
 }
+
+/**
+ * オブジェクトの配列内で指定されたIDを持つオブジェクトを検索し、
+ * 見つかった場合は置き換えデータで置換し、見つからなかった場合は末尾に追加した新しい配列を返します。
+ *
+ * @template T 配列内のオブジェクトの型。idフィールドを持つことが期待されます。
+ * @param array 対象となるオブジェクトの配列。
+ * @param id 検索対象となるオブジェクトのID。
+ * @param replacementData 置き換えまたは追加する新しいオブジェクトデータ。
+ * @returns 処理後の新しいオブジェクト配列。
+ */
+export function replaceOrAddObject<T extends { id: any }>(
+  array: T[],
+  id: any,
+  replacementData: T
+): T[] {
+  // 配列内で指定されたIDを持つオブジェクトのインデックスを検索
+  const index = array.findIndex((item) => item.id === id);
+
+  if (index !== -1) {
+    // 🔍 IDが見つかった場合：その位置でオブジェクトを置き換える
+    // スプレッド構文 (...) を使用して、元の配列を変更せず、新しい配列を生成します。
+    return [
+      ...array.slice(0, index), // 0からインデックス直前まで
+      replacementData, // 置き換えデータ
+      ...array.slice(index + 1), // インデックスの次から末尾まで
+    ];
+  } else {
+    // ➕ IDが見つからなかった場合：置き換えデータを配列の末尾に追加する
+    return [...array, replacementData];
+  }
+}

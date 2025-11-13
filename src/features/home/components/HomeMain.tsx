@@ -1,14 +1,13 @@
 import React, { useEffect, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useParameter } from 'storybook/internal/preview-api';
+import { Flex, Pill, Stack } from '@mantine/core';
 import { TotalXPModal } from '@/features/xp/components/TotalXPModal';
-import {
-  calculateTotalXP,
-  calculateTotalXPWithLearningCycle,
-} from '@/features/xp/functions/calculateXP';
+import { XpIconPill } from '@/features/xp/components/XpIconPill';
+import { calculateTotalXPWithLearningCycle } from '@/features/xp/functions/calculateXP';
 import { XPResults } from '@/features/xp/types/xp-types';
 import { LearningCycleDocument } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 import { useLearningCycleStore } from '@/shared/stores/useLearningCycleStore';
+import useUserStore from '@/shared/stores/useUserStore';
 import {
   filterLearningCycles,
   groupCyclesByAllDateDifferences,
@@ -20,9 +19,13 @@ interface HomeMainProps {}
 
 export const HomeMain: React.FC<HomeMainProps> = ({}) => {
   const navigate = useNavigate();
+
+  const { user, fetchUser } = useUserStore((state) => state);
   const { learningCycles: learningCycles, fetchLearningCycles } = useLearningCycleStore(
     (state) => state
   );
+
+  const totalGainedXp = user?.totalGainedXp ?? 0;
 
   const [searchParams, setSearchParams] = useSearchParams();
   const resultCycleId = searchParams.get('resultCycleId');
@@ -32,6 +35,10 @@ export const HomeMain: React.FC<HomeMainProps> = ({}) => {
   useEffect(() => {
     fetchLearningCycles();
   }, [fetchLearningCycles]);
+
+  useEffect(() => {
+    fetchUser();
+  }, [fetchUser]);
 
   const { todayReviewCycles, todayReviewedCycles, todayStartedCycles } = useMemo(
     () => filterLearningCycles(learningCycles),
@@ -70,7 +77,10 @@ export const HomeMain: React.FC<HomeMainProps> = ({}) => {
   };
 
   return (
-    <div>
+    <Stack gap={0}>
+      <Flex w={'100%'} justify="end">
+        <XpIconPill totalGainedXp={totalGainedXp} />
+      </Flex>
       <HomeReviewCard
         groupedCycles={groupedCycles}
         todayReviewCyclesCount={todayReviewCycles.length}
@@ -86,6 +96,6 @@ export const HomeMain: React.FC<HomeMainProps> = ({}) => {
           learningCycle={resultCycle}
         />
       )}
-    </div>
+    </Stack>
   );
 };

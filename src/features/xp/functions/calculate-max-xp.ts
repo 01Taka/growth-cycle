@@ -1,120 +1,66 @@
-import { WEIGHTS, XP_CORRECTNESS_WEIGHTS, XP_QUALITY_WEIGHTS } from '../constants/ex-weights';
+import { WEIGHTS, XP_CORRECTNESS_WEIGHTS } from '../constants/ex-weights';
 import { PLANT_GROWTH_PX_MAP } from '../constants/plant-growth-xp';
+import { calculateXPLearningTime, calculateXPPlantGrowth } from './calculateXP';
 
 /**
- * XP最大値の結果を格納する型定義
+ * 経験値 (XP) の理論上の最大値を計算する関数。
+ * 提供された定数ファイルと計算ロジックに基づき、各XP要素の最大値を合計する。
+ *
+ * @returns 計算された最大XP
  */
-export type MaxXPResults = {
-  maxXPLearningTime: number;
-  maxXPCorrectness: number;
-  maxXPQuality: number;
-  maxXPPlantGrowth: number;
-  maxTotalXP: number;
-};
+export function calculateMaxXP(): number {
+  // 1. XP_時間 (勉強時間) の最大値
+  // learningDurationMsの最大値: MAX_LEANING_DURATION_MS (3時間 = 180分)
+  const maxLearningDurationMs = WEIGHTS.MAX_LEANING_DURATION_MS;
+  const baseXpLearningTime = calculateXPLearningTime(maxLearningDurationMs);
+  const maxXP_LearningTime = baseXpLearningTime * WEIGHTS.W_LEARNING_TIME; // 180 * 5.0 = 900.0
 
-/**
- * XP_時間 (xpLearningTime) の理論上の最大値を計算する。
- * (MAX_LEANING_DURATION_MS × W_LEARNING_TIME)
- */
-function getMaxXPLearningTime(): number {
-  const maxLearningDurationMin = WEIGHTS.MAX_LEANING_DURATION_MS / 60000;
-  // W_LEARNING_TIME の重みは 5.0
-  const maxXP = maxLearningDurationMin * (WEIGHTS.W_LEARNING_TIME ?? 1.0);
-  // (3 * 60 * 60 * 1000) / 60000 = 180 (分)
-  // 180 * 5.0 = 900.0
-  return maxXP;
+  // 2. XP_正答率 (成果と効率) の最大値
+  // - correctRate (正答率) は 1.0 (100%)
+  // - 過去の平均正答率 avgCorrectRatePast は 0.0 のとき、成長ボーナスは最大
+  // - 高得点ボーナス (correctRate >= 0.9) は 100% のため適用
+  // - 俊足解答ボーナス (speedMultiplier) は最大
+
+  // A. ベースXP: 1.0 * W_BASE (100) = 100
+  const xpBaseMax = 1.0 * XP_CORRECTNESS_WEIGHTS.W_BASE; // 100
+
+  // B. 成績ボーナス: 正答率1.0で高得点ボーナスが適用される
+  const maxBonusScore = XP_CORRECTNESS_WEIGHTS.W_HIGH_SCORE; // 25
+
+  // C. 俊足解答ボーナス: maxMultiplier = 1.0 + MAX_QUICK_ANSWER_BONUS
+  const maxSpeedMultiplier =
+    XP_CORRECTNESS_WEIGHTS.MIN_MULTIPLIER_BASE + XP_CORRECTNESS_WEIGHTS.MAX_QUICK_ANSWER_BONUS; // 1.0 + 0.2 = 1.2
+
+  // D. 最終計算: (ベースXP + ボーナス) * 倍率 * 重み
+  // (100 + 25) * 1.2 * W_CORRECTNESS (5.0)
+  const maxXP_Correctness =
+    (xpBaseMax + maxBonusScore) * maxSpeedMultiplier * WEIGHTS.W_CORRECTNESS;
+  // 125 * 1.2 * 5.0 = 750.0
+
+  // 3. XP_質 (自己評価と労力) の最大値
+  // - baseQualityScore (calculateQualityScore): 理想的な条件 (correct & confident, timeRatio=TIME_SCORE_MAX=2.0)
+  //   - 1問あたりの最大スコア: MAX_SCORE_PER_PROBLEM (1.5)
+  //   - 質スコアの最大値は 1.0 に正規化される (理想: totalProblems * 1.5 / totalProblems * 1.5 = 1.0)
+  const maxBaseQualityScore = 1.0;
+
+  // - effortDurationScore (労力倍率): totalTestTimeSpendMin を無限大に近い値としたとき 1.0 に漸近する
+  const maxEffortDurationScore = 1.0;
+
+  // - 最終計算: ベーススコア * 労力スコア * 最終重み
+  // 1.0 * 1.0 * W_QUALITY (1000.0)
+  const maxXP_Quality = maxBaseQualityScore * maxEffortDurationScore * WEIGHTS.W_QUALITY; // 1000.0
+
+  // 4. XP_成長 (プラント成長) の最大値
+  // PLANT_GROWTH_PX_MAP の値の中で最大のもの
+  const maxPlantStage = Math.max(...Object.keys(PLANT_GROWTH_PX_MAP).map(Number));
+  const maxXP_PlantGrowth = calculateXPPlantGrowth(maxPlantStage); // 1000.0
+
+  // 5. 合計XP
+  const floatMaxXP = maxXP_LearningTime + maxXP_Correctness + maxXP_Quality + maxXP_PlantGrowth;
+
+  return floatMaxXP;
 }
 
-/**
- * XP_正答率 (xpCorrectness) の理論上の最大値を計算する。
- * (正答率1.0, 高得点ボーナス適用, 最大俊足倍率適用)
- */
-function getMaxXPCorrectness(): number {
-  // 1. ベースXPの最大値 (correctRate = 1.0)
-  const maxXpBase = 1.0 * XP_CORRECTNESS_WEIGHTS.W_BASE; // 100
-
-  // 2. 成績ボーナスの最大値
-  // 成長ボーナス (MAX_GROWTH_BONUS_SCORE: 20) と
-  // 高得点ボーナス (W_HIGH_SCORE: 25) を比較し、大きい方を採用
-  // calculateXPCorrectness のロジックでは両者は排他であるため、maxを取る
-  const maxBonusScore = Math.max(
-    XP_CORRECTNESS_WEIGHTS.W_HIGH_SCORE,
-    XP_CORRECTNESS_WEIGHTS.MAX_GROWTH_BONUS_SCORE
-  ); // 25
-
-  // 3. 効率倍率の最大値 (俊足解答ボーナスが最大値のとき)
-  const maxQuickAnswerBonus = XP_CORRECTNESS_WEIGHTS.MAX_QUICK_ANSWER_BONUS; // 0.2
-  const maxSpeedMultiplier = XP_CORRECTNESS_WEIGHTS.MIN_MULTIPLIER_BASE + maxQuickAnswerBonus; // 1.0 + 0.2 = 1.2
-
-  // 4. 最終計算
-  // (Max Base XP + Max Bonus Score) * Max Speed Multiplier
-  const baseXpCorrectnessMax = (maxXpBase + maxBonusScore) * maxSpeedMultiplier;
-
-  const maxXPCorrectness = baseXpCorrectnessMax * (WEIGHTS.W_CORRECTNESS ?? 1.0);
-  return maxXPCorrectness;
-}
-
-/**
- * XP_質 (xpQuality) の理論上の最大値を計算する。
- * (qualityScore = 1.0, effortMultiplier = 2.0)
- */
-function getMaxXPQuality(): number {
-  // EFFORT_MAX_MULTIPLIER (労力倍率の上限) は 2.0
-  const { EFFORT_MAX_MULTIPLIER } = XP_QUALITY_WEIGHTS;
-
-  // 1. ベース質スコアの最大値 (1.0) - calculateQualityScoreの結果の最大値
-  const baseQualityScoreMax = 1.0;
-
-  // 2. 労力倍率の最大値
-  const effortMultiplierMax = EFFORT_MAX_MULTIPLIER; // 2.0
-
-  // 3. baseXpQuality の最大値 (1.0 * 2.0)
-  const baseXpQualityMax = baseQualityScoreMax * effortMultiplierMax; // 2.0
-
-  // 4. 最終 XP (baseXpQualityMax * W_QUALITY)
-  // W_QUALITY の重みは 500.0
-  const maxXPQuality = baseXpQualityMax * (WEIGHTS.W_QUALITY ?? 1.0);
-  // 2.0 * 500.0 = 1000.0
-  return maxXPQuality;
-}
-
-/**
- * XP_成長 (xpPlantGrowth) の理論上の最大値を計算する。
- * (PLANT_GROWTH_PX_MAP の最大値)
- */
-function getMaxXPPlantGrowth(): number {
-  // PLANT_GROWTH_PX_MAPの値の中から最大値を見つける
-  const values = Object.values(PLANT_GROWTH_PX_MAP);
-  // 最大値は 1000
-  const maxXP = values.length > 0 ? Math.max(...values) : 0;
-  return maxXP;
-}
-
-// ----------------------------------------------------------------------
-// 最終結果をまとめるメイン関数
-// ----------------------------------------------------------------------
-
-/**
- * すべてのXP要素の理論上の最大値を計算し、結果をまとめて返す。
- * @returns MaxXPResults 型のオブジェクト
- */
-export function calculateMaxTotalXP(): MaxXPResults {
-  // 1. 各XPの最大値を計算
-  const maxXPLearningTime = getMaxXPLearningTime();
-  const maxXPCorrectness = getMaxXPCorrectness();
-  const maxXPQuality = getMaxXPQuality();
-  const maxXPPlantGrowth = getMaxXPPlantGrowth();
-
-  // 2. 総XPの最大値を計算
-  const maxTotalXP = maxXPLearningTime + maxXPCorrectness + maxXPQuality + maxXPPlantGrowth;
-  // 900.0 + 52500.0 + 1000.0 + 1000.0 = 55400.0
-
-  // 3. 結果をオブジェクトにまとめて返す
-  return {
-    maxXPLearningTime,
-    maxXPCorrectness,
-    maxXPQuality,
-    maxXPPlantGrowth,
-    maxTotalXP: Math.floor(maxTotalXP), // 最終的な総XPは通常、整数に切り捨てられる
-  };
-}
+// 実行例
+// const MAX_XP = calculateMaxXP();
+// console.log(`理論上の最大XP: ${MAX_XP}`);

@@ -88,7 +88,7 @@ export type TestResult = z.infer<typeof TestResultSchema>;
 export const TestSessionSchema = z
   .object({
     gainedXp: z.number().min(0).default(0),
-    isFixedReviewSession: z.boolean(),
+    isFixedReviewSession: z.boolean().default(false),
     attemptedAt: z.number().describe('i18n:session.attempted_at'),
     results: z.array(TestResultSchema).describe('i18n:session.results_list'),
   })
