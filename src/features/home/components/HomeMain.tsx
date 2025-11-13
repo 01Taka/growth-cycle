@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Flex, Pill, Stack } from '@mantine/core';
-import { TotalXPModal } from '@/features/xp/components/TotalXPModal';
-import { XpIconPill } from '@/features/xp/components/XpIconPill';
-import { calculateTotalXPWithLearningCycle } from '@/features/xp/functions/calculateXP';
-import { XPResults } from '@/features/xp/types/xp-types';
+import { Flex, Stack } from '@mantine/core';
+import { TotalXPModal } from '@/features/app/xp/components/TotalXPModal';
+import { XpIconPill } from '@/features/app/xp/components/XpIconPill';
+import { calculateTotalXPWithLearningCycle } from '@/features/app/xp/functions/calculateXP';
+import { XPResults } from '@/features/app/xp/types/xp-types';
 import { LearningCycleDocument } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 import { useLearningCycleStore } from '@/shared/stores/useLearningCycleStore';
 import useUserStore from '@/shared/stores/useUserStore';

@@ -3,7 +3,7 @@ import { User, UserDocument } from '@/shared/data/documents/user/user-document';
 import { generateIdbPath } from '@/shared/data/idb/generate-path';
 import { IDB_PATH } from '@/shared/data/idb/idb-path';
 import { idbStore } from '@/shared/data/idb/idb-store';
-import { calculateMaxXP } from '../xp/functions/calculate-max-xp';
+import { calculateMaxXP } from './xp/functions/calculate-max-xp';
 
 const LOCAL_USER_PATH = generateIdbPath(IDB_PATH.users, LOCAL_USER_ID);
 

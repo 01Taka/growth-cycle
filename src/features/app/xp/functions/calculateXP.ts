@@ -3,8 +3,8 @@ import { TestSession } from '@/shared/data/documents/learning-cycle/learning-cyc
 import { WEIGHTS } from '../constants/ex-weights';
 import { PLANT_GROWTH_PX_MAP } from '../constants/plant-growth-xp';
 import { XPResults } from '../types/xp-types';
-import { calculateXPCorrectness } from './xp/correctness';
-import { calculateXPQuality } from './xp/quality';
+import { calculateXPCorrectness } from './correctness';
+import { calculateXPQuality } from './quality';
 
 export type XPSession = Pick<TestSession, 'results' | 'attemptedAt'>;
 

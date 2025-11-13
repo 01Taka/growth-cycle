@@ -1,4 +1,4 @@
-import { XP_CORRECTNESS_WEIGHTS } from '../../constants/ex-weights';
+import { XP_CORRECTNESS_WEIGHTS } from '../constants/ex-weights';
 
 /**
  * テストの効率性に基づき、XP_時間に乗じるボーナス係数を算出する。

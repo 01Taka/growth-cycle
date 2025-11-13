@@ -1,7 +1,6 @@
 import { incrementLocalUserXp } from '@/features/app/curd-user';
-import { calculateMaxXP } from '@/features/xp/functions/calculate-max-xp';
-import { calculateTotalXPWithLearningCycle } from '@/features/xp/functions/calculateXP';
-import { LOCAL_USER_ID } from '@/shared/constants/app-constants';
+import { calculateMaxXP } from '@/features/app/xp/functions/calculate-max-xp';
+import { calculateTotalXPWithLearningCycle } from '@/features/app/xp/functions/calculateXP';
 import {
   LearningCycle,
   LearningCycleDocument,

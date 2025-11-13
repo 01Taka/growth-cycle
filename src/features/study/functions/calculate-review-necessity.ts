@@ -1,4 +1,4 @@
-import { calculateReviewNecessity } from '@/shared/utils/calc-necessity';
+import { calculateReviewNecessity } from '@/features/app/review-necessity/functions/calc-necessity';
 import {
   AttemptLog,
   FinalReviewNecessityResult,
