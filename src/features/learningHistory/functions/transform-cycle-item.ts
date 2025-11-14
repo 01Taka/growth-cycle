@@ -38,7 +38,7 @@ export const transformCycleToItemData = (cycle: LearningCycle): LearningHistoryI
 
   const actionColor = getColorByRatio(fixation);
 
-  const isWaitingFixedReview = differenceToNextFixedReview !== null;
+  const isWaitingFixedReview = differenceToNextFixedReviewSafe !== null;
 
   return {
     plant: cycle.plant,

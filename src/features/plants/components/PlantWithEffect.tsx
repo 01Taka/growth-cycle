@@ -20,6 +20,7 @@ interface PlantWithEffectProps {
     style?: MantineStyleProp;
   };
   plantSize?: number;
+  dirtSize?: number;
   zIndex?: number;
 }
 
@@ -30,12 +31,18 @@ export const PlantWithEffect: React.FC<PlantWithEffectProps> = ({
   imagePath,
   auraEffect,
   plantSize = 64,
+  dirtSize,
   zIndex = 0,
 }) => {
   const theme = useSubjectColorMap(subject);
-
   return (
-    <Stack w={plantSize} miw={plantSize} align="center" style={{ position: 'relative' }}>
+    <Stack
+      w={plantSize}
+      miw={plantSize}
+      h={plantSize}
+      align="center"
+      style={{ position: 'relative' }}
+    >
       {label && (
         <Text
           style={{
@@ -67,11 +74,11 @@ export const PlantWithEffect: React.FC<PlantWithEffectProps> = ({
         }}
       />
       <DirtMound
-        size={plantSize}
+        size={dirtSize ?? plantSize}
         style={{
           ...UTIL_STYLES.absoluteCenter,
           top: undefined,
-          bottom: -plantSize / 2 - 5,
+          bottom: -10,
           zIndex: zIndex + 2,
         }}
       />

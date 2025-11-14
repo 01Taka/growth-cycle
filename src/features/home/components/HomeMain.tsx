@@ -10,9 +10,9 @@ import { useLearningCycleStore } from '@/shared/stores/useLearningCycleStore';
 import useUserStore from '@/shared/stores/useUserStore';
 import {
   filterLearningCycles,
-  groupCyclesByAllDateDifferences,
+  groupingByDifferenceFromStartDate,
 } from '../functions/filter-learning-cycle';
-import { HomeReviewCard } from './review/HomeReviewCard';
+import { HomeReviewCard } from './review/card/HomeReviewCard';
 import { GrowthPresentation } from './startStudy/GrowthPresentation';
 
 interface HomeMainProps {}
@@ -43,10 +43,23 @@ export const HomeMain: React.FC<HomeMainProps> = ({}) => {
     [learningCycles]
   );
 
-  const groupedCycles = useMemo(
-    () => groupCyclesByAllDateDifferences({ todayReviewCycles, todayReviewedCycles }),
-    [todayReviewCycles, todayReviewedCycles]
+  const groupedTodayReviewCycles = useMemo(
+    () => groupingByDifferenceFromStartDate(todayReviewCycles),
+    [todayReviewCycles]
   );
+
+  const groupedTodayReviewedCycles = useMemo(
+    () => groupingByDifferenceFromStartDate(todayReviewedCycles),
+    [todayReviewedCycles]
+  );
+
+  const groupKeys = useMemo(() => {
+    const allKeys = new Set([
+      ...Object.keys(groupedTodayReviewCycles),
+      ...Object.keys(groupedTodayReviewedCycles),
+    ]);
+    return Array.from(allKeys).sort((a, b) => Number(a) - Number(b));
+  }, [groupedTodayReviewCycles, groupedTodayReviewedCycles]);
 
   const learnings = todayStartedCycles.map((cycle) => ({
     subject: cycle.subject,
@@ -79,13 +92,18 @@ export const HomeMain: React.FC<HomeMainProps> = ({}) => {
       <Flex w={'100%'} justify="end">
         <XpIconPill totalGainedXp={totalGainedXp} />
       </Flex>
+
       <HomeReviewCard
-        groupedCycles={groupedCycles}
+        displayGroupKeys={groupKeys}
+        groupedTodayReviewCycles={groupedTodayReviewCycles}
+        groupedTodayReviewedCycles={groupedTodayReviewedCycles}
         todayReviewCyclesCount={todayReviewCycles.length}
         todayReviewedCyclesCount={todayReviewedCycles.length}
         onStartReview={handleStartReview}
       />
+
       <GrowthPresentation learnings={learnings} onStartStudy={() => navigate('/textbooks')} />
+
       <Card>
         <Button
           fullWidth

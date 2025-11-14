@@ -5,8 +5,8 @@ import { PlantWithEffect } from '@/features/plants/components/PlantWithEffect';
 import { useSubjectColorMap } from '@/shared/hooks/useSubjectColor';
 import { Plant } from '@/shared/types/plant-shared-types';
 import { Subject } from '@/shared/types/subject-types';
-import { GiveWaterButton } from './GiveWaterButton';
-import { UnitPill } from './UnitPill';
+import { GiveWaterButton } from '../GiveWaterButton';
+import { UnitPill } from '../UnitPill';
 
 export interface ReviewLearningCycleItemProps {
   isCompleted: boolean;
@@ -56,6 +56,7 @@ export const ReviewLearningCycleItem: React.FC<ReviewLearningCycleItemProps> = (
                 }
           }
           imagePath={isCompleted ? StarEffect : undefined}
+          zIndex={100}
         />
 
         {/* 右側のコンテンツエリア: flex: 1 で残りの幅を占有するように設定 */}

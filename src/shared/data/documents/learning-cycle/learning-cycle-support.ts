@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { SubjectSchema } from '@/shared/types/subject-types';
 
 // ------------------------------------------------------------
 // 共有型とスキーマ (study-shared-types.ts に相当)

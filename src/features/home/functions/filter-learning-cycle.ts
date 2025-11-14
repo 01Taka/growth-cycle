@@ -1,7 +1,10 @@
 import { format } from 'date-fns';
-import { LearningCycleDocument } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
+import {
+  LearningCycle,
+  LearningCycleDocument,
+} from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 import { getDaysDifference } from '@/shared/utils/datetime/datetime-compare-utils';
-import { containsToday, isToday } from '@/shared/utils/datetime/datetime-utils';
+import { containsToday, dateToyyyyMMdd, isToday } from '@/shared/utils/datetime/datetime-utils';
 
 interface FilterOptions {
   todayReview: boolean;
@@ -44,7 +47,7 @@ export const filterLearningCycles = (
 
     if (containsToday(cycle.fixedReviewDates ?? [])) {
       const sessionDatesSet = new Set(
-        cycle.sessions.map((session) => format(session.attemptedAt, 'yyyy-MM-dd'))
+        cycle.sessions.map((session) => dateToyyyyMMdd(session.attemptedAt))
       );
       const isReviewed = cycle.fixedReviewDates.some((date) => sessionDatesSet.has(date));
 
@@ -66,6 +69,24 @@ export const filterLearningCycles = (
 
     return acc;
   }, initialAccumulator);
+};
+
+export const groupingByDifferenceFromStartDate = (
+  learningCycles: LearningCycleDocument[],
+  baseDate = new Date()
+) => {
+  return learningCycles.reduce((result: Record<number, LearningCycleDocument[]>, cycle) => {
+    // cycleStartAtがない場合はスキップ
+    if (!cycle.cycleStartAt) return result;
+
+    const dayDiff = getDaysDifference(baseDate, cycle.cycleStartAt);
+
+    // スプレッド構文または直接代入で配列を更新
+    return {
+      ...result,
+      [dayDiff]: [...(result[dayDiff] || []), cycle],
+    };
+  }, {});
 };
 
 /**
