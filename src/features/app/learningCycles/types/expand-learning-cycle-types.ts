@@ -20,6 +20,9 @@ export interface ExpandedLearningCycleProblem extends LearningCycleProblem {
   unit: UnitDetail | null;
   /** 問題が属するカテゴリーの名前 (categoryMapから取得) */
   category: CategoryDetail | null;
+  unitName: string;
+  categoryName: string;
+  latestAttemptedAt: number;
 }
 
 export interface ExpandedLearningCycleTestResult extends LearningCycleTestResult {

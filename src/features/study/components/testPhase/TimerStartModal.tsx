@@ -1,14 +1,14 @@
 import React from 'react';
 import { IconClockHour3, IconListCheck, IconRocket } from '@tabler/icons-react';
 import { Box, Button, Group, Modal, Stack, Text } from '@mantine/core';
+import { ExpandedLearningCycleProblem } from '@/features/app/learningCycles/types/expand-learning-cycle-types';
 import { SubjectColorMap } from '@/shared/theme/subjectColorType';
-import { LearningProblemKey } from '../../types/problem-types';
 import { LearningProblemKeyList } from '../shared/problemList/LearningProblemKeyList';
 
 interface TimerStartModalProps {
   isStarted: boolean;
   remainingTimeMin: number;
-  problems: LearningProblemKey[];
+  problems: ExpandedLearningCycleProblem[];
   theme: SubjectColorMap;
   opened: boolean;
   onClose: () => void;

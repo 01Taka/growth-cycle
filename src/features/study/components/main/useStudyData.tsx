@@ -1,5 +1,6 @@
-import { JSX, useCallback, useEffect, useMemo } from 'react';
+import { JSX, useCallback, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { ExpandedLearningCycleProblem } from '@/features/app/learningCycles/types/expand-learning-cycle-types';
 import { LearningCycleDocument } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 import {
   ProblemScoringStatus,
@@ -10,19 +11,17 @@ import { SingleTimerData } from '@/shared/hooks/multi-timer/multi-timer-types';
 import { useLearningCycleStore } from '@/shared/stores/useLearningCycleStore';
 import { useTextbookStore } from '@/shared/stores/useTextbookStore';
 import { handleRecordSession } from '../../functions/curd-learning-cycle';
-import { transformData } from '../../functions/transform-data';
-import { LearningProblemBase, ProblemAttemptResult } from '../../types/problem-types';
 import { StudyLoadingOrError } from './StudyLoadingOrError';
 
 const CYCLE_ID_KEY = 'cycleId';
 
 interface StudyResultData {
-  problems: ProblemAttemptResult[];
   selfEvaluationMap: Record<number, TestSelfEvaluation>;
   scoringStatusMap: Record<number, ProblemScoringStatus>;
   elapsedTimeMap: Record<number, number>;
   studyTimer: SingleTimerData;
   testTimer: SingleTimerData;
+  problems?: ExpandedLearningCycleProblem[];
 }
 
 // 戻り値の型定義
@@ -35,7 +34,6 @@ export interface StudyData {
   overallLoading: boolean;
   cycleError: any;
   textbookError: any;
-  attemptingProblems: LearningProblemBase[];
   isDataReady: boolean;
   // レンダリングのためのLoading/Errorコンポーネント
   renderLoadingOrError: () => JSX.Element;
@@ -108,13 +106,6 @@ export const useStudyData = (): StudyData => {
     learningCycle,
   ]);
 
-  // --- Data Preparation (useMemo/Memoized values) ---
-
-  const attemptingProblems: LearningProblemBase[] = useMemo(
-    () => (learningCycle ? transformData(learningCycle) : []),
-    [learningCycle]
-  );
-
   const isDataReady = isFoundCycle && isFoundTextbook && !!learningCycle && !!textbook;
 
   const renderLoadingOrError = () => (
@@ -132,7 +123,13 @@ export const useStudyData = (): StudyData => {
     async (args: StudyResultData) => {
       if (isDataReady) {
         try {
-          await handleRecordSession(textbook.id, learningCycle.id, args.problems);
+          await handleRecordSession(
+            textbook.id,
+            learningCycle.id,
+            args.scoringStatusMap,
+            args.selfEvaluationMap,
+            args.elapsedTimeMap
+          );
           await fetchLearningCycles(); // storeのデータを更新する
           navigate(`/?resultCycleId=${learningCycle.id}`);
         } catch (error) {
@@ -159,7 +156,6 @@ export const useStudyData = (): StudyData => {
     overallLoading,
     cycleError,
     textbookError,
-    attemptingProblems,
     isDataReady,
     renderLoadingOrError,
     handleFinishLearning,

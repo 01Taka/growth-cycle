@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
 import { Modal, Stack } from '@mantine/core';
+import { ExpandedLearningCycleProblem } from '@/features/app/learningCycles/types/expand-learning-cycle-types';
 import { SingleTimerData } from '@/shared/hooks/multi-timer/multi-timer-types';
 import { SubjectColorMap } from '@/shared/theme/subjectColorType';
 import { Plant } from '@/shared/types/plant-shared-types';
 import { Subject } from '@/shared/types/subject-types';
 import { StudyHeader } from '../../../../shared/components/StudyHeader';
-import { LearningProblemKey } from '../../types/problem-types';
 import { LearningProblemKeyList } from '../shared/problemList/LearningProblemKeyList';
 import { StudyActionButtons } from './StudyActionButtons';
 import { StudyPhasePlantDisplay } from './StudyPhasePlantDisplay';
 import { StudyTimer } from './StudyTimer';
 
 interface StudyPhaseProps {
-  problems: LearningProblemKey[];
+  problems: ExpandedLearningCycleProblem[];
   isReadyTest: boolean;
   header: {
     subject: Subject;

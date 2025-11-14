@@ -82,45 +82,45 @@ export const REVIEW_NECESSITY_COLORS: {
   },
 };
 
-/**
- * 💡 確認必要度の理由コードをモバイルUI表示用の【短縮日本語】に変換する定数オブジェクト
- */
-export const REVIEW_NECESSITY_REASON_LABELS: {
-  [key in LatestAttemptNecessityReason]: string;
-} & {
-  [key in RecentWeightedNecessityReason]: string;
-} = {
-  // --- ロジック1: 最新の試行による理由 ---
+// /**
+//  * 💡 確認必要度の理由コードをモバイルUI表示用の【短縮日本語】に変換する定数オブジェクト
+//  */
+// export const REVIEW_NECESSITY_REASON_LABELS: {
+//   [key in LatestAttemptNecessityReason]: string;
+// } & {
+//   [key in RecentWeightedNecessityReason]: string;
+// } = {
+//   // --- ロジック1: 最新の試行による理由 ---
 
-  /** 3: 間違い + 確信あり */
-  overconfidenceError: '過信間違い', // (短縮前: 過信による誤り（最優先）)
+//   /** 3: 間違い + 確信あり */
+//   overconfidenceError: '過信間違い', // (短縮前: 過信による誤り（最優先）)
 
-  /** 2: 間違い + 確信なし/未評価 */
-  definiteMistake: '間違い', // (短縮前: 明確な誤り)
+//   /** 2: 間違い + 確信なし/未評価 */
+//   definiteMistake: '間違い', // (短縮前: 明確な誤り)
 
-  /** 2: 正解 + 不安 */
-  uncertainCorrect: 'まぐれ正解', // (短縮前: 正解だが不安（運頼み）)
+//   /** 2: 正解 + 不安 */
+//   uncertainCorrect: 'まぐれ正解', // (短縮前: 正解だが不安（運頼み）)
 
-  /** 1: 正解 + 不完全 */
-  imperfectCorrect: '不安正解', // (短縮前: 正解だが不完全)
+//   /** 1: 正解 + 不完全 */
+//   imperfectCorrect: '不安正解', // (短縮前: 正解だが不完全)
 
-  /** 0: 正解 + 確信あり/未評価 または未評価 */
-  understood: '問題なし', // (短縮前: 確認不要)
+//   /** 0: 正解 + 確信あり/未評価 または未評価 */
+//   understood: '問題なし', // (短縮前: 確認不要)
 
-  /** 0: 試行ログなし */
-  noAttempt: '記録なし', // (短縮前: 試行記録なし)
+//   /** 0: 試行ログなし */
+//   noAttempt: '記録なし', // (短縮前: 試行記録なし)
 
-  // --- ロジック2: 直近2回の試行による重み付け理由 ---
+//   // --- ロジック2: 直近2回の試行による重み付け理由 ---
 
-  /** 3: 直近2回とも高必要性（2以上） */
-  consecutiveMistake: '連続間違い', // (短縮前: 連続して復習が必要)
+//   /** 3: 直近2回とも高必要性（2以上） */
+//   consecutiveMistake: '連続間違い', // (短縮前: 連続して復習が必要)
 
-  /** 2: 最新の試行のみ高必要性（2以上） */
-  latestHighNecessity: '直近ミス', // (短縮前: 直近の試行で復習が必要)
+//   /** 2: 最新の試行のみ高必要性（2以上） */
+//   latestHighNecessity: '直近ミス', // (短縮前: 直近の試行で復習が必要)
 
-  /** 1: 2番目の試行のみ高必要性（2以上） */
-  previousHighNecessity: '前回ミス', // (短縮前: 以前の試行で復習が必要)
+//   /** 1: 2番目の試行のみ高必要性（2以上） */
+//   previousHighNecessity: '前回ミス', // (短縮前: 以前の試行で復習が必要)
 
-  /** 0: どちらも低必要性（1以下）またはデータなし */
-  none: '安定', // (短縮前: 直近の復習履歴に問題なし)
-};
+//   /** 0: どちらも低必要性（1以下）またはデータなし */
+//   none: '安定', // (短縮前: 直近の復習履歴に問題なし)
+// }; | DEL? |

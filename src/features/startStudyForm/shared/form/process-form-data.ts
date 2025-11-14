@@ -7,13 +7,7 @@ import {
 } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { safeArrayToRecord } from '@/shared/utils/object/object-utils';
 import { RangeWithId } from '../range/range-form-types';
-import {
-  NewCategory,
-  NewUnit,
-  RangeFormData,
-  StartStudyFormNewIdGenerator,
-  StartStudyFormProblemMetadata,
-} from './form-types';
+import { NewCategory, NewUnit, RangeFormData, StartStudyFormProblemMetadata } from './form-types';
 
 /**
  * testRangeデータに基づき、既存のunits/categoriesと照合し、新規追加フラグ付きの統合リストを生成します。
@@ -132,7 +126,7 @@ export const createProblemsAndUsedMetadata = (
       const end = rangeValue.end ?? rangeValue.start;
       for (const problemNumber of range(rangeValue.start, end)) {
         problems.push({
-          index: index++, // indexをインクリメント
+          problemIndex: index++, // indexをインクリメント
           problemNumber,
           unitId: unit ? unit.id : null,
           categoryId: category ? category.id : null,

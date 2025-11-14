@@ -1,7 +1,7 @@
 import React from 'react';
 import { Flex, Grid, rem, Text } from '@mantine/core';
+import { ExpandedLearningCycleProblem } from '@/features/app/learningCycles/types/expand-learning-cycle-types';
 import { useSelfEvaluationColors } from '@/features/study/hooks/useSelfEvaluationColors';
-import { LearningProblemBase } from '@/features/study/types/problem-types';
 import { TestSelfEvaluation } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { SubjectColorMap } from '@/shared/theme/subjectColorType';
 
@@ -17,7 +17,7 @@ type ResponsiveSpan =
   | number;
 
 interface TestProblemsItemProps {
-  problem: LearningProblemBase;
+  problem: ExpandedLearningCycleProblem;
   elapsedTimeMs: number | null;
   selfEvaluation: TestSelfEvaluation;
   isCurrent: boolean;

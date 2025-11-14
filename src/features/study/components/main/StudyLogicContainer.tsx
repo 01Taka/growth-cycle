@@ -25,7 +25,7 @@ export const StudyLogicContainer: React.FC<StudyLogicContainerProps> = ({
   studyData,
   debugTime,
 }) => {
-  const { learningCycle, textbook, attemptingProblems, isDataReady } = studyData;
+  const { learningCycle, textbook, isDataReady } = studyData;
 
   const [searchParams, setSearchParam] = useSearchParams();
   const phaseInUrl = searchParams.get(PHASE_KEY) as Phase | null;
@@ -64,7 +64,7 @@ export const StudyLogicContainer: React.FC<StudyLogicContainerProps> = ({
       : isDataReady && learningCycle
         ? learningCycle.testDurationMs
         : 0,
-    attemptingProblems: isDataReady ? attemptingProblems : [],
+    problemCount: learningCycle?.problems.length ?? 0,
     header: {
       textbookName: textbook?.name ?? 'Loading...',
       units: (learningCycle?.units ?? []).map((unit) => unit.name),
@@ -76,7 +76,6 @@ export const StudyLogicContainer: React.FC<StudyLogicContainerProps> = ({
   const {
     header,
     theme,
-    problems,
     selfEvaluationMap,
     scoringStatusMap,
     studyTimer,
@@ -86,6 +85,7 @@ export const StudyLogicContainer: React.FC<StudyLogicContainerProps> = ({
     elapsedTimeMap,
     isAllProblemsEvaluated,
     isFinishTestTimer,
+    expandedLearningCycle,
     groupedByIndexTestResults,
     handleScoreChange,
     handleSelfEvaluationMap,
@@ -136,7 +136,6 @@ export const StudyLogicContainer: React.FC<StudyLogicContainerProps> = ({
     // const _isCompleted = isEnteredData && isTimerCompleted;
 
     studyData.handleFinishLearning({
-      problems,
       selfEvaluationMap,
       scoringStatusMap,
       elapsedTimeMap,
@@ -144,15 +143,7 @@ export const StudyLogicContainer: React.FC<StudyLogicContainerProps> = ({
       testTimer,
     });
     resetAll();
-  }, [
-    problems,
-    selfEvaluationMap,
-    scoringStatusMap,
-    elapsedTimeMap,
-    studyTimer,
-    testTimer,
-    resetAll,
-  ]);
+  }, [selfEvaluationMap, scoringStatusMap, elapsedTimeMap, studyTimer, testTimer, resetAll]);
 
   // 💡 データが揃った後のフェーズレンダリング
   const renderPhase = () => {
@@ -160,7 +151,7 @@ export const StudyLogicContainer: React.FC<StudyLogicContainerProps> = ({
       case 'study':
         return (
           <StudyPhase
-            problems={problems}
+            problems={expandedLearningCycle?.problems ?? []}
             isReadyTest={studyTimer.remainingTime <= 0}
             header={header}
             plant={learningCycle?.plant ?? null}
@@ -173,7 +164,7 @@ export const StudyLogicContainer: React.FC<StudyLogicContainerProps> = ({
       case 'test':
         return (
           <TestPhase
-            problems={problems}
+            problems={expandedLearningCycle?.problems ?? []}
             header={header}
             isAllProblemsEvaluated={isAllProblemsEvaluated}
             isFinishTestTimer={isFinishTestTimer}
@@ -195,8 +186,9 @@ export const StudyLogicContainer: React.FC<StudyLogicContainerProps> = ({
       case 'scoring':
         return (
           <ScoringPhase
+            problems={expandedLearningCycle?.problems ?? []}
             scoringStatusMap={scoringStatusMap}
-            problems={problems}
+            selfEvaluationsMap={selfEvaluationMap}
             header={header}
             theme={theme}
             handleScoreChange={handleScoreChange}

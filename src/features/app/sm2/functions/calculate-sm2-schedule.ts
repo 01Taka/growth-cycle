@@ -123,7 +123,7 @@ function compileTimeDataAndProblemMap(cycle: LearningCycle): {
   const categoryTimeData: Record<string, { totalTime: number; count: number }> = {};
 
   for (const problem of cycle.problems) {
-    learningCycleProblemMap[problem.index] = problem;
+    learningCycleProblemMap[problem.problemIndex] = problem;
   }
 
   for (const session of cycle.sessions) {
@@ -215,7 +215,7 @@ export function calculateSM2ReviewScheduleForCycle(cycle: LearningCycle): Proble
   const scheduleRecord: ProblemScheduleRecord = {};
 
   for (const problem of cycle.problems) {
-    const problemIndex = problem.index;
+    const problemIndex = problem.problemIndex;
     const history = problemHistoryMap[problemIndex];
 
     // 履歴がない場合はスキップ (-1)

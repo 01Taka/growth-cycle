@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { IconBook, IconSearch } from '@tabler/icons-react';
 import { ActionIcon, Box, Flex, Paper, Stack, Text } from '@mantine/core';
-import { LearningProblemKey } from '@/features/study/types/problem-types';
+import { ExpandedLearningCycleProblem } from '@/features/app/learningCycles/types/expand-learning-cycle-types';
 import { SubjectColorMap } from '@/shared/theme/subjectColorType';
 import { ProblemFilters } from './ProblemFilters';
 import { ProblemListContent } from './ProblemListContent';
 import { useProblemFiltering } from './useProblemFiltering';
 
 interface LearningProblemKeyListProps {
-  problems: LearningProblemKey[];
+  problems: ExpandedLearningCycleProblem[];
   theme: SubjectColorMap;
   headerTop?: number;
 }

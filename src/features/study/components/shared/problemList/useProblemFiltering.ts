@@ -1,11 +1,11 @@
 // src/hooks/useProblemFiltering.ts
 
 import { useMemo, useState } from 'react';
-import { LearningProblemKey } from '@/features/study/types/problem-types';
+import { ExpandedLearningCycleProblem } from '@/features/app/learningCycles/types/expand-learning-cycle-types';
 
 // カスタムフックの引数と返り値の型
 interface UseProblemFilteringProps {
-  problems: LearningProblemKey[];
+  problems: ExpandedLearningCycleProblem[];
 }
 
 interface UseProblemFilteringResult {
@@ -17,7 +17,7 @@ interface UseProblemFilteringResult {
   setCategoryFilter: (category: string | null) => void;
   uniqueUnits: string[];
   uniqueCategories: string[];
-  filteredProblems: LearningProblemKey[];
+  filteredProblems: ExpandedLearningCycleProblem[];
 }
 
 export const useProblemFiltering = ({

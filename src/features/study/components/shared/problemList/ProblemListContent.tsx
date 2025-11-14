@@ -1,12 +1,12 @@
 import React from 'react';
 import { IconBook } from '@tabler/icons-react';
 import { Flex, Group, Paper, rem, Stack, Text } from '@mantine/core';
-import { LearningProblemKey } from '@/features/study/types/problem-types'; // 型のインポート
+import { ExpandedLearningCycleProblem } from '@/features/app/learningCycles/types/expand-learning-cycle-types';
 import { SubjectColorMap } from '@/shared/theme/subjectColorType';
 
 interface ProblemListContentProps {
   // グループ化されたデータではなく、フィルター済みの平坦なリストを受け取る
-  filteredProblems: LearningProblemKey[];
+  filteredProblems: ExpandedLearningCycleProblem[];
   theme: SubjectColorMap;
 }
 

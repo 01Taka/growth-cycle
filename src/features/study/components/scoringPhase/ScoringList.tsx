@@ -1,18 +1,26 @@
 import React from 'react';
 import { Box, Stack } from '@mantine/core';
-import { ProblemScoringStatus } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
-import { ProblemAttemptDetail } from '../../types/problem-types';
+import { ExpandedLearningCycleProblem } from '@/features/app/learningCycles/types/expand-learning-cycle-types';
+import {
+  ProblemScoringStatus,
+  TestSelfEvaluation,
+} from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { ScoringItem } from './ScoringItem';
 
 interface ScoringListProps {
-  problems: ProblemAttemptDetail[];
+  problems: ExpandedLearningCycleProblem[];
+  selfEvaluationsMap: Record<number, TestSelfEvaluation>;
   scoringStatusMap: Record<number, ProblemScoringStatus>;
   bottomMargin?: number | string;
-  onScoreChange: (problem: ProblemAttemptDetail, scoringStatus: ProblemScoringStatus) => void;
+  onScoreChange: (
+    problem: ExpandedLearningCycleProblem,
+    scoringStatus: ProblemScoringStatus
+  ) => void;
 }
 
 export const ScoringList: React.FC<ScoringListProps> = ({
   problems,
+  selfEvaluationsMap,
   scoringStatusMap,
   bottomMargin,
   onScoreChange,
@@ -23,6 +31,7 @@ export const ScoringList: React.FC<ScoringListProps> = ({
         <ScoringItem
           key={index}
           problem={problem}
+          selfEvaluation={selfEvaluationsMap[problem.problemIndex] ?? 'unrated'}
           scoringStatus={scoringStatusMap[problem.problemIndex] ?? 'unrated'}
           onScoreChange={(scoringStatus) => onScoreChange(problem, scoringStatus)}
         />

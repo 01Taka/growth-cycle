@@ -98,7 +98,7 @@ export type LearningCycleSession = z.infer<typeof LearningCycleSessionSchema>;
 
 export const LearningCycleProblemSchema = z
   .object({
-    index: z.number().int().min(0).describe('i18n:problem.index'),
+    problemIndex: z.number().int().min(0).describe('i18n:problem.index'),
     unitId: z.string().min(1).nullable().describe('i18n:shared.unit_id'),
     categoryId: z.string().min(1).nullable().describe('i18n:shared.category_id'),
     problemNumber: z.number().int().min(1).describe('i18n:problem.number'),

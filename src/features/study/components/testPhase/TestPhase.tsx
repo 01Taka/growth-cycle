@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { IconPencil } from '@tabler/icons-react';
 import { Box, Button, Card, Divider, Flex, Stack, Text } from '@mantine/core';
+import { ExpandedLearningCycleProblem } from '@/features/app/learningCycles/types/expand-learning-cycle-types';
 import { TestSelfEvaluation } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { SingleTimerData } from '@/shared/hooks/multi-timer/multi-timer-types';
 import { sharedStyle } from '@/shared/styles/shared-styles';
 import { SubjectColorMap } from '@/shared/theme/subjectColorType';
 import { Subject } from '@/shared/types/subject-types';
 import { StudyHeader } from '../../../../shared/components/StudyHeader';
-import { LearningProblemBase } from '../../types/problem-types';
 import { StudyTimer } from '../studyPhase/StudyTimer';
 import { TestProblemCard } from './card/TestProblemCard';
 import { TestStateGrid } from './grid/TestStateGrid';
@@ -15,7 +15,7 @@ import { TestProblemsList } from './list/TestProblemsList';
 import { TimerStartModal } from './TimerStartModal';
 
 interface TestPhaseProps {
-  problems: LearningProblemBase[];
+  problems: ExpandedLearningCycleProblem[];
   header: {
     subject: Subject;
     textbookName: string;
@@ -59,8 +59,8 @@ export const TestPhase: React.FC<TestPhaseProps> = ({
     }
   }, [mainTimer.isRunning]);
 
-  const currentProblem: LearningProblemBase | null = (problems[currentProblemIndex] ??
-    null) as LearningProblemBase | null;
+  const currentProblem: ExpandedLearningCycleProblem | null = (problems[currentProblemIndex] ??
+    null) as ExpandedLearningCycleProblem | null;
 
   const selfEvaluations = problems.map(
     (problem) => selfEvaluationMap[problem.problemIndex] ?? 'unrated'

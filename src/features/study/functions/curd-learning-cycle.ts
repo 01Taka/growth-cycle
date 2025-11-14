@@ -1,4 +1,5 @@
 import { incrementLocalUserXp } from '@/features/app/curd-user';
+import { createExpandedLearningCycleTestResultsFromCycle } from '@/features/app/learningCycles/functions/expand-learning-cycle-utils';
 import { calculateMaxXP } from '@/features/app/xp/functions/calculate-max-xp';
 import { calculateTotalXPWithLearningCycle } from '@/features/app/xp/functions/calculateXP';
 import {
@@ -10,6 +11,9 @@ import {
 import {
   LearningCycleSession,
   LearningCycleTestResult,
+  LearningCycleTestResultSchema,
+  ProblemScoringStatus,
+  TestSelfEvaluation,
 } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import {
   Textbook,
@@ -23,13 +27,21 @@ import { idbStore } from '@/shared/data/idb/idb-store';
 import { Plant, PLANT_MAX_STAGE, PlantSchema } from '@/shared/types/plant-shared-types';
 import { containsToday, isToday } from '@/shared/utils/datetime/datetime-utils';
 import { replaceOrAddObject } from '@/shared/utils/object/object-utils';
-import { ProblemAttemptResult } from '../types/problem-types';
 
 const problemsToLearningCycleTestResults = (
-  problems: ProblemAttemptResult[]
+  learningCycle: LearningCycle,
+  selfEvaluationsMap: Record<number, TestSelfEvaluation>,
+  scoringStatusMap: Record<number, ProblemScoringStatus>,
+  elapsedTimeMap: Record<number, number>
 ): LearningCycleTestResult[] => {
   // 現在は構造が同じなのでそのまま返すだけでよい
-  return problems;
+  return createExpandedLearningCycleTestResultsFromCycle(
+    -1,
+    learningCycle,
+    selfEvaluationsMap,
+    scoringStatusMap,
+    elapsedTimeMap
+  );
 };
 
 const checkIsFixedReviewSession = (pastLearningCycle: LearningCycle) => {
@@ -45,7 +57,9 @@ const checkIsFixedReviewSession = (pastLearningCycle: LearningCycle) => {
 export const handleRecordSession = async (
   textbookId: string,
   learningCycleId: string,
-  problems: ProblemAttemptResult[]
+  scoringStatusMap: Record<number, ProblemScoringStatus>,
+  selfEvaluationsMap: Record<number, TestSelfEvaluation>,
+  elapsedTimeMap: Record<number, number>
 ) => {
   // 1. 入力値の基本チェック
   if (!textbookId) {
@@ -53,9 +67,6 @@ export const handleRecordSession = async (
   }
   if (!learningCycleId) {
     throw new Error('learningCycleId must not be empty.');
-  }
-  if (!problems || problems.length === 0) {
-    throw new Error('problems array must not be empty.');
   }
 
   const textbookPath = generateIdbPath(IDB_PATH.textbooks, textbookId);
@@ -105,11 +116,19 @@ export const handleRecordSession = async (
   }
 
   const isFixedReviewSession = checkIsFixedReviewSession(learningCycle);
+  const results = LearningCycleTestResultSchema.array().parse(
+    problemsToLearningCycleTestResults(
+      learningCycle,
+      selfEvaluationsMap,
+      scoringStatusMap,
+      elapsedTimeMap
+    )
+  );
   const newSession: LearningCycleSession = {
     isFixedReviewSession,
     gainedXp: 0,
     attemptedAt: now,
-    results: problemsToLearningCycleTestResults(problems),
+    results,
   };
 
   const xp = calculateTotalXPWithLearningCycle(learningCycle, newSession, newPlant.currentStage);

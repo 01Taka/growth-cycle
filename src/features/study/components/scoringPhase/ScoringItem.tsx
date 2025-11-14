@@ -1,13 +1,17 @@
 import React from 'react';
 import { IconCheck, IconX } from '@tabler/icons-react'; // アイコンを追加
 import { Button, Card, Flex, Group, Stack, Text } from '@mantine/core';
-import { ProblemScoringStatus } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
+import { ExpandedLearningCycleProblem } from '@/features/app/learningCycles/types/expand-learning-cycle-types';
+import {
+  ProblemScoringStatus,
+  TestSelfEvaluation,
+} from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { useSelfEvaluationColors } from '../../hooks/useSelfEvaluationColors';
-import { ProblemAttemptDetail } from '../../types/problem-types';
 import { getSelfEvaluationIcon } from '../reviewPhase/icons';
 
 interface ScoringItemProps {
-  problem: ProblemAttemptDetail;
+  problem: ExpandedLearningCycleProblem;
+  selfEvaluation: TestSelfEvaluation;
   scoringStatus: ProblemScoringStatus;
   onScoreChange: (scoringStatus: ProblemScoringStatus) => void;
 }
@@ -20,13 +24,14 @@ const COLORS: Record<ProblemScoringStatus, { text: string; background: string }>
 
 export const ScoringItem: React.FC<ScoringItemProps> = ({
   problem,
+  selfEvaluation,
   scoringStatus,
   onScoreChange,
 }) => {
   const theme = COLORS[scoringStatus];
   const getColor = useSelfEvaluationColors();
 
-  const { icon: SelfEvaluationIcon } = getSelfEvaluationIcon(problem.selfEvaluation);
+  const { icon: SelfEvaluationIcon } = getSelfEvaluationIcon(selfEvaluation);
 
   return (
     <Card
@@ -64,10 +69,10 @@ export const ScoringItem: React.FC<ScoringItemProps> = ({
               size="sm"
               style={{
                 textAlign: 'center',
-                color: getColor(problem.selfEvaluation).text,
+                color: getColor(selfEvaluation).text,
               }}
             >
-              {getColor(problem.selfEvaluation).label}
+              {getColor(selfEvaluation).label}
             </Text>
           </Flex>
         </Stack>

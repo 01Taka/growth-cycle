@@ -30,7 +30,7 @@ function generateProblems(count: number): LearningCycleProblem[] {
     const index = 1000 + i;
     const categoryId = CATEGORIES[i % CATEGORIES.length]; // カテゴリを循環させる
     problems.push({
-      index: index,
+      problemIndex: index,
       unitId: `unit-${Math.floor(i / 10) + 1}`,
       problemNumber: i % 10,
       isReviewTarget: true,
@@ -73,7 +73,7 @@ function generateRandomSession(
     const timeSpentMs = Math.floor(3000 + (Math.random() - 0.5) * 3000);
 
     return {
-      problemIndex: problem.index,
+      problemIndex: problem.problemIndex,
       timeSpentMs: timeSpentMs,
       selfEvaluation: selfEvaluation,
       scoringStatus: scoringStatus,
@@ -162,7 +162,7 @@ export function runCustomSM2Test(numProblems: number, numSessions: number, inter
 
   for (let i = 0; i < sampleCount; i++) {
     const problem = cycle.problems[i];
-    const index = problem.index;
+    const index = problem.problemIndex;
     const nextDateMs = schedule[index];
     const nextDateStr = formatDate(nextDateMs);
 
@@ -174,7 +174,7 @@ export function runCustomSM2Test(numProblems: number, numSessions: number, inter
   }
 
   // 履歴なしの問題の有無を確認 (このテストケースでは全て履歴を持つはず)
-  const noHistoryCount = cycle.problems.filter((p) => schedule[p.index] === -1).length;
+  const noHistoryCount = cycle.problems.filter((p) => schedule[p.problemIndex] === -1).length;
   if (noHistoryCount > 0) {
     console.log(`\n**注**: 履歴なしと判定された問題が ${noHistoryCount} 件あります。`);
   }

@@ -1,28 +1,35 @@
 import React from 'react';
 import { IconSearch } from '@tabler/icons-react';
 import { Box, Button, Flex, rem, Stack, Text } from '@mantine/core'; // Boxコンポーネントを追加
-
-import { ProblemScoringStatus } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
+import { ExpandedLearningCycleProblem } from '@/features/app/learningCycles/types/expand-learning-cycle-types';
+import {
+  ProblemScoringStatus,
+  TestSelfEvaluation,
+} from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { sharedStyle } from '@/shared/styles/shared-styles';
 import { SubjectColorMap } from '@/shared/theme/subjectColorType';
 import { Subject } from '@/shared/types/subject-types';
 import { toRGBA } from '@/shared/utils/color/color-convert-utils';
 import { StudyHeader } from '../../../../shared/components/StudyHeader';
-import { ProblemAttemptDetail } from '../../types/problem-types';
 import { ScoringList } from './ScoringList';
 import { ScoringSummary } from './ScoringSummary';
 
 interface ScoringPhaseProps {
   scoringStatusMap: Record<number, ProblemScoringStatus>;
-  problems: ProblemAttemptDetail[];
+  selfEvaluationsMap: Record<number, TestSelfEvaluation>;
+  problems: ExpandedLearningCycleProblem[];
   header: { subject: Subject; textbookName: string; units: string[] };
   theme: SubjectColorMap;
-  handleScoreChange: (problem: ProblemAttemptDetail, scoringStatus: ProblemScoringStatus) => void;
+  handleScoreChange: (
+    problem: ExpandedLearningCycleProblem,
+    scoringStatus: ProblemScoringStatus
+  ) => void;
   onStartReview: () => void;
 }
 
 export const ScoringPhase: React.FC<ScoringPhaseProps> = ({
   scoringStatusMap,
+  selfEvaluationsMap,
   problems,
   header,
   theme,
@@ -70,6 +77,7 @@ export const ScoringPhase: React.FC<ScoringPhaseProps> = ({
       >
         <ScoringList
           problems={problems}
+          selfEvaluationsMap={selfEvaluationsMap}
           scoringStatusMap={scoringStatusMap}
           bottomMargin={100}
           onScoreChange={handleScoreChange}

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { IconSearch } from '@tabler/icons-react';
-import { Group, Paper, Select, Stack, TextInput } from '@mantine/core';
+import { Group, Select, Stack, TextInput } from '@mantine/core';
 
 interface ProblemFiltersProps {
   searchQuery: string;
