@@ -10,7 +10,7 @@ import { SingleTimerData } from '@/shared/hooks/multi-timer/multi-timer-types';
 import { useLearningCycleStore } from '@/shared/stores/useLearningCycleStore';
 import { useTextbookStore } from '@/shared/stores/useTextbookStore';
 import { handleRecordSession } from '../../functions/curd-learning-cycle';
-import { convertLearningCycleToAttempts, transformData } from '../../functions/transform-data';
+import { transformData } from '../../functions/transform-data';
 import { LearningProblemBase, ProblemAttemptResult } from '../../types/problem-types';
 import { StudyLoadingOrError } from './StudyLoadingOrError';
 
@@ -36,7 +36,6 @@ export interface StudyData {
   cycleError: any;
   textbookError: any;
   attemptingProblems: LearningProblemBase[];
-  pastAttemptedResults: ProblemAttemptResult[];
   isDataReady: boolean;
   // レンダリングのためのLoading/Errorコンポーネント
   renderLoadingOrError: () => JSX.Element;
@@ -116,11 +115,6 @@ export const useStudyData = (): StudyData => {
     [learningCycle]
   );
 
-  const pastAttemptedResults = useMemo(
-    () => (learningCycle ? convertLearningCycleToAttempts(learningCycle) : []),
-    [learningCycle]
-  );
-
   const isDataReady = isFoundCycle && isFoundTextbook && !!learningCycle && !!textbook;
 
   const renderLoadingOrError = () => (
@@ -166,7 +160,6 @@ export const useStudyData = (): StudyData => {
     cycleError,
     textbookError,
     attemptingProblems,
-    pastAttemptedResults,
     isDataReady,
     renderLoadingOrError,
     handleFinishLearning,

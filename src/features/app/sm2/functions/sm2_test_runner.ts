@@ -1,9 +1,9 @@
 import { LearningCycle } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 import {
+  LearningCycleProblem,
   LearningCycleSession,
-  ProblemDetail,
+  LearningCycleTestResult,
   ProblemScoringStatus,
-  TestResult,
   TestSelfEvaluation,
 } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { calculateSM2ReviewScheduleForCycle } from './calculate-sm2-schedule';
@@ -24,8 +24,8 @@ const CATEGORIES = ['math-basic', 'japanese-kanji', 'english-vocab', 'science-ch
 /**
  * 指定された数だけダミーの問題を生成します。
  */
-function generateProblems(count: number): ProblemDetail[] {
-  const problems: ProblemDetail[] = [];
+function generateProblems(count: number): LearningCycleProblem[] {
+  const problems: LearningCycleProblem[] = [];
   for (let i = 0; i < count; i++) {
     const index = 1000 + i;
     const categoryId = CATEGORIES[i % CATEGORIES.length]; // カテゴリを循環させる
@@ -35,7 +35,7 @@ function generateProblems(count: number): ProblemDetail[] {
       problemNumber: i % 10,
       isReviewTarget: true,
       categoryId: categoryId,
-    } as ProblemDetail);
+    } as LearningCycleProblem);
   }
   return problems;
 }
@@ -50,10 +50,10 @@ function generateProblems(count: number): ProblemDetail[] {
  * TestSelfEvaluation: "notSure", "imperfect", "confident" がそれぞれ約1/3の確率で選ばれます。
  */
 function generateRandomSession(
-  problems: ProblemDetail[],
+  problems: LearningCycleProblem[],
   attemptedAt: number
 ): LearningCycleSession {
-  const results: TestResult[] = problems.map((problem) => {
+  const results: LearningCycleTestResult[] = problems.map((problem) => {
     // 80%の確率で正解 ('correct')、20%の確率で不正解 ('incorrect')
     const scoringStatus: ProblemScoringStatus = Math.random() < 0.7 ? 'correct' : 'incorrect';
 
@@ -77,7 +77,7 @@ function generateRandomSession(
       timeSpentMs: timeSpentMs,
       selfEvaluation: selfEvaluation,
       scoringStatus: scoringStatus,
-    } as TestResult;
+    } as LearningCycleTestResult;
   });
 
   return {

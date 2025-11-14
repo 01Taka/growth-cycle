@@ -1,6 +1,9 @@
-// date-utils.ts (修正案)
 import { addDays, format } from 'date-fns';
 import { adjustDateForBoundary } from './boundary-utils';
+
+export const dateToyyyyMMdd = (date: string | number | Date) => {
+  return format(date, 'yyyy-MM-dd');
+};
 
 /**
  * 現在の「カスタム境目に基づく今日」の日付を 'yyyy-MM-dd' 形式で返します。
@@ -11,7 +14,7 @@ export const getToday = (): string => {
   const adjustedNow = adjustDateForBoundary(Date.now());
 
   // 2. 調整後の日付を 'yyyy-MM-dd' 形式で整形
-  return format(adjustedNow, 'yyyy-MM-dd');
+  return dateToyyyyMMdd(adjustedNow);
 };
 
 /**
@@ -29,7 +32,7 @@ export function getDateAfterDays(
   const originalDate = new Date(timestamp);
   const newDate = addDays(originalDate, daysToAdd);
 
-  return format(newDate, 'yyyy-MM-dd');
+  return dateToyyyyMMdd(newDate);
 }
 
 // getDateAfterDays_Boundary版の提案 (カスタム境目を考慮した日付加算が必要な場合)
@@ -44,7 +47,7 @@ export function getDateAfterDaysBoundary(
   const newDate = addDays(adjustedNow, daysToAdd);
 
   // 3. 結果を整形
-  return format(newDate, 'yyyy-MM-dd');
+  return dateToyyyyMMdd(newDate);
 }
 
 /**
@@ -58,7 +61,7 @@ export const isToday = (date: string | number | Date): boolean => {
   const adjustedTargetDate = adjustDateForBoundary(date);
 
   // 調整された日付を 'yyyy-MM-dd' 形式で整形
-  const formattedTargetDate = format(adjustedTargetDate, 'yyyy-MM-dd');
+  const formattedTargetDate = dateToyyyyMMdd(adjustedTargetDate);
 
   // 調整された今日の日付と比較
   return getToday() === formattedTargetDate;

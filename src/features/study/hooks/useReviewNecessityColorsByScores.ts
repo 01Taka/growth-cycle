@@ -1,7 +1,8 @@
 import { MantineColorScheme, useComputedColorScheme } from '@mantine/core';
+import { LearningCycleTestResult } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { REVIEW_NECESSITY_COLORS } from '../constants/review-necessity-constants';
 import { calculateReviewNecessityFromLatestAttempt } from '../functions/calculate-review-necessity';
-import { AttemptLog, FinalReviewNecessityResult, NecessityColorSet } from '../types/problem-types';
+import { FinalReviewNecessityResult, NecessityColorSet } from '../types/problem-types';
 
 export interface ReviewNecessityScores {
   reviewNecessity: number;
@@ -16,7 +17,7 @@ export interface NecessityColors {
   reviewNecessity: NecessityColorSet;
   latestAttemptNecessity: NecessityColorSet;
   recentWeightedNecessity: NecessityColorSet;
-  getNecessityColor: (attempt: AttemptLog | null) => NecessityColorSet;
+  getNecessityColor: (attempt: LearningCycleTestResult | null) => NecessityColorSet;
 }
 
 /**
@@ -49,7 +50,7 @@ export const useReviewNecessityColorsByScores = (
     return colorsByTheme[0];
   };
 
-  const getNecessityColor = (attempt: AttemptLog | null) => {
+  const getNecessityColor = (attempt: LearningCycleTestResult | null) => {
     const colNecessity = attempt
       ? calculateReviewNecessityFromLatestAttempt(attempt)
       : { level: 0 };

@@ -30,6 +30,7 @@ export interface LearningHistoryItemData {
   differenceToNextFixedReview: number | null;
   aggregatedSections: AggregatedSection[];
   actionColor: string;
+  isWaitingFixedReview: boolean;
 }
 
 export interface LearningItem {

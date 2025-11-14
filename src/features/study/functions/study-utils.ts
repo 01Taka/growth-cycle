@@ -42,7 +42,7 @@ export const createProblemAttemptResult = (
   return {
     ...problemKey,
     selfEvaluation: selfEvaluation,
-    timeSpentMs: timeSpentMs, // elapsedTimeMap から取得
+    timeSpentMs: timeSpentMs,
     scoringStatus: scoringStatus,
   };
 };
@@ -58,62 +58,62 @@ export const createProblemAttemptResults = (
   );
 };
 
-/**
- * ProblemAttemptResultの配列をProblemLearningRecordの配列に変換します。
- * problemIndexのみをキーとしてグループ化し、他のキーが異なる場合は警告ログを出力します。
- *
- * @param results - ProblemAttemptResultの配列
- * @returns ProblemLearningRecordの配列
- */
-export const convertResultsToLearningRecordsByIndex = (
-  results: ProblemAttemptResult[]
-): ProblemLearningRecord[] => {
-  // Mapのキーを problemIndex (number) に変更します。
-  const recordsMap = new Map<number, ProblemLearningRecord>();
+// /**
+//  * ProblemAttemptResultの配列をProblemLearningRecordの配列に変換します。
+//  * problemIndexのみをキーとしてグループ化し、他のキーが異なる場合は警告ログを出力します。
+//  *
+//  * @param results - ProblemAttemptResultの配列
+//  * @returns ProblemLearningRecordの配列
+//  */
+// export const convertResultsToLearningRecordsByIndex = (
+//   results: ProblemAttemptResult[]
+// ): ProblemLearningRecord[] => {
+//   // Mapのキーを problemIndex (number) に変更します。
+//   const recordsMap = new Map<number, ProblemLearningRecord>();
 
-  results.forEach((result) => {
-    const { problemIndex } = result;
+//   results.forEach((result) => {
+//     const { problemIndex } = result;
 
-    // AttemptLogを作成（Timestampはダミーとして、現在の時刻+インデックスを使用）
-    const attemptLog: AttemptLog = {
-      attemptAt: result.attemptAt,
-      selfEvaluation: result.selfEvaluation,
-      timeSpentMs: result.timeSpentMs,
-      scoringStatus: result.scoringStatus,
-    };
+//     // AttemptLogを作成（Timestampはダミーとして、現在の時刻+インデックスを使用）
+//     const attemptLog: AttemptLog = {
+//       attemptAt: result.attemptAt,
+//       selfEvaluation: result.selfEvaluation,
+//       timeSpentMs: result.timeSpentMs,
+//       scoringStatus: result.scoringStatus,
+//     };
 
-    if (recordsMap.has(problemIndex)) {
-      // 既存のレコードに試行ログを追加
-      const record = recordsMap.get(problemIndex)!;
+//     if (recordsMap.has(problemIndex)) {
+//       // 既存のレコードに試行ログを追加
+//       const record = recordsMap.get(problemIndex)!;
 
-      // 💡 警告チェック: 既存のレコードとLearningProblemBaseの他のプロパティを比較
-      if (
-        record.unitName !== result.unitName ||
-        record.categoryName !== result.categoryName ||
-        record.problemNumber !== result.problemNumber
-      ) {
-        console.warn(
-          `[Warning] Inconsistent LearningProblemBase found for problemIndex: ${problemIndex}. ` +
-            `Existing Key: {unitName: ${record.unitName}, categoryName: ${record.categoryName}, problemNumber: ${record.problemNumber}}, ` +
-            `New Result Key: {unitName: ${result.unitName}, categoryName: ${result.categoryName}, problemNumber: ${result.problemNumber}}. ` +
-            `Grouping continues based on problemIndex, but data integrity is compromised.`
-        );
-      }
+//       // 💡 警告チェック: 既存のレコードとLearningProblemBaseの他のプロパティを比較
+//       if (
+//         record.unitName !== result.unitName ||
+//         record.categoryName !== result.categoryName ||
+//         record.problemNumber !== result.problemNumber
+//       ) {
+//         console.warn(
+//           `[Warning] Inconsistent LearningProblemBase found for problemIndex: ${problemIndex}. ` +
+//             `Existing Key: {unitName: ${record.unitName}, categoryName: ${record.categoryName}, problemNumber: ${record.problemNumber}}, ` +
+//             `New Result Key: {unitName: ${result.unitName}, categoryName: ${result.categoryName}, problemNumber: ${result.problemNumber}}. ` +
+//             `Grouping continues based on problemIndex, but data integrity is compromised.`
+//         );
+//       }
 
-      record.attempts.push(attemptLog);
-    } else {
-      // 新しいレコードの場合、ProblemLearningRecordを作成し、Mapに追加
-      const newRecord: ProblemLearningRecord = {
-        unitName: result.unitName,
-        categoryName: result.categoryName,
-        problemNumber: result.problemNumber,
-        problemIndex: problemIndex,
-        attempts: [attemptLog],
-      };
-      recordsMap.set(problemIndex, newRecord);
-    }
-  });
+//       record.attempts.push(attemptLog);
+//     } else {
+//       // 新しいレコードの場合、ProblemLearningRecordを作成し、Mapに追加
+//       const newRecord: ProblemLearningRecord = {
+//         unitName: result.unitName,
+//         categoryName: result.categoryName,
+//         problemNumber: result.problemNumber,
+//         problemIndex: problemIndex,
+//         attempts: [attemptLog],
+//       };
+//       recordsMap.set(problemIndex, newRecord);
+//     }
+//   });
 
-  // Mapの値を配列に変換して返します
-  return Array.from(recordsMap.values());
-};
+//   // Mapの値を配列に変換して返します
+//   return Array.from(recordsMap.values());
+// }; | DEL? |

@@ -12,7 +12,7 @@ export const getJustBeforeLogs = (
   record: ProblemLearningRecord,
   number: number = 3
 ): (AttemptLog | null)[] => {
-  const attempts = record.attempts;
+  const attempts = record.attempts.sort((a, b) => a.attemptAt - b.attemptAt);
 
   // 1. 直前 (末尾) の最大 number 個の要素を取得
   // slice(-number) で末尾から number 個の要素を取得します。

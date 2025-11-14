@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-// useSearchParams は引数で受け取るため、フック内でのインポートは削除
-
+import { ExpandedLearningCycle } from '@/features/app/learningCycles/types/expand-learning-cycle-types';
+import { LearningCycle } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 import {
   ProblemScoringStatus,
   TestSelfEvaluation,
@@ -9,30 +9,28 @@ import { MultiTimerPersistenceProvider } from '@/shared/hooks/multi-timer/multi-
 import { useSubjectColorMap } from '@/shared/hooks/useSubjectColor';
 import { Subject } from '@/shared/types/subject-types';
 import {
-  convertResultsToLearningRecordsByIndex,
-  createProblemAttemptResults,
-} from '../functions/study-utils';
+  createExpandedLearningCycleTestResults,
+  expandLearningCycle,
+  groupingTestResultsByIndex,
+} from '../../app/learningCycles/functions/expand-learning-cycle-utils';
+import { createProblemAttemptResults } from '../functions/study-utils';
 import { useStudyTimer } from '../hooks/useStudyTimer';
-import {
-  LearningProblemBase,
-  ProblemAttemptDetail,
-  ProblemAttemptResult,
-} from '../types/problem-types';
+import { LearningProblemBase, ProblemAttemptDetail } from '../types/problem-types';
 
 interface UseStudyLogicArgs {
+  learningCycle: LearningCycle | null;
   studyDuration: number;
   testDuration: number;
   attemptingProblems: LearningProblemBase[];
-  pastAttemptedResults: ProblemAttemptResult[];
   header: { subject: Subject; textbookName: string; units: string[] };
   timerProvider?: MultiTimerPersistenceProvider;
 }
 
 export const useStudyLogic = ({
+  learningCycle,
   studyDuration,
   testDuration,
   attemptingProblems,
-  pastAttemptedResults,
   header,
   timerProvider,
 }: UseStudyLogicArgs) => {
@@ -102,15 +100,26 @@ export const useStudyLogic = ({
     [attemptingProblems, selfEvaluationMap, scoringStatusMap, elapsedTimeMap]
   );
 
-  const attemptResults = useMemo(
-    () => [...problems, ...pastAttemptedResults],
-    [problems, pastAttemptedResults]
-  );
+  const expandedLearningCycle: ExpandedLearningCycle | null = useMemo(() => {
+    return learningCycle ? expandLearningCycle(learningCycle) : null;
+  }, [learningCycle]);
 
-  const records = useMemo(
-    () => convertResultsToLearningRecordsByIndex(attemptResults),
-    [attemptResults]
-  );
+  const groupedByIndexTestResults = useMemo(() => {
+    if (expandedLearningCycle) {
+      const newResults = [
+        createExpandedLearningCycleTestResults(
+          Date.now(),
+          expandedLearningCycle,
+          selfEvaluationMap,
+          scoringStatusMap,
+          elapsedTimeMap
+        ),
+      ];
+
+      return groupingTestResultsByIndex(expandedLearningCycle, newResults);
+    }
+    return [];
+  }, [expandedLearningCycle, selfEvaluationMap, scoringStatusMap, elapsedTimeMap]);
 
   const isAllProblemsEvaluated = useMemo(() => {
     const validEvaluations = Object.values(selfEvaluationMap).filter(
@@ -124,7 +133,6 @@ export const useStudyLogic = ({
     header,
     theme,
     problems,
-    records,
     selfEvaluationMap,
     scoringStatusMap,
     studyTimer,
@@ -134,6 +142,7 @@ export const useStudyLogic = ({
     elapsedTimeMap,
     isAllProblemsEvaluated,
     isFinishTestTimer,
+    groupedByIndexTestResults,
     handleScoreChange,
     handleSelfEvaluationMap,
     stopAll,

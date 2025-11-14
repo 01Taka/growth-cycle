@@ -49,6 +49,8 @@ export function calculateReviewNecessity(
         break;
     }
     return {
+      isUnrated: true,
+      isGroup: false,
       level: -1,
       reason: reason,
       alternativeLevel: 0, // 採点結果がないため、代替は0
@@ -61,6 +63,8 @@ export function calculateReviewNecessity(
     const reason = isCorrect ? 'selfUnratedCorrect' : 'selfUnratedIncorrect';
 
     return {
+      isUnrated: true,
+      isGroup: false,
       level: -1,
       reason: reason as UnratedLabel,
       alternativeLevel: alternativeLevel as ReviewNecessityStage,
@@ -116,6 +120,8 @@ export function calculateReviewNecessity(
     }
 
     return {
+      isUnrated: false,
+      isGroup: false,
       level: level,
       reason: reason,
       alternativeLevel: level, // level (0-3) と alternativeLevel を同期

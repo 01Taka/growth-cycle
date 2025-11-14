@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Box, Stack } from '@mantine/core';
 import { generateDummyLearningCycles } from '@/features/home/utils/learning-cycle-dummy';
 import { useLearningCycleStore } from '@/shared/stores/useLearningCycleStore';
@@ -12,13 +13,14 @@ interface LearningHistoryMainProps {}
 
 // メインコンポーネントはデータの取得、変換、状態管理、レンダリングを担う
 export const LearningHistoryMain: React.FC<LearningHistoryMainProps> = ({}) => {
-  const { learningCycles: _, fetchLearningCycles } = useLearningCycleStore();
+  const navigate = useNavigate();
+  const { learningCycles, fetchLearningCycles } = useLearningCycleStore();
 
-  // ダミーデータの生成 (useMemoを使用して不要な再計算を防ぐ)
-  const learningCycles = useMemo(() => {
-    // 実際にFirestoreから取得する際は、この行を削除します
-    return [...generateDummyLearningCycles(20)];
-  }, []);
+  // // ダミーデータの生成 (useMemoを使用して不要な再計算を防ぐ)
+  // const learningCycles = useMemo(() => {
+  //   // 実際にFirestoreから取得する際は、この行を削除します
+  //   return [...generateDummyLearningCycles(20)];
+  // }, []);
 
   useEffect(() => {
     // 実際のデータフェッチ
@@ -83,7 +85,7 @@ export const LearningHistoryMain: React.FC<LearningHistoryMainProps> = ({}) => {
                 {...data}
                 openedDetail={openedDetail}
                 toggleOpenedDetail={() => handleCheckDetail(cycleId)}
-                onStartReview={() => {}}
+                onStartReview={() => navigate(`/study?cycleId=${cycleId}&phase=test`)}
               />
             </Box>
           );

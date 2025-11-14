@@ -9,7 +9,7 @@ import {
 } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 import {
   LearningCycleSession,
-  TestResult,
+  LearningCycleTestResult,
 } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import {
   Textbook,
@@ -25,7 +25,9 @@ import { containsToday, isToday } from '@/shared/utils/datetime/datetime-utils';
 import { replaceOrAddObject } from '@/shared/utils/object/object-utils';
 import { ProblemAttemptResult } from '../types/problem-types';
 
-const problemsToTestResults = (problems: ProblemAttemptResult[]): TestResult[] => {
+const problemsToLearningCycleTestResults = (
+  problems: ProblemAttemptResult[]
+): LearningCycleTestResult[] => {
   // 現在は構造が同じなのでそのまま返すだけでよい
   return problems;
 };
@@ -102,11 +104,12 @@ export const handleRecordSession = async (
     );
   }
 
+  const isFixedReviewSession = checkIsFixedReviewSession(learningCycle);
   const newSession: LearningCycleSession = {
-    isFixedReviewSession: checkIsFixedReviewSession(learningCycle),
+    isFixedReviewSession,
     gainedXp: 0,
     attemptedAt: now,
-    results: problemsToTestResults(problems),
+    results: problemsToLearningCycleTestResults(problems),
   };
 
   const xp = calculateTotalXPWithLearningCycle(learningCycle, newSession, newPlant.currentStage);

@@ -4,8 +4,8 @@ import { SubjectSchema } from '@/shared/types/subject-types';
 import { IDBDocumentSchema } from '../../idb/idb-types';
 import {
   CategoryDetailSchema,
+  LearningCycleProblemSchema,
   LearningCycleSessionSchema,
-  ProblemDetailSchema,
   TestModeSchema,
   UnitDetailSchema,
 } from './learning-cycle-support';
@@ -22,7 +22,7 @@ export const LearningCycleSchema = z
     testMode: TestModeSchema.describe('i18n:test_mode.mode'),
     learningDurationMs: z.number().int().min(0).describe('i18n:cycle.learning_duration_ms'),
     testDurationMs: z.number().int().min(0).describe('i18n:cycle.test_duration_ms'),
-    problems: z.array(ProblemDetailSchema).min(1).describe('i18n:cycle.problems'),
+    problems: z.array(LearningCycleProblemSchema).min(1).describe('i18n:cycle.problems'),
     isReviewTarget: z.boolean().describe('i18n:cycle.is_review_target'),
 
     // --- サーバーが初期設定/管理するデータ ---

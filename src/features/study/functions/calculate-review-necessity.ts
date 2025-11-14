@@ -1,6 +1,6 @@
 import { calculateReviewNecessity } from '@/features/app/review-necessity/functions/calc-necessity';
+import { LearningCycleTestResult } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import {
-  AttemptLog,
   FinalReviewNecessityResult,
   LatestAttemptNecessityResult,
   RecentWeightedNecessityReason,
@@ -9,12 +9,12 @@ import {
 
 /**
  * 💡 ロジック 1: 直近の一つの自己評価と正誤による確認必要度 (0-3) を算出
- * @param {AttemptLog | null} latestAttempt 最新の試行ログ
+ * @param {LearningCycleTestResult | null} latestAttempt 最新の試行ログ
  * @param {number} defaultNecessity ログがない場合のデフォルト値 (未使用だが引数としては残す)
  * @returns {LatestAttemptNecessityResult} 算出された確認必要度と理由
  */
 export function calculateReviewNecessityFromLatestAttempt(
-  latestAttempt: AttemptLog | null
+  latestAttempt: LearningCycleTestResult | null
 ): LatestAttemptNecessityResult {
   if (!latestAttempt) {
     // 試行ログがない場合
@@ -45,14 +45,14 @@ export function calculateReviewNecessityFromLatestAttempt(
  * 💡 ロジック 2 (改善版): 直近2回の試行における「自己評価に基づく確認必要度」が
  * 「2以上（復習必要性が高い）」であったかどうかに重みを付けて算出 (最大 3)
  *
- * @param {AttemptLog | null} latestAttempt 最新の試行
- * @param {AttemptLog | null} secondLatestAttempt 2番目に新しい試行
+ * @param {LearningCycleTestResult | null} latestAttempt 最新の試行
+ * @param {LearningCycleTestResult | null} secondLatestAttempt 2番目に新しい試行
  * @param {object} options オプション
  * @returns {RecentWeightedNecessityResult} 算出された重み付きの確認必要度と理由
  */
 function calculateWeightedReviewNecessity(
-  latestAttempt: AttemptLog | null,
-  secondLatestAttempt: AttemptLog | null,
+  latestAttempt: LearningCycleTestResult | null,
+  secondLatestAttempt: LearningCycleTestResult | null,
   options?: {
     defaultNecessity?: number;
     latestAttemptWeight?: number;
@@ -106,11 +106,11 @@ function calculateWeightedReviewNecessity(
 
 /**
  * 🎯 メイン関数: 2つのロジックで算出された値のうち、大きい方を使用して最終的な確認必要度を決定
- * @param {AttemptLog[]} attempts 試行履歴のリスト (末尾が最新)
+ * @param {LearningCycleTestResult[]} attempts 試行履歴のリスト (末尾が最新)
  * @returns {FinalReviewNecessityResult} 最終的な確認必要度を含むオブジェクト
  */
 export function determineFinalReviewNecessity(
-  attempts: (AttemptLog | null)[]
+  attempts: (LearningCycleTestResult | null)[]
 ): FinalReviewNecessityResult {
   // 最新の試行を取得 (配列の末尾が最新)
   const latestAttempt = attempts.length > 0 ? attempts[attempts.length - 1] : null;

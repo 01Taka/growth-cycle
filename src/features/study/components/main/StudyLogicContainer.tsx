@@ -25,8 +25,7 @@ export const StudyLogicContainer: React.FC<StudyLogicContainerProps> = ({
   studyData,
   debugTime,
 }) => {
-  const { learningCycle, textbook, attemptingProblems, pastAttemptedResults, isDataReady } =
-    studyData;
+  const { learningCycle, textbook, attemptingProblems, isDataReady } = studyData;
 
   const [searchParams, setSearchParam] = useSearchParams();
   const phaseInUrl = searchParams.get(PHASE_KEY) as Phase | null;
@@ -54,6 +53,7 @@ export const StudyLogicContainer: React.FC<StudyLogicContainerProps> = ({
   );
 
   const studyLogicProps = useStudyLogic({
+    learningCycle: learningCycle ?? null,
     studyDuration: debugTime
       ? 2000
       : isDataReady && learningCycle
@@ -65,7 +65,6 @@ export const StudyLogicContainer: React.FC<StudyLogicContainerProps> = ({
         ? learningCycle.testDurationMs
         : 0,
     attemptingProblems: isDataReady ? attemptingProblems : [],
-    pastAttemptedResults: isDataReady ? pastAttemptedResults : [],
     header: {
       textbookName: textbook?.name ?? 'Loading...',
       units: (learningCycle?.units ?? []).map((unit) => unit.name),
@@ -78,7 +77,6 @@ export const StudyLogicContainer: React.FC<StudyLogicContainerProps> = ({
     header,
     theme,
     problems,
-    records,
     selfEvaluationMap,
     scoringStatusMap,
     studyTimer,
@@ -88,6 +86,7 @@ export const StudyLogicContainer: React.FC<StudyLogicContainerProps> = ({
     elapsedTimeMap,
     isAllProblemsEvaluated,
     isFinishTestTimer,
+    groupedByIndexTestResults,
     handleScoreChange,
     handleSelfEvaluationMap,
     stopAll,
@@ -130,11 +129,11 @@ export const StudyLogicContainer: React.FC<StudyLogicContainerProps> = ({
   );
 
   const onFinish = useCallback(() => {
-    const isTimerCompleted = studyTimer.remainingTime <= 0 && testTimer.remainingTime <= 0;
-    const isEnteredData =
-      Object.keys(selfEvaluationMap).length > 0 && Object.keys(scoringStatusMap).length > 0;
-    // ポップアップの表示などに利用
-    const _isCompleted = isEnteredData && isTimerCompleted;
+    // const isTimerCompleted = studyTimer.remainingTime <= 0 && testTimer.remainingTime <= 0;
+    // const isEnteredData =
+    //   Object.keys(selfEvaluationMap).length > 0 && Object.keys(scoringStatusMap).length > 0;
+    // // ポップアップの表示などに利用
+    // const _isCompleted = isEnteredData && isTimerCompleted;
 
     studyData.handleFinishLearning({
       problems,
@@ -144,7 +143,16 @@ export const StudyLogicContainer: React.FC<StudyLogicContainerProps> = ({
       studyTimer,
       testTimer,
     });
-  }, [problems, selfEvaluationMap, scoringStatusMap, elapsedTimeMap, studyTimer, testTimer]);
+    resetAll();
+  }, [
+    problems,
+    selfEvaluationMap,
+    scoringStatusMap,
+    elapsedTimeMap,
+    studyTimer,
+    testTimer,
+    resetAll,
+  ]);
 
   // 💡 データが揃った後のフェーズレンダリング
   const renderPhase = () => {
@@ -196,7 +204,13 @@ export const StudyLogicContainer: React.FC<StudyLogicContainerProps> = ({
           />
         );
       case 'review':
-        return <ReviewPhase records={records} theme={theme} onFinish={() => onFinish()} />;
+        return (
+          <ReviewPhase
+            groupedTestResults={groupedByIndexTestResults}
+            theme={theme}
+            onFinish={() => onFinish()}
+          />
+        );
       default:
         return null;
     }

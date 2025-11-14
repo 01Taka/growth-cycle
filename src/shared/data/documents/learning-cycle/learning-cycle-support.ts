@@ -74,7 +74,7 @@ export const ProblemScoringStatusSchema = z.union([
 
 export type ProblemScoringStatus = z.infer<typeof ProblemScoringStatusSchema>;
 
-export const TestResultSchema = z
+export const LearningCycleTestResultSchema = z
   .object({
     problemIndex: z.number().int().min(0).describe('i18n:result.problem_index'),
     selfEvaluation: TestSelfEvaluationSchema.describe('i18n:result.self_evaluation'),
@@ -83,20 +83,20 @@ export const TestResultSchema = z
   })
   .describe('i18n:result.test_result');
 
-export type TestResult = z.infer<typeof TestResultSchema>;
+export type LearningCycleTestResult = z.infer<typeof LearningCycleTestResultSchema>;
 
 export const LearningCycleSessionSchema = z
   .object({
     gainedXp: z.number().min(0).default(0),
     isFixedReviewSession: z.boolean().default(false),
     attemptedAt: z.number().describe('i18n:session.attempted_at'),
-    results: z.array(TestResultSchema).describe('i18n:session.results_list'),
+    results: z.array(LearningCycleTestResultSchema).describe('i18n:session.results_list'),
   })
   .describe('i18n:session.test_session');
 
 export type LearningCycleSession = z.infer<typeof LearningCycleSessionSchema>;
 
-export const ProblemDetailSchema = z
+export const LearningCycleProblemSchema = z
   .object({
     index: z.number().int().min(0).describe('i18n:problem.index'),
     unitId: z.string().min(1).nullable().describe('i18n:shared.unit_id'),
@@ -105,4 +105,4 @@ export const ProblemDetailSchema = z
   })
   .describe('i18n:problem.detail');
 
-export type ProblemDetail = z.infer<typeof ProblemDetailSchema>;
+export type LearningCycleProblem = z.infer<typeof LearningCycleProblemSchema>;

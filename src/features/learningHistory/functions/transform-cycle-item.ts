@@ -23,7 +23,7 @@ export const transformCycleToItemData = (cycle: LearningCycle): LearningHistoryI
   // 2. 固定復習までの日数の計算
   const differenceToNextFixedReview = Math.min(
     ...cycle.fixedReviewDates.map((date) => {
-      const diff = getDaysDifference(date);
+      const diff = getDaysDifference(date, Date.now(), false);
       return diff >= 0 ? diff : Number.MAX_SAFE_INTEGER;
     })
   );
@@ -38,6 +38,8 @@ export const transformCycleToItemData = (cycle: LearningCycle): LearningHistoryI
 
   const actionColor = getColorByRatio(fixation);
 
+  const isWaitingFixedReview = differenceToNextFixedReview !== null;
+
   return {
     plant: cycle.plant,
     subject: cycle.subject,
@@ -50,5 +52,6 @@ export const transformCycleToItemData = (cycle: LearningCycle): LearningHistoryI
     differenceToNextFixedReview: differenceToNextFixedReviewSafe,
     aggregatedSections,
     actionColor,
+    isWaitingFixedReview,
   };
 };

@@ -1,8 +1,8 @@
 import { LearningCycle } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 import {
-  ProblemDetail,
+  LearningCycleProblem,
+  LearningCycleTestResult,
   ProblemScoringStatus,
-  TestResult,
   TestSelfEvaluation,
 } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { DEFAULT_CATEGORY_ID, DEFAULT_REF_TIME_MS } from '../constants/sm2-constants';
@@ -55,7 +55,7 @@ const DEFAULT_SM2_STATE: SM2State = {
 export type ProblemScheduleRecord = Record<number, number>;
 
 // 履歴処理に必要な中間型
-type AttemptHistoryItem = TestResult & { attemptedAt: number };
+type AttemptHistoryItem = LearningCycleTestResult & { attemptedAt: number };
 type ProblemAttemptHistoryMap = Record<number, AttemptHistoryItem[]>;
 type CategoryRefTimeRecord = Record<string, number>;
 
@@ -116,23 +116,23 @@ function calculateNextReviewDate(intervalDays: number, fromTimestampMs: number):
  * 問題インデックスと問題詳細のマッピングを作成し、カテゴリごとの平均時間を集計します。
  */
 function compileTimeDataAndProblemMap(cycle: LearningCycle): {
-  problemDetailMap: Record<number, ProblemDetail>;
+  learningCycleProblemMap: Record<number, LearningCycleProblem>;
   categoryRefTimeRecord: CategoryRefTimeRecord;
 } {
-  const problemDetailMap: Record<number, ProblemDetail> = {};
+  const learningCycleProblemMap: Record<number, LearningCycleProblem> = {};
   const categoryTimeData: Record<string, { totalTime: number; count: number }> = {};
 
   for (const problem of cycle.problems) {
-    problemDetailMap[problem.index] = problem;
+    learningCycleProblemMap[problem.index] = problem;
   }
 
   for (const session of cycle.sessions) {
     for (const result of session.results) {
-      const problemDetail = problemDetailMap[result.problemIndex];
+      const learningCycleProblem = learningCycleProblemMap[result.problemIndex];
 
       // 問題詳細があり、カテゴリIDが設定されている場合のみ集計対象とする
-      if (problemDetail) {
-        const categoryId = problemDetail.categoryId ?? DEFAULT_CATEGORY_ID;
+      if (learningCycleProblem) {
+        const categoryId = learningCycleProblem.categoryId ?? DEFAULT_CATEGORY_ID;
 
         if (!categoryTimeData[categoryId]) {
           categoryTimeData[categoryId] = { totalTime: 0, count: 0 };
@@ -152,7 +152,7 @@ function compileTimeDataAndProblemMap(cycle: LearningCycle): {
     }
   }
 
-  return { problemDetailMap, categoryRefTimeRecord };
+  return { learningCycleProblemMap, categoryRefTimeRecord };
 }
 
 /**
@@ -190,7 +190,7 @@ function compileProblemHistory(cycle: LearningCycle): ProblemAttemptHistoryMap {
  * 問題に設定されたカテゴリIDに基づき、基準時間 (refTimeMs) を取得します。
  */
 function getRefTimeMsForProblem(
-  problem: ProblemDetail,
+  problem: LearningCycleProblem,
   categoryRefTimeRecord: CategoryRefTimeRecord
 ): number {
   const categoryId = problem.categoryId ?? DEFAULT_CATEGORY_ID;

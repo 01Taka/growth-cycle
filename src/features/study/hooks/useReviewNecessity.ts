@@ -1,9 +1,12 @@
+import { LearningCycleTestResult } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { REVIEW_NECESSITY_REASON_LABELS } from '../constants/review-necessity-constants';
 import { determineFinalReviewNecessity } from '../functions/calculate-review-necessity';
-import { AttemptLog, ReviewNecessityResult } from '../types/problem-types';
+import { ReviewNecessityResult } from '../types/problem-types';
 import { useReviewNecessityColorsByScores } from './useReviewNecessityColorsByScores';
 
-export const useReviewNecessity = (logs: (AttemptLog | null)[]): ReviewNecessityResult => {
+export const useReviewNecessity = (
+  logs: (LearningCycleTestResult | null)[]
+): ReviewNecessityResult => {
   const scores = determineFinalReviewNecessity(logs);
   const theme = useReviewNecessityColorsByScores(scores);
   return {

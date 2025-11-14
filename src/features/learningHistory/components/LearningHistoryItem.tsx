@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { IconRun } from '@tabler/icons-react';
 import {
   ActionIcon,
@@ -19,8 +19,6 @@ import { PlantWithEffect } from '@/features/plants/components/PlantWithEffect';
 import { UTIL_STYLES } from '@/shared/styles/shared-styles';
 import { Plant } from '@/shared/types/plant-shared-types';
 import { Subject } from '@/shared/types/subject-types';
-import { getColorByRatio } from '../functions/history-grade-color-utils';
-import { useAggregatedSections } from '../hooks/useAggregatedSections';
 import { AggregatedSection } from '../types/learning-history-types';
 
 interface LearningHistoryItemProps {
@@ -36,6 +34,7 @@ interface LearningHistoryItemProps {
   openedDetail: boolean;
   aggregatedSections: AggregatedSection[];
   actionColor: string;
+  isWaitingFixedReview: boolean;
   toggleOpenedDetail: () => void;
   onStartReview: () => void;
 }
@@ -53,6 +52,7 @@ export const LearningHistoryItem: React.FC<LearningHistoryItemProps> = ({
   openedDetail,
   aggregatedSections,
   actionColor,
+  isWaitingFixedReview,
   toggleOpenedDetail,
   onStartReview,
 }) => {
@@ -67,9 +67,6 @@ export const LearningHistoryItem: React.FC<LearningHistoryItemProps> = ({
     bgChip: '#F5F5F5',
   };
   const theme = neutralTheme;
-  // ----------------------------------------------------
-
-  const isWaitingFixedReview = differenceToNextFixedReview !== null;
 
   return (
     <Card
@@ -185,7 +182,7 @@ export const LearningHistoryItem: React.FC<LearningHistoryItemProps> = ({
                 bg={'#FF8C00'}
                 align="center"
                 justify="center"
-                h={rem(20)}
+                h={rem(24)}
                 style={{ borderRadius: rem(10), minHeight: rem(20) }}
               >
                 <Text fw={700} c={'#FFFFFF'}>

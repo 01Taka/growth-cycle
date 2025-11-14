@@ -1,7 +1,7 @@
 import { range } from '@mantine/hooks';
 import {
   CategoryDetail,
-  ProblemDetail,
+  LearningCycleProblem,
   ProblemNumberFormat,
   UnitDetail,
 } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
@@ -112,7 +112,7 @@ export const createProblemsAndUsedMetadata = (
   existingUnits: UnitDetail[],
   existingCategories: CategoryDetail[]
 ) => {
-  const problems: ProblemDetail[] = [];
+  const problems: LearningCycleProblem[] = [];
   const usedUnitIds: Set<string> = new Set();
   const usedCategoryIds: Set<string> = new Set();
 
@@ -130,7 +130,7 @@ export const createProblemsAndUsedMetadata = (
     for (const rangeValue of section.ranges) {
       // range関数のendのデフォルト値ロジックを維持
       const end = rangeValue.end ?? rangeValue.start;
-      for (const problemNumber of range(rangeValue.start, end + 1)) {
+      for (const problemNumber of range(rangeValue.start, end)) {
         problems.push({
           index: index++, // indexをインクリメント
           problemNumber,

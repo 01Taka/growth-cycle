@@ -22,6 +22,8 @@ export type UnratedLabel =
  * 評価済みの結果型 (levelが0〜3のとき)
  */
 export type EvaluatedResult = {
+  isUnrated: false;
+  isGroup: false;
   level: ReviewNecessityStage; // 0, 1, 2, 3
   reason: EvaluatedLabel;
   // 評価済みの場合、alternativeLevelはlevelと同じ値になる
@@ -32,11 +34,49 @@ export type EvaluatedResult = {
  * 未評価の結果型 (levelが-1のとき)
  */
 export type UnratedResult = {
+  isUnrated: true;
+  isGroup: false;
   level: -1;
   reason: UnratedLabel;
   // 未評価の場合でも、代替レベルは必ず提供される
   alternativeLevel: ReviewNecessityStage;
 };
 
+export type GroupEvaluatedLabel =
+  | 'consecutiveMistakes'
+  | 'failedLatestAttempt'
+  | 'failedSecondToLastAttempt'
+  | 'consecutiveCorrect';
+
+export type GroupUnratedLabel = 'insufficientRatedAttempts';
+
+/**
+ * 評価済みの結果型 (levelが0〜3のとき)
+ */
+export type GroupEvaluatedResult = {
+  isUnrated: false;
+  isGroup: true;
+  level: ReviewNecessityStage; // 0, 1, 2, 3
+  reason: GroupEvaluatedLabel;
+  // 評価済みの場合、alternativeLevelはlevelと同じ値になる
+  alternativeLevel: ReviewNecessityStage;
+};
+
+/**
+ * 未評価の結果型 (levelが-1のとき)
+ */
+export type GroupUnratedResult = {
+  isUnrated: true;
+  isGroup: true;
+  level: -1;
+  reason: GroupUnratedLabel;
+  // 未評価の場合でも、代替レベルは必ず提供される
+  alternativeLevel: ReviewNecessityStage;
+};
+
 // 最終的な結果型は、評価済みか未評価かのどちらか
 export type ReviewNecessityResult = EvaluatedResult | UnratedResult;
+
+export type GroupReviewNecessityResult = GroupEvaluatedResult | GroupUnratedResult;
+
+export type ReviewNecessityResultWithGroup = ReviewNecessityResult | GroupReviewNecessityResult;

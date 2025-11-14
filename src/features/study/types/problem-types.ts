@@ -1,4 +1,5 @@
 import {
+  LearningCycleTestResult,
   ProblemScoringStatus,
   TestSelfEvaluation,
 } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
@@ -42,9 +43,9 @@ export interface EmptyAttemptLog {
 }
 
 // 特定の問題に対する学習の記録全体（識別情報と試行履歴のリストを含む）
-export interface ProblemLearningRecord extends LearningProblemKey {
+export type ProblemLearningRecord = LearningProblemKey & {
   attempts: AttemptLog[];
-}
+};
 
 // カラーセットの型定義
 export interface NecessityColorSet {
@@ -113,5 +114,5 @@ export interface ReviewNecessityResult {
     reasonLabel: string;
     label: string;
   };
-  getNecessityColor: (attempt: AttemptLog | null) => NecessityColorSet;
+  getNecessityColor: (attempt: LearningCycleTestResult | null) => NecessityColorSet;
 }
