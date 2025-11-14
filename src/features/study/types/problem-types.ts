@@ -48,14 +48,6 @@
 // };
 
 // // カラーセットの型定義
-// export interface NecessityColorSet {
-//   background: string;
-//   text: string;
-//   border: string;
-//   accent: string;
-//   reverseText: string;
-//   label: string;
-// }
 
 // /**
 //  * 確認必要度の理由（ロジック2：直近2回の試行による重み付け）

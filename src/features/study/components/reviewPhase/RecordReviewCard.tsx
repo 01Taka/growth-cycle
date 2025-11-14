@@ -15,13 +15,13 @@ import { REVIEW_NECESSITY_REASON_LABELS } from '@/features/app/review-necessity/
 import { ReviewNecessityResultWithGroup } from '@/features/app/review-necessity/types/review-necessity-types';
 import { TestSelfEvaluation } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { formatMillisecondsToMSS } from '@/shared/utils/datetime/time-utils';
-import { range } from '@/shared/utils/range';
 import { REVIEW_NECESSITY_COLORS } from '../../constants/review-necessity-constants';
 import { formatMsToDaysAgo } from '../../functions/review-phase-utils';
 import { getScoringStatusIcon, getSelfEvaluationIcon } from './icons';
 
 interface RecordReviewCardProps {
   groupedTestResult: GroupedByIndexTestResult;
+  // 新しく追加する props
   problems: any[];
   higherLevelNecessity: ReviewNecessityResultWithGroup;
 }

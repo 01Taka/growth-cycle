@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Modal } from '@mantine/core';
+import { ExpandedLearningCycleProblem } from '@/features/app/learningCycles/types/expand-learning-cycle-types';
 import { LearningProblemKeyList } from '@/features/study/components/shared/problemList/LearningProblemKeyList';
-import { LearningProblemKey } from '@/features/study/types/problem-types';
 import { StudyHeader } from '@/shared/components/StudyHeader';
 import { useSubjectColorMap } from '@/shared/hooks/useSubjectColor';
 import { Subject } from '@/shared/types/subject-types';
@@ -11,7 +11,7 @@ interface StartReviewModalProps {
   textbookName: string;
   units: string[];
   opened: boolean;
-  problems: LearningProblemKey[];
+  problems: ExpandedLearningCycleProblem[];
   onClose: () => void;
   onStartReview: () => void;
 }

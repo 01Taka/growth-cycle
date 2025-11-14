@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { IconClockHour3, IconSquareCheck } from '@tabler/icons-react';
 import { Card, CardSection, Flex, Pill, rem, Stack, Tabs, Text } from '@mantine/core';
+import { expandLearningCycle } from '@/features/app/learningCycles/functions/expand-learning-cycle-utils';
 import { LearningCycleDocument } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 import { ReviewLearningCycleItem } from './ReviewLearningCycleItem';
 import { StartReviewModal } from './StartReviewModal';
@@ -97,6 +98,13 @@ export const HomeReviewCard: React.FC<HomeReviewCardProps> = ({
       setActiveTab((prev) => (prev === null ? dateKeys[0] : prev));
     }
   }, [dateKeys]);
+
+  const reviewTargetProblems = useMemo(() => {
+    if (reviewTarget) {
+      return expandLearningCycle(reviewTarget)?.problems ?? [];
+    }
+    return [];
+  }, [reviewTarget]);
 
   const remainingTasks = todayReviewCyclesCount;
   const totalTasks = todayReviewCyclesCount + todayReviewedCyclesCount;
@@ -261,18 +269,7 @@ export const HomeReviewCard: React.FC<HomeReviewCardProps> = ({
         subject={reviewTarget?.subject ?? 'japanese'}
         textbookName={reviewTarget?.textbookName ?? ''}
         units={(reviewTarget?.units ?? []).map((unit) => unit.name)}
-        problems={
-          reviewTarget
-            ? reviewTarget.problems.map((problem) => ({
-                unitName: reviewTarget.units.find((unit) => unit.id === problem.unitId)?.name ?? '',
-                categoryName:
-                  reviewTarget.categories.find((category) => category.id === problem.categoryId)
-                    ?.name ?? '',
-                problemNumber: problem.problemNumber,
-                problemIndex: problem.index,
-              }))
-            : []
-        }
+        problems={reviewTargetProblems}
         opened={reviewTarget !== null}
         onClose={() => setReviewTarget(null)}
         onStartReview={() => onStartReview(reviewTarget)}

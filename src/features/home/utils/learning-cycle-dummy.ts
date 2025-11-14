@@ -2,7 +2,10 @@
 // 実際の環境に合わせてインポートパスはそのままにしてあります。
 import { _generatePlantShapeForMVP } from '@/features/plants/functions/plant-utils';
 import { LearningCycleDocument } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
-import { LearningCycleSession } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
+import {
+  LearningCycleProblem,
+  LearningCycleSession,
+} from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { generateFirestoreId } from '@/shared/data/idb/generate-path';
 import { Plant } from '@/shared/types/plant-shared-types';
 
@@ -66,8 +69,8 @@ export function generateDummyLearningCycle(
     .substring(2, 6)}`;
 
   // 1. 問題リストの生成
-  const problems = Array.from({ length: numProblems }, (_, i) => ({
-    index: i,
+  const problems: LearningCycleProblem[] = Array.from({ length: numProblems }, (_, i) => ({
+    problemIndex: i,
     unitId: units[i % units.length].id,
     categoryId: categories[i % categories.length].id,
     problemNumber: i + 1,
@@ -122,7 +125,7 @@ export function generateDummyLearningCycle(
       const selfEvaluation = selfEvalOptions[Math.floor(Math.random() * selfEvalOptions.length)];
 
       return {
-        problemIndex: problem.index,
+        problemIndex: problem.problemIndex,
         selfEvaluation: selfEvaluation,
         scoringStatus: isCorrect ? ('correct' as const) : ('incorrect' as const),
         timeSpentMs: Math.floor(Math.random() * 50000) + 10000, // 10秒〜60秒
