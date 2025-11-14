@@ -10,7 +10,10 @@ import {
   Text,
   useComputedColorScheme,
 } from '@mantine/core';
-import { GroupedByIndexTestResult } from '@/features/app/learningCycles/types/expand-learning-cycle-types';
+import {
+  GroupedByIndexTestResult,
+  GroupedByIndexTestResultProblem,
+} from '@/features/app/learningCycles/types/expand-learning-cycle-types';
 import { REVIEW_NECESSITY_REASON_LABELS } from '@/features/app/review-necessity/constants/review-necessity-reason-label';
 import { ReviewNecessityResultWithGroup } from '@/features/app/review-necessity/types/review-necessity-types';
 import { TestSelfEvaluation } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
@@ -19,10 +22,9 @@ import { REVIEW_NECESSITY_COLORS } from '../../constants/review-necessity-consta
 import { formatMsToDaysAgo } from '../../functions/review-phase-utils';
 import { getScoringStatusIcon, getSelfEvaluationIcon } from './icons';
 
-interface RecordReviewCardProps {
+export interface RecordReviewCardProps {
   groupedTestResult: GroupedByIndexTestResult;
-  // 新しく追加する props
-  problems: any[];
+  problems: GroupedByIndexTestResultProblem[];
   higherLevelNecessity: ReviewNecessityResultWithGroup;
 }
 
@@ -33,9 +35,9 @@ export const RecordReviewCard: React.FC<RecordReviewCardProps> = ({
 }) => {
   const colorScheme: MantineColorScheme = useComputedColorScheme();
   const getTheme = (necessity: ReviewNecessityResultWithGroup) =>
-    REVIEW_NECESSITY_COLORS[colorScheme][necessity.level];
+    REVIEW_NECESSITY_COLORS[colorScheme][necessity?.level ?? '-1'];
   const getLabel = (necessity: ReviewNecessityResultWithGroup) =>
-    REVIEW_NECESSITY_REASON_LABELS[necessity.reason];
+    REVIEW_NECESSITY_REASON_LABELS[necessity?.reason ?? 'fullyUnrated'];
 
   const theme = REVIEW_NECESSITY_COLORS[colorScheme][higherLevelNecessity.level];
   const lastProblem = problems[problems.length - 1];

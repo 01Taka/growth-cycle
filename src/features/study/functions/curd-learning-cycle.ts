@@ -73,29 +73,18 @@ export const handleRecordSession = async (
   const learningCyclePath = generateIdbPath(IDB_PATH.learningCycles, learningCycleId);
 
   // 2. データ取得と存在チェックの強化
-  const textbook = await idbStore.get<TextbookDocument>(textbookPath);
-  if (!textbook) {
+  const textbookData = await idbStore.get<TextbookDocument>(textbookPath);
+  if (!textbookData) {
     throw new Error(`Textbook document not found for ID: ${textbookId}`);
   }
 
-  const learningCycle = await idbStore.get<LearningCycleDocument>(learningCyclePath);
-  if (!learningCycle) {
+  const learningCycleData = await idbStore.get<LearningCycleDocument>(learningCyclePath);
+  if (!learningCycleData) {
     throw new Error(`LearningCycle document not found for ID: ${learningCycleId}`);
   }
 
-  try {
-    // 3. 取得データのスキーマバリデーション
-    TextbookDocumentSchema.parse(textbook);
-    LearningCycleDocumentSchema.parse(learningCycle);
-  } catch (error) {
-    // ZodErrorなど、パースエラーの具体的なハンドリング
-    // if (error instanceof ZodError) {
-    //   throw new Error(`Schema validation failed for retrieved document: ${error.issues.map(i => i.message).join(', ')}`);
-    // }
-    throw new Error(
-      `Document schema validation failed during retrieval. Error: ${error instanceof Error ? error.message : String(error)}`
-    );
-  }
+  const textbook = TextbookDocumentSchema.parse(textbookData);
+  const learningCycle = LearningCycleDocumentSchema.parse(learningCycleData);
 
   const existingSessions = learningCycle.sessions;
   const now = Date.now();

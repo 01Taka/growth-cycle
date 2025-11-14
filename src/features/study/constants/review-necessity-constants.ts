@@ -48,6 +48,16 @@ export const REVIEW_NECESSITY_COLORS: {
       reverseText: '#ffffff',
       label: '要復習',
     },
+    // --- 未定義/N/A 用のキーを追加 (例: "-1") ---
+    '-1': {
+      background: '#f3f4f6', // Light gray background
+      text: '#4b5563', // Dark gray text
+      border: '#d1d5db', // Medium gray border
+      accent: '#9ca3af', // Accent gray
+      reverseText: '#1f2937', // Nearly black for good contrast
+      label: 'N/A (不明)',
+    },
+    // ------------------------------------
   },
   dark: {
     0: {
@@ -82,5 +92,15 @@ export const REVIEW_NECESSITY_COLORS: {
       reverseText: '#3b0764',
       label: '要復習',
     },
+    // --- 未定義/N/A 用のキーを追加 (例: "-1") ---
+    '-1': {
+      background: '#374151', // Darker gray background
+      text: '#e5e7eb', // Light gray text
+      border: '#6b7280', // Medium-dark gray border
+      accent: '#9ca3af', // Accent gray
+      reverseText: '#1f2937', // Nearly black for good contrast
+      label: 'N/A (不明)',
+    },
+    // ------------------------------------
   },
 };

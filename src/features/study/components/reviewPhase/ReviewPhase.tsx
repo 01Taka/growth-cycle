@@ -1,15 +1,10 @@
 import React from 'react';
 import { IconCircleCheck } from '@tabler/icons-react';
 import { Box, Button, rem, Stack } from '@mantine/core';
-import {
-  GroupedByIndexTestResult,
-  GroupedByIndexTestResultProblem,
-} from '@/features/app/learningCycles/types/expand-learning-cycle-types';
-import { ReviewNecessityResultWithGroup } from '@/features/app/review-necessity/types/review-necessity-types';
+import { GroupedByIndexTestResult } from '@/features/app/learningCycles/types/expand-learning-cycle-types';
 import { sharedStyle } from '@/shared/styles/shared-styles';
 import { SubjectColorMap } from '@/shared/theme/subjectColorType';
-import { range } from '@/shared/utils/range';
-import { RecordReviewCard } from './RecordReviewCard';
+import { RecordReviewCard, RecordReviewCardProps } from './RecordReviewCard';
 
 interface ReviewPhaseProps {
   groupedTestResults: GroupedByIndexTestResult[];
@@ -17,20 +12,14 @@ interface ReviewPhaseProps {
   onFinish: () => void;
 }
 
-interface CardDisplayData {
-  problems: GroupedByIndexTestResultProblem[];
-  higherLevelNecessity: ReviewNecessityResultWithGroup;
-  groupedTestResult: GroupedByIndexTestResult;
-}
-
 export const ReviewPhase: React.FC<ReviewPhaseProps> = ({
   groupedTestResults,
   theme,
   onFinish,
 }) => {
-  const processedResults: CardDisplayData[] = groupedTestResults.map((groupedTestResult) => {
+  const processedResults: RecordReviewCardProps[] = groupedTestResults.map((groupedTestResult) => {
     // 試行データ（problems）の準備
-    const problems = [...range(2, -1, -1)].map(
+    const problems = [2, 1, 0].map(
       (order) =>
         groupedTestResult.resultsMapByAttemptOrder[order] ?? {
           attemptAt: Date.now(),

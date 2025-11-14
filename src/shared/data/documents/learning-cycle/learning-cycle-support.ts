@@ -98,11 +98,26 @@ export type LearningCycleSession = z.infer<typeof LearningCycleSessionSchema>;
 
 export const LearningCycleProblemSchema = z
   .object({
-    problemIndex: z.number().int().min(0).describe('i18n:problem.index'),
+    problemIndex: z
+      .number()
+      .int()
+      .min(0)
+      .default(Number.MAX_SAFE_INTEGER)
+      .describe('i18n:problem.index'),
     unitId: z.string().min(1).nullable().describe('i18n:shared.unit_id'),
     categoryId: z.string().min(1).nullable().describe('i18n:shared.category_id'),
     problemNumber: z.number().int().min(1).describe('i18n:problem.number'),
+    // 削除したフィールド
+    index: z.number().optional(),
   })
-  .describe('i18n:problem.detail');
+  .describe('i18n:problem.detail')
+  .transform((data) => {
+    const problemIndexValue = data.index !== undefined ? data.index : (data as any).problemIndex;
+    delete data.index;
+    return {
+      ...data,
+      problemIndex: problemIndexValue as number,
+    };
+  });
 
 export type LearningCycleProblem = z.infer<typeof LearningCycleProblemSchema>;
