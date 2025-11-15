@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Stack } from '@mantine/core';
 import { useLearningCycleStore } from '@/shared/stores/useLearningCycleStore';
+import { ProblemListItem } from '../../problemsList/components/ProblemListItem';
 import { filterItems, sortItems } from '../functions/sort-and-filter';
 import { transformCycleToItemData } from '../functions/transform-cycle-item';
 import { HistorySortType } from '../types/learning-history-types';

@@ -5,6 +5,11 @@ import { TotalXPModal } from '@/features/app/xp/components/TotalXPModal';
 import { XpIconPill } from '@/features/app/xp/components/XpIconPill';
 import { calculateTotalXPWithLearningCycle } from '@/features/app/xp/functions/calculateXP';
 import { XPResults } from '@/features/app/xp/types/xp-types';
+import {
+  calculateAvgCorrectRate,
+  createProblemDataArray,
+  groupingResultsByProblem,
+} from '@/features/problemsList/functions/calc-avg-correct-rate';
 import { LearningCycleDocument } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 import { useLearningCycleStore } from '@/shared/stores/useLearningCycleStore';
 import useUserStore from '@/shared/stores/useUserStore';
@@ -71,6 +76,13 @@ export const HomeMain: React.FC<HomeMainProps> = ({}) => {
       navigate(`/study?cycleId=${cycle.id}&phase=test`);
     }
   };
+
+  useEffect(() => {
+    if (learningCycles.length > 0) {
+      const group = createProblemDataArray(learningCycles);
+      console.log(group);
+    }
+  }, [learningCycles]);
 
   const resultCycle = useMemo(() => {
     return learningCycles.find((cycle) => cycle.id === resultCycleId);
