@@ -1,8 +1,11 @@
 // src/features/learning-history/hooks/useAggregatedSections.ts
 
 import { useMemo } from 'react';
+import {
+  AggregatedSection,
+  DifferenceGrade,
+} from '../../app/learningCycles/history/types/learning-history-types'; // 適切なパスに修正してください
 import { getGradeByDifference } from '../functions/history-grade-color-utils'; // 適切なパスに修正してください
-import { AggregatedSection, DifferenceGrade } from '../types/learning-history-types'; // 適切なパスに修正してください
 
 /**
  * 復習からの経過日数に基づいて、学習履歴のProgressバー用セクションデータを計算するカスタムフック

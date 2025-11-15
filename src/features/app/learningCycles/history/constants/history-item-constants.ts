@@ -22,6 +22,8 @@ export const LEARNING_HISTORY_ITEM_TEXTS = {
   estimatedTimeUnit: '分',
   startReviewButton: '復習開始',
   actionIconAriaLabel: '勉強を開始',
+  startRecommendedButton: 'おすすめで学習開始',
+  checkAndSelectButton: '問題を確認 / 問題を変える',
 } as const;
 
 export const HISTORY_ITEM_COLORS = {

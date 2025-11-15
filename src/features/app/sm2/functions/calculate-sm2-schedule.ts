@@ -6,53 +6,15 @@ import {
   TestSelfEvaluation,
 } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { DEFAULT_CATEGORY_ID, DEFAULT_REF_TIME_MS } from '../constants/sm2-constants';
+import { DEFAULT_SM2_STATE, SM2_SCHEDULER_PARAMS } from '../constants/sm2-schedule-constants';
+import { SM2State } from '../types/sm2-types';
 import { calculateSM2Quality } from './calculate-sm2-quality';
 
 /**
- * SM-2スケジューリング計算に関するパラメータ群。
- */
-export const SM2_SCHEDULER_PARAMS = {
-  // 状態初期値
-  INITIAL_EF: 2.5, // 初期易しさ係数 (EF)
-  // Quality < 3 の時のリセット値
-  RESET_INTERVAL: 1, // 忘却時の間隔リセット値 (日数)
-  RESET_REPETITIONS: 0, // 忘却時の連続正解回数リセット値
-  // 最初の復習間隔 (日数)
-  FIRST_INTERVAL: 1, // 1回目 (n=0 -> n=1) の間隔
-  SECOND_INTERVAL: 6, // 2回目 (n=1 -> n=2) の間隔
-  // EF更新に関する係数
-  EF_ADJUSTMENT_COEFFICIENT_A: 0.1,
-  EF_ADJUSTMENT_COEFFICIENT_B: 0.08,
-  EF_ADJUSTMENT_COEFFICIENT_C: 0.02,
-  // EFの下限
-  MIN_EF: 1.3,
-  // 即時復習の間隔 (ms): 間隔が1日未満の場合に適用
-  IMMEDIATE_REVIEW_MS: 1 * 60 * 60 * 1000, // 1時間
-};
-
-/**
- * SM-2アルゴリズムの状態を定義します。
- */
-export type SM2State = {
-  interval: number; // I: 次の復習までの間隔 (日数)
-  easeFactor: number; // EF: 易しさ係数
-  repetitions: number; // n: 正解の連続回数
-};
-
-/**
- * SM-2の状態初期値 (問題がまだ学習されていない場合)
- */
-const DEFAULT_SM2_STATE: SM2State = {
-  interval: 0,
-  easeFactor: SM2_SCHEDULER_PARAMS.INITIAL_EF,
-  repetitions: 0,
-};
-
-/**
  * 問題番号 (problemIndex) に対応する次の復習推奨日 (UNIXタイムスタンプ ms) を格納するRecord型。
- * スコアが計算できなかった場合は、-1 を格納します。
+ * スコアが計算できなかった場合は、null を格納します。
  */
-export type ProblemScheduleRecord = Record<number, number>;
+export type ProblemScheduleRecord = Record<number, number | null>;
 
 // 履歴処理に必要な中間型
 type AttemptHistoryItem = LearningCycleTestResult & { attemptedAt: number };
@@ -218,9 +180,9 @@ export function calculateSM2ReviewScheduleForCycle(cycle: LearningCycle): Proble
     const problemIndex = problem.problemIndex;
     const history = problemHistoryMap[problemIndex];
 
-    // 履歴がない場合はスキップ (-1)
+    // 履歴がない場合はスキップ (null)
     if (!history || history.length === 0) {
-      scheduleRecord[problemIndex] = -1;
+      scheduleRecord[problemIndex] = null;
       continue;
     }
 
@@ -254,4 +216,54 @@ export function calculateSM2ReviewScheduleForCycle(cycle: LearningCycle): Proble
   }
 
   return scheduleRecord;
+}
+
+// 新しい戻り値の型
+export type ProblemForgottenStatusRecord = Record<number, boolean>;
+
+/**
+ * LearningCycle全体の問題ごとの最終試行の忘却状態 (q < 3) を計算します。
+ *
+ * @param cycle 処理対象のLearningCycleデータ
+ * @returns 問題番号をキーとし、直前の試行で忘却（q < 3）したかどうかを値とするRecord
+ */
+export function calculateForgottenStatusForCycle(
+  cycle: LearningCycle
+): ProblemForgottenStatusRecord {
+  // 1. 基準時間と問題詳細マップの準備
+  const { categoryRefTimeRecord } = compileTimeDataAndProblemMap(cycle);
+  // 2. 全履歴を問題ごとに時系列で集約
+  const problemHistoryMap = compileProblemHistory(cycle);
+
+  const forgottenStatusRecord: ProblemForgottenStatusRecord = {};
+
+  for (const problem of cycle.problems) {
+    const problemIndex = problem.problemIndex;
+    const history = problemHistoryMap[problemIndex];
+
+    if (!history || history.length === 0) {
+      forgottenStatusRecord[problemIndex] = false;
+      continue;
+    }
+
+    // === 🚀 変更点: 最終試行だけを取得 ===
+    const lastAttempt = history[history.length - 1];
+    // ====================================
+
+    // 3. 基準時間の取得
+    const refTimeMs = getRefTimeMsForProblem(problem, categoryRefTimeRecord);
+
+    // 4. 最終 Quality スコアを計算 (ループは不要)
+    const lastQualityScore = calculateSM2Quality(
+      lastAttempt.selfEvaluation as TestSelfEvaluation,
+      lastAttempt.scoringStatus as ProblemScoringStatus,
+      lastAttempt.timeSpentMs,
+      refTimeMs
+    );
+
+    // 5. 最終的なリセット状態を判定
+    forgottenStatusRecord[problemIndex] = lastQualityScore < 3;
+  }
+
+  return forgottenStatusRecord;
 }

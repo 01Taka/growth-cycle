@@ -2,9 +2,12 @@ import React from 'react';
 import { Box, Card, Collapse, Flex, Stack } from '@mantine/core';
 import { Plant } from '@/shared/types/plant-shared-types';
 import { Subject } from '@/shared/types/subject-types';
-import { HISTORY_ITEM_COLORS } from '../../constants/history-item-constants';
-import { AggregatedSection } from '../../types/learning-history-types';
-import { ActionButton } from './ActionButton';
+import { ActionButton } from '../../../../learningHistory/components/item/ActionButton';
+import {
+  HISTORY_ITEM_COLORS,
+  LEARNING_HISTORY_ITEM_TEXTS,
+} from '../constants/history-item-constants';
+import { AggregatedSection } from '../types/learning-history-types';
 import { DetailSection } from './DetailSection';
 import { FixationProgress } from './FixationProgress';
 import { PlantSection } from './PlantSection';
@@ -27,6 +30,7 @@ interface LearningHistoryItemProps {
   openedDetail: boolean;
   toggleOpenedDetail: () => void;
   onStartReview: () => void;
+  onCheckAndSelectProblems: () => void;
 }
 
 export const LearningHistoryItem: React.FC<LearningHistoryItemProps> = ({
@@ -45,6 +49,7 @@ export const LearningHistoryItem: React.FC<LearningHistoryItemProps> = ({
   isWaitingFixedReview,
   toggleOpenedDetail,
   onStartReview,
+  onCheckAndSelectProblems,
 }) => {
   const theme = HISTORY_ITEM_COLORS;
 
@@ -62,9 +67,9 @@ export const LearningHistoryItem: React.FC<LearningHistoryItemProps> = ({
     >
       <Flex align="center" h={80} onClick={toggleOpenedDetail}>
         <PlantSection
+          label={LEARNING_HISTORY_ITEM_TEXTS.daysAgo(differenceFromLastAttempt)}
           plant={plant}
           subject={subject}
-          differenceFromLastAttempt={differenceFromLastAttempt}
         />
 
         <Stack ml="md" w="100%" gap={0} flex={1} miw={0}>
@@ -102,6 +107,7 @@ export const LearningHistoryItem: React.FC<LearningHistoryItemProps> = ({
           estimatedTestTimeMin={estimatedTestTimeMin}
           actionColor={actionColor}
           onStartReview={onStartReview}
+          onCheckAndSelectProblems={onCheckAndSelectProblems}
         />
       </Collapse>
     </Card>

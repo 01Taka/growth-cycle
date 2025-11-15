@@ -2,12 +2,12 @@
 import React, { useMemo, useState } from 'react';
 import { Card } from '@mantine/core';
 import { expandLearningCycle } from '@/features/app/learningCycles/functions/expand-learning-cycle-utils';
-import { COLORS } from '@/features/home/constants/review-constants';
+import { COLORS, REVIEW_LABELS } from '@/features/home/constants/review-constants';
 import { LearningCycleDocument } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
+import { ReviewedCycleCard } from '../reviewedCard/ReviewedCycleCard';
 import { StartReviewModal } from '../StartReviewModal';
 import { HomeReviewCardHeader } from './HomeReviewCardHeader';
-import { HomeReviewTabs } from './HomeReviewTabs';
-import { ReviewedCycleCard } from './ReviewedCycleCard';
+import { HomeReviewTabs } from './tab/HomeReviewTabs';
 
 interface HomeReviewCardProps {
   displayGroupKeys: string[];
@@ -37,7 +37,7 @@ export const HomeReviewCard: React.FC<HomeReviewCardProps> = ({
 
   const remainingTasks = todayReviewCyclesCount;
   const totalTasks = todayReviewCyclesCount + todayReviewedCyclesCount;
-  const progressString = `${todayReviewedCyclesCount} / ${totalTasks}`;
+  const progressString = REVIEW_LABELS.getProgressPillLabel(todayReviewedCyclesCount, totalTasks);
 
   return (
     <Card
@@ -49,8 +49,6 @@ export const HomeReviewCard: React.FC<HomeReviewCardProps> = ({
     >
       {/* --- ヘッダーと進捗表示 --- */}
       <HomeReviewCardHeader remainingTasks={remainingTasks} progressString={progressString} />
-
-      <ReviewedCycleCard />
 
       <HomeReviewTabs
         displayGroupKeys={displayGroupKeys}

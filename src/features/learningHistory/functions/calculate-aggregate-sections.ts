@@ -1,4 +1,7 @@
-import { AggregatedSection, DifferenceGrade } from '../types/learning-history-types'; // 適切なパスに修正してください
+import {
+  AggregatedSection,
+  DifferenceGrade,
+} from '../../app/learningCycles/history/types/learning-history-types'; // 適切なパスに修正してください
 import { getGradeByDifference } from './history-grade-color-utils'; // 適切なパスに修正してください
 
 /**

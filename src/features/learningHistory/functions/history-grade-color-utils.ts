@@ -1,5 +1,5 @@
+import { DifferenceGrade } from '../../app/learningCycles/history/types/learning-history-types';
 import { differenceColorGrades, ratioBorders } from '../constants/difference-colors';
-import { DifferenceGrade } from '../types/learning-history-types';
 
 /**
  * 日数の差に基づいてDifferenceGradeオブジェクトを取得する関数

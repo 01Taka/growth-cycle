@@ -1,7 +1,7 @@
 // HomeReviewCardHeader.tsx
 import React from 'react';
 import { CardSection, Flex, Pill, Stack, Text } from '@mantine/core';
-import { COLORS, STRINGS } from '@/features/home/constants/review-constants';
+import { COLORS, REVIEW_LABELS } from '@/features/home/constants/review-constants';
 
 interface HomeReviewCardHeaderProps {
   remainingTasks: number;
@@ -15,17 +15,17 @@ export const HomeReviewCardHeader: React.FC<HomeReviewCardHeaderProps> = ({
   <CardSection p="md">
     <Stack gap="xs">
       <Text fw={700} size="xl" c={COLORS.textDark}>
-        {STRINGS.headerTitle}
+        {REVIEW_LABELS.headerTitle}
       </Text>
       <Flex justify="space-between" align="center">
         <Text fw={600} size="md" c={COLORS.textDark}>
-          {STRINGS.remainingTasksLabel}
+          {REVIEW_LABELS.remainingTasksLabel}
           <Text span c={COLORS.orangeButton} size="xl" fw={700} ml={5}>
             {remainingTasks}
           </Text>
         </Text>
         <Pill size="md" radius="xl" variant="filled" bg={COLORS.pillBg} color={COLORS.textDark}>
-          進捗: {progressString}
+          {progressString}
         </Pill>
       </Flex>
     </Stack>
