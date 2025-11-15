@@ -6,7 +6,7 @@ import { ProblemListItem } from './ProblemListItem';
 interface ProblemListProps {
   problems: ProblemListItemData[];
   selectedProblemIds: string[];
-  onToggleSelect: (problem: ProblemListItemData) => {};
+  onToggleSelect: (id: string, problem: ProblemListItemData) => void;
 }
 
 export const ProblemList: React.FC<ProblemListProps> = ({
@@ -15,13 +15,14 @@ export const ProblemList: React.FC<ProblemListProps> = ({
   onToggleSelect,
 }) => {
   return (
-    <Stack>
+    <Stack gap={2}>
       {problems.map((problem) => (
         <ProblemListItem
-          key={problem.id}
+          key={problem.key}
           problem={problem}
-          isSelected={selectedProblemIds.includes(problem.id)}
-          onToggleSelect={() => onToggleSelect(problem)}
+          problemIndex={5}
+          isSelected={selectedProblemIds.includes(problem.key)}
+          onToggleSelect={() => onToggleSelect(problem.key, problem)}
         />
       ))}
     </Stack>

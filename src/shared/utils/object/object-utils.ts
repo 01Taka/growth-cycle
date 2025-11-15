@@ -108,3 +108,18 @@ export function replaceOrAddObject<T extends { id: any }>(
     return [...array, replacementData];
   }
 }
+
+/**
+ * Map<K, V[]>から、正規表現に一致するキーに対応する値の配列をフラット化して結合して返します。
+ * * @param map - 処理対象のMap (キーは string 型である必要があります)
+ * @param regex - キーに適用する正規表現
+ * @returns 正規表現に一致するキーに対応するすべての値が結合され、フラット化された配列
+ */
+export function getFlattenedValuesByRegex<V>(map: Map<string, V[]>, regex: RegExp): V[] {
+  // Array.from(map.entries()) で Map を [key, value[]] のタプルの配列に変換
+  // .filter(([key]) => regex.test(key)) で正規表現に一致するキーを持つエントリのみをフィルタリング
+  // .flatMap(([, values]) => values) で、残ったエントリの値の配列 (V[]) をすべてフラット化して結合
+  return Array.from(map.entries())
+    .filter(([key]) => regex.test(key))
+    .flatMap(([, values]) => values);
+}

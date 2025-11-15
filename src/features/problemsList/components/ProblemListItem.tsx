@@ -8,6 +8,7 @@ import { ProblemListItemData } from '../../learningHistory/types/problem-list-ty
 
 interface ProblemListItemProps {
   problem: ProblemListItemData;
+  problemIndex: number;
   isSelected: boolean;
   onToggleSelect: () => void;
 }
@@ -22,35 +23,36 @@ const getCorrectnessColor = (rate: number): MantineColor => {
 
 export const ProblemListItem: React.FC<ProblemListItemProps> = ({
   problem,
+  problemIndex,
   isSelected,
   onToggleSelect,
 }) => {
   const {
-    problemIndex,
     textbookName,
     unitName,
     categoryName,
     problemNumber,
-    isUrgent,
-    dueDateText,
     correctnessRate,
+    differenceFromNextAttempt,
+    lastAttemptSM2Quality,
   } = problem;
+  const isUrgent = lastAttemptSM2Quality < 3;
 
   const ratePercent = Math.round(correctnessRate * 100);
 
   // 選択時の色設定
   const selectedColor = 'blue';
 
+  const daysDifference = Math.floor(differenceFromNextAttempt / (24 * 60 * 60 * 100));
+  const daysDifferenceText =
+    daysDifference < 0 ? `${-daysDifference}日前` : `${daysDifference}日後`;
+
   return (
     <Flex
-      p="lg"
+      p="sm"
       align="center"
       gap="lg"
       bg={isSelected ? 'blue.0' : 'white'}
-      style={{
-        borderBottom: `1px solid var(--mantine-color-gray-2)`,
-        cursor: 'pointer',
-      }}
       onClick={onToggleSelect}
     >
       {/* 1. 選択UI (カスタム選択ボックス) */}
@@ -128,7 +130,7 @@ export const ProblemListItem: React.FC<ProblemListItemProps> = ({
 
         {/* その下: dueDateText (具体的な情報) */}
         <Text size="sm" fw={700} c={getUrgencyPillColor(isUrgent)}>
-          {dueDateText}
+          {daysDifferenceText}
         </Text>
 
         {/* 正解率 (習熟度) */}

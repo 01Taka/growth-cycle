@@ -20,7 +20,7 @@ export const SM2_SCHEDULER_PARAMS = {
   MIN_EF: 1.3,
   // 即時復習の間隔 (ms): 間隔が1日未満の場合に適用
   IMMEDIATE_REVIEW_MS: 1 * 60 * 60 * 1000, // 1時間
-};
+} as const;
 
 /**
  * SM-2の状態初期値 (問題がまだ学習されていない場合)
@@ -29,4 +29,4 @@ export const DEFAULT_SM2_STATE: SM2State = {
   interval: 0,
   easeFactor: SM2_SCHEDULER_PARAMS.INITIAL_EF,
   repetitions: 0,
-};
+} as const;

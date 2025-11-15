@@ -1,11 +1,21 @@
+import {
+  CategoryDetail,
+  UnitDetail,
+} from '@/shared/data/documents/learning-cycle/learning-cycle-support';
+
 export interface ProblemListItemData {
-  id: string;
-  problemIndex: number;
+  key: string;
+  textbookId: string;
   textbookName: string;
+  unitId: string;
+  unit: UnitDetail;
   unitName: string;
+  categoryId: string;
+  category: CategoryDetail;
   categoryName: string;
   problemNumber: number;
-  dueDateText: string;
-  correctnessRate: number; // 0.0 ~ 1.0
-  isUrgent: boolean;
+  correctnessRate: number;
+  nextAttemptTimestamp: number;
+  differenceFromNextAttempt: number;
+  lastAttemptSM2Quality: number;
 }
