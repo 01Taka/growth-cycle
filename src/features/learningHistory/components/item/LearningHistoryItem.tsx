@@ -2,12 +2,12 @@ import React from 'react';
 import { Box, Card, Collapse, Flex, Stack } from '@mantine/core';
 import { Plant } from '@/shared/types/plant-shared-types';
 import { Subject } from '@/shared/types/subject-types';
-import { ActionButton } from '../../../../learningHistory/components/item/ActionButton';
 import {
   HISTORY_ITEM_COLORS,
   LEARNING_HISTORY_ITEM_TEXTS,
-} from '../constants/history-item-constants';
-import { AggregatedSection } from '../types/learning-history-types';
+} from '../../constants/history-item-constants';
+import { AggregatedSection } from '../../types/learning-history-types';
+import { ActionButton } from './ActionButton';
 import { DetailSection } from './DetailSection';
 import { FixationProgress } from './FixationProgress';
 import { PlantSection } from './PlantSection';

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, Flex, Stack, Text } from '@mantine/core';
-import { LEARNING_HISTORY_ITEM_TEXTS } from '../constants/history-item-constants';
+import { LEARNING_HISTORY_ITEM_TEXTS } from '../../constants/history-item-constants';
 
 interface DetailSectionProps {
   testTargetProblemCount: number;

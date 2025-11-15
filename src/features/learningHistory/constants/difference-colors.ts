@@ -1,4 +1,4 @@
-import { DifferenceGrade } from '../../app/learningCycles/history/types/learning-history-types';
+import { DifferenceGrade } from '../types/learning-history-types';
 
 export const differenceColorGrades: DifferenceGrade[] = [
   { grade: 1, maxDifferenceDays: 1, color: 'red', description: '見直し' },

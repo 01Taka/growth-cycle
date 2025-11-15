@@ -1,7 +1,7 @@
 import React from 'react';
 import { IconRun } from '@tabler/icons-react';
 import { ActionIcon, Flex, rem, Stack, Text } from '@mantine/core';
-import { LEARNING_HISTORY_ITEM_TEXTS } from '../../../app/learningCycles/history/constants/history-item-constants';
+import { LEARNING_HISTORY_ITEM_TEXTS } from '../../constants/history-item-constants';
 
 interface ActionButtonProps {
   openedDetail: boolean;

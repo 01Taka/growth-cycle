@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text } from '@mantine/core';
-import { LearningHistoryItem } from '@/features/app/learningCycles/history/components/LearningHistoryItem';
 import { REVIEW_LABELS } from '@/features/home/constants/review-constants';
+import { LearningHistoryItem } from '@/features/learningHistory/components/item/LearningHistoryItem';
 import { LearningCycleDocument } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 
 interface ReviewItemListProps {

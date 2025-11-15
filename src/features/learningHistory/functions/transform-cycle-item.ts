@@ -9,10 +9,7 @@ import {
 } from '@/features/app/sm2/functions/sm2-data-utils';
 import { LearningCycle } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 import { getDaysDifference } from '@/shared/utils/datetime/datetime-compare-utils';
-import {
-  AggregatedSection,
-  LearningHistoryItemData,
-} from '../../app/learningCycles/history/types/learning-history-types';
+import { AggregatedSection, LearningHistoryItemData } from '../types/learning-history-types';
 import { getAggregateSections } from './calculate-aggregate-sections';
 import { getColorByRatio } from './history-grade-color-utils';
 

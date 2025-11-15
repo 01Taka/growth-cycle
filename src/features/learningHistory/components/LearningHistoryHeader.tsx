@@ -2,8 +2,8 @@ import React, { useMemo } from 'react';
 import { ComboboxData, Flex, Select, Title } from '@mantine/core';
 import { SUBJECT_LABEL_MAP } from '@/shared/constants/document-constants';
 import { Subject } from '@/shared/types/subject-types';
-import { HistorySortType } from '../../app/learningCycles/history/types/learning-history-types';
 import { HISTORY_SORT_OPTIONS } from '../constants/sort-options';
+import { HistorySortType } from '../types/learning-history-types';
 
 // Propsの型定義
 interface LearningHistoryHeaderProps {

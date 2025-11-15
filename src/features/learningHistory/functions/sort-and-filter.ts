@@ -1,7 +1,4 @@
-import {
-  HistorySortType,
-  LearningItem,
-} from '../../app/learningCycles/history/types/learning-history-types';
+import { HistorySortType, LearningItem } from '../types/learning-history-types';
 
 /**
  * データを教科でフィルタリングする純粋関数
