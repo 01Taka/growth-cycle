@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Stack } from '@mantine/core';
 import { LearningCycleList } from '@/features/learningDataList/components/cycleList/LearningCycleList';
@@ -28,7 +28,7 @@ export const LearningHistoryMain: React.FC<LearningHistoryMainProps> = ({}) => {
     fetchLearningCycles();
   }, [fetchLearningCycles]);
 
-  const { problems } = useProblemList(learningCycles);
+  const { problems, problemsMap } = useProblemList(learningCycles);
 
   const { recommendedTestMap, recommendedTestOverviewMap } = useRecommendedTest(
     learningCycles,
@@ -43,20 +43,9 @@ export const LearningHistoryMain: React.FC<LearningHistoryMainProps> = ({}) => {
     setSortBy,
     setSubjectFilter,
     onToggleOpenedDetail,
-  } = useCycleList(learningCycles, problems, recommendedTestOverviewMap);
+  } = useCycleList(learningCycles, problemsMap, recommendedTestOverviewMap);
 
-  const {
-    displayingProblems,
-    activeTab,
-    openedModal,
-    selectedProblemIdSet,
-    problemIndexMap,
-    onToggleSelect,
-    onClearCustomSelect,
-    onChangeTab,
-    onClose,
-    onOpen,
-  } = useCycleProblemsModal(problems, recommendedTestMap);
+  const modalProps = useCycleProblemsModal(problems, recommendedTestMap);
 
   const learningCycleSubjects = useMemo(() => {
     return learningCycles.map((cycle) => cycle.subject);
@@ -73,6 +62,7 @@ export const LearningHistoryMain: React.FC<LearningHistoryMainProps> = ({}) => {
       />
 
       <LearningCycleList
+        alwaysOpen
         cycleListItems={cycleListItems}
         openedDetailId={openedDetailItemId}
         toggleOpenedDetail={(item) => onToggleOpenedDetail(item.cycleId)}
@@ -81,20 +71,10 @@ export const LearningHistoryMain: React.FC<LearningHistoryMainProps> = ({}) => {
             navigate(`/study?cycleId=${item.cycleId}&phase=test`);
           }
         }}
-        onCheckAndSelectProblems={(item) => onOpen(item.textbookId, item.cycleId)}
+        onCheckAndSelectProblems={(item) => modalProps.onOpen(item.textbookId, item.cycleId)}
       />
 
-      <CycleProblemsModal
-        opened={openedModal}
-        problems={displayingProblems}
-        selectedProblemIdSet={selectedProblemIdSet}
-        problemIndexMap={problemIndexMap}
-        activeTab={activeTab}
-        onToggleSelect={onToggleSelect}
-        onChangeTab={onChangeTab}
-        onClose={onClose}
-        onClearCustomSelect={onClearCustomSelect}
-      />
+      <CycleProblemsModal {...modalProps} />
     </Stack>
   );
 };

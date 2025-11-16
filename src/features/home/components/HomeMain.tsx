@@ -8,6 +8,7 @@ import { XPResults } from '@/features/app/xp/types/xp-types';
 
 import '@/features/learningDataList/functions/problemList/calc-avg-correct-rate';
 
+import { CycleProblemsModal } from '@/features/learningDataList/components/cycleProblemsModal/CycleProblemsModal';
 import { LearningCycleDocument } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 import { useLearningCycleStore } from '@/shared/stores/useLearningCycleStore';
 import useUserStore from '@/shared/stores/useUserStore';
@@ -15,6 +16,7 @@ import {
   filterLearningCycles,
   groupingByDifferenceFromStartDate,
 } from '../functions/filter-learning-cycle';
+import { useCycleListForHome } from '../hooks/useCycleListForHome';
 import { generateDummyLearningCycles } from '../utils/learning-cycle-dummy';
 import { HomeReviewCard } from './review/card/HomeReviewCard';
 import { GrowthPresentation } from './startStudy/GrowthPresentation';
@@ -25,15 +27,15 @@ export const HomeMain: React.FC<HomeMainProps> = ({}) => {
   const navigate = useNavigate();
 
   const { user, fetchUser } = useUserStore((state) => state);
-  const { learningCycles: _learningCycles, fetchLearningCycles } = useLearningCycleStore(
+  const { learningCycles: learningCycles, fetchLearningCycles } = useLearningCycleStore(
     (state) => state
   );
 
   // ダミーデータの生成 (useMemoを使用して不要な再計算を防ぐ)
-  const learningCycles = useMemo(() => {
-    // 実際にFirestoreから取得する際は、この行を削除します
-    return [...generateDummyLearningCycles(3)];
-  }, []);
+  // const learningCycles = useMemo(() => {
+  //   // 実際にFirestoreから取得する際は、この行を削除します
+  //   return [...generateDummyLearningCycles(3)];
+  // }, []);
 
   const totalGainedXp = user?.totalGainedXp ?? 0;
 
@@ -47,36 +49,6 @@ export const HomeMain: React.FC<HomeMainProps> = ({}) => {
   useEffect(() => {
     fetchUser();
   }, [fetchUser]);
-
-  const { todayReviewCycles, todayReviewedCycles, todayStartedCycles } = useMemo(
-    () => filterLearningCycles(learningCycles),
-    [learningCycles]
-  );
-
-  console.log(learningCycles, todayReviewCycles, todayReviewedCycles, todayStartedCycles);
-
-  const groupedTodayReviewCycles = useMemo(
-    () => groupingByDifferenceFromStartDate(todayReviewCycles),
-    [todayReviewCycles]
-  );
-
-  const groupedTodayReviewedCycles = useMemo(
-    () => groupingByDifferenceFromStartDate(todayReviewedCycles),
-    [todayReviewedCycles]
-  );
-
-  const groupKeys = useMemo(() => {
-    const allKeys = new Set([
-      ...Object.keys(groupedTodayReviewCycles),
-      ...Object.keys(groupedTodayReviewedCycles),
-    ]);
-    return Array.from(allKeys).sort((a, b) => Number(a) - Number(b));
-  }, [groupedTodayReviewCycles, groupedTodayReviewedCycles]);
-
-  const learnings = todayStartedCycles.map((cycle) => ({
-    subject: cycle.subject,
-    plant: cycle.plant,
-  }));
 
   const handleStartReview = (cycle: LearningCycleDocument | null) => {
     if (cycle) {
@@ -99,6 +71,22 @@ export const HomeMain: React.FC<HomeMainProps> = ({}) => {
     setSearchParams(newSearchParams);
   };
 
+  const { todayReviewCycles, todayReviewedCycles, todayStartedCycles } = useMemo(
+    () => filterLearningCycles(learningCycles),
+    [learningCycles]
+  );
+
+  const { listProps, modalProps } = useCycleListForHome(
+    learningCycles,
+    todayReviewCycles,
+    todayReviewedCycles
+  );
+
+  const learnings = todayStartedCycles.map((cycle) => ({
+    subject: cycle.subject,
+    plant: cycle.plant,
+  }));
+
   return (
     <Stack gap={0}>
       <Flex w={'100%'} justify="end">
@@ -106,13 +94,11 @@ export const HomeMain: React.FC<HomeMainProps> = ({}) => {
       </Flex>
 
       <HomeReviewCard
-        displayGroupKeys={groupKeys}
-        groupedTodayReviewCycles={groupedTodayReviewCycles}
-        groupedTodayReviewedCycles={groupedTodayReviewedCycles}
-        todayReviewCyclesCount={todayReviewCycles.length}
-        todayReviewedCyclesCount={todayReviewedCycles.length}
-        onStartReview={handleStartReview}
+        listProps={listProps}
+        remainingTaskCount={listProps.reviewCycleItems.length}
+        totalTaskCount={listProps.reviewCycleItems.length + listProps.reviewedCycleItems.length}
       />
+      <CycleProblemsModal {...modalProps} />
 
       <GrowthPresentation learnings={learnings} onStartStudy={() => navigate('/textbooks')} />
 

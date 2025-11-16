@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { LearningCycle } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
+import { safeArrayToRecord } from '@/shared/utils/object/object-utils';
 import { createProblemListItems } from '../functions/problemList/create-problem-list-items';
 import { ProblemListItemData } from '../types/problem-list-types';
 
@@ -19,5 +20,7 @@ export const useProblemList = (
     return [];
   }, [learningCycles, problemsFilter]);
 
-  return { problems };
+  const problemsMap = useMemo(() => safeArrayToRecord(problems, 'key'), [problems]);
+
+  return { problems, problemsMap };
 };

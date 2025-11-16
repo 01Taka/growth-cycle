@@ -10,30 +10,21 @@ import {
 // Chevronアイコンをインポート
 import { rem, Stack, Text } from '@mantine/core';
 import { COLORS, REVIEW_LABELS } from '@/features/home/constants/review-constants';
-import { LearningCycleDocument } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
-import { ReviewItemList } from './eviewItemList';
+import {
+  LearningCycleList,
+  LearningCycleListProps,
+} from '@/features/learningDataList/components/cycleList/LearningCycleList';
 
 interface ReviewSectionProps {
   title: 'reviewPlanned' | 'reviewCompleted';
-  cycles: LearningCycleDocument[];
-  tabKey: string;
-  isCompleted: boolean;
-  displayDetailCycleId: string | null;
-  onToggleDetail: (cycleId: string) => void;
-  onSelectReviewTarget: (cycle: LearningCycleDocument | null) => void;
-  // 以下、新たに追加するProps
+  listProps: LearningCycleListProps;
   isSectionOpen?: boolean; // セクションの展開状態 (オプション: reviewPlannedでは使用しないため)
   onToggleSection?: () => void; // セクションのトグル関数 (オプション: reviewPlannedでは使用しないため)
 }
 
 export const ReviewSection: React.FC<ReviewSectionProps> = ({
   title,
-  cycles,
-  tabKey,
-  isCompleted,
-  displayDetailCycleId,
-  onToggleDetail,
-  onSelectReviewTarget,
+  listProps,
   isSectionOpen = true,
   onToggleSection,
 }) => {
@@ -63,7 +54,8 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
         onClick={isToggleable ? onToggleSection : undefined} // トグル可能な場合のみクリックハンドラを設定
       >
         <Icon style={{ verticalAlign: 'middle', marginRight: rem(4) }} />
-        {titleText} ({cycles.length}){/* トグル可能な場合にのみ矢印アイコンを表示 */}
+        {titleText} ({listProps.cycleListItems.length})
+        {/* トグル可能な場合にのみ矢印アイコンを表示 */}
         {isToggleable && (
           <ChevronIcon
             size={18}
@@ -76,18 +68,7 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
         )}
       </Text>
 
-      {(isPlanned || isSectionOpen) && (
-        <Stack gap="xs">
-          <ReviewItemList
-            cycles={cycles}
-            tabKey={tabKey}
-            isCompleted={isCompleted}
-            displayDetailCycleId={displayDetailCycleId}
-            onToggleDetail={onToggleDetail}
-            onSelectReviewTarget={onSelectReviewTarget}
-          />
-        </Stack>
-      )}
+      {(isPlanned || isSectionOpen) && <LearningCycleList {...listProps} />}
     </Stack>
   );
 };

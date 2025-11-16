@@ -45,7 +45,7 @@ export const filterLearningCycles = (
     // includeNotReviewTargetがfalseなら、isReviewTargetがtrueの場合のみ含める
     const shouldInclude = (includeOption: boolean) => includeOption || isReviewTarget;
 
-    if (containsToday(cycle.fixedReviewDates ?? [])) {
+    if (true || containsToday(cycle.fixedReviewDates ?? [])) {
       const sessionDatesSet = new Set(
         cycle.sessions.map((session) => dateToyyyyMMdd(session.attemptedAt))
       );
@@ -75,7 +75,7 @@ export const groupingByDifferenceFromStartDate = (
   learningCycles: LearningCycleDocument[],
   baseDate = new Date()
 ) => {
-  return learningCycles.reduce((result: Record<number, LearningCycleDocument[]>, cycle) => {
+  return learningCycles.reduce((result: Record<string, LearningCycleDocument[]>, cycle) => {
     // cycleStartAtがない場合はスキップ
     if (!cycle.cycleStartAt) return result;
 
@@ -98,7 +98,7 @@ export const groupingByDifferenceFromStartDate = (
  */
 export const groupCyclesByAllDateDifferences = (
   filteredCycles: Omit<FilteredCycles, 'todayStartedCycles'>
-): Record<number, DateGroupedCycles> => {
+): Record<string, DateGroupedCycles> => {
   const now = Date.now(); // 基準となる「今日」のタイムスタンプ
 
   // 最終的な結果を格納するオブジェクト

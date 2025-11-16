@@ -1,5 +1,10 @@
-import { LearningCycle } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
+import {
+  LearningCycle,
+  LearningCycleDocument,
+} from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 import { LearningCycleProblem } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
+import { safeArrayToRecord } from '@/shared/utils/object/object-utils';
+import { ProblemListItemData } from '../../types/problem-list-types';
 
 export const DEFAULT_UNIT_ID = 'unitId';
 export const DEFAULT_CATEGORY_ID = 'categoryId';
@@ -49,4 +54,26 @@ export const mapProblemIndexToGroupKey = (cycle: LearningCycle): Record<string, 
   });
 
   return problemKeyMap;
+};
+
+type ProblemMapByCycle = {
+  [cycleId: string]: (ProblemListItemData | undefined)[];
+};
+
+export const mapCycleIdToProblem = (
+  cycles: LearningCycleDocument[],
+  problems: ProblemListItemData[]
+): ProblemMapByCycle => {
+  const problemMap: Record<string, ProblemListItemData> = safeArrayToRecord(problems, 'key');
+
+  const entries: [string, (ProblemListItemData | undefined)[]][] = cycles.map((cycle) => {
+    // 内部の処理をより簡潔に記述
+    const problemList = cycle.problems.map((problem) => {
+      const key = generateProblemListKey(cycle, problem);
+      return problemMap[key]; // undefined の可能性を許容
+    });
+    return [cycle.id, problemList];
+  });
+
+  return Object.fromEntries(entries);
 };

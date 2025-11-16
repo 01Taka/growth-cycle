@@ -3,15 +3,8 @@ import {
   LearningCycle,
   LearningCycleDocument,
 } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
-import { LearningCycleProblem } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { getDaysDifference } from '@/shared/utils/datetime/datetime-compare-utils';
-import { REVIEW_STAGES } from '../../constants/review-recommendation-stage-constants';
-import {
-  CycleItemBaseData,
-  CycleItemData,
-  CycleListItemAggregatedSection,
-  TestOverviewInfo,
-} from '../../types/cycle-list-types';
+import { CycleItemBaseData, CycleItemData, TestOverviewInfo } from '../../types/cycle-list-types';
 import { ProblemListItemData } from '../../types/problem-list-types';
 import { mapProblemIndexToGroupKey } from '../problemList/problem-list-key-utils';
 import { aggregateReviewStages } from './create-aggregated-section';

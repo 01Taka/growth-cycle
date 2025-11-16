@@ -63,7 +63,8 @@ export const ActionInfo: React.FC<ActionInfoProps> = ({ problem }) => {
 
   const urgencyProps = getUrgencyPillProps(lastAttemptSM2Quality);
   const ratePercent = Math.round(correctnessRate * 100);
-  const daysDifference = Math.floor(differenceFromNextAttempt / (24 * 60 * 60 * 100));
+  const daysDifference = Math.floor(differenceFromNextAttempt / (24 * 60 * 60 * 1000));
+
   const daysColor = getDaysDifferenceTextColor(daysDifference, lastAttemptSM2Quality);
 
   return (

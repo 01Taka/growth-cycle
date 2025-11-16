@@ -1,7 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { HistorySortType } from '@/features/learningHistory/types/learning-history-types';
 import { LearningCycleDocument } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
-import { safeArrayToRecord } from '@/shared/utils/object/object-utils';
 import { createCycleListItems } from '../functions/cycleList/create-cycle-list-items';
 import { filterCycleItems, sortCycleItems } from '../functions/cycleList/sort-and-filter';
 import { TestOverviewInfo } from '../types/cycle-list-types';
@@ -9,7 +8,7 @@ import { ProblemListItemData } from '../types/problem-list-types';
 
 export const useCycleList = (
   learningCycles: LearningCycleDocument[],
-  problems: ProblemListItemData[],
+  problemsMap: Record<string, ProblemListItemData>,
   recommendedTestOverviewMap: Record<string, TestOverviewInfo>
 ) => {
   // --- ステート管理 ---
@@ -24,10 +23,6 @@ export const useCycleList = (
   const onToggleOpenedDetail = useCallback((cycleId: string) => {
     setOpenedDetailId((prevId) => (prevId === cycleId ? null : cycleId));
   }, []);
-
-  const problemsMap = useMemo(() => {
-    return safeArrayToRecord(problems, 'key');
-  }, [problems]);
 
   // 1. 全学習サイクルのデータ変換結果をメモ化（パフォーマンス対策）
   const itemsData = useMemo(() => {

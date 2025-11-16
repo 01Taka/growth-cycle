@@ -5,8 +5,8 @@ import { ProblemListItemData } from '../../types/problem-list-types';
 import { CycleProblemsModalContent } from './CycleProblemsModalContent';
 
 interface CycleProblemsModalProps {
-  opened: boolean;
-  problems: ProblemListItemData[];
+  openedModal: boolean;
+  displayingProblems: ProblemListItemData[];
   selectedProblemIdSet: Set<string>;
   problemIndexMap: Record<string, number>;
   activeTab: CycleProblemsModalTabType;
@@ -17,8 +17,8 @@ interface CycleProblemsModalProps {
 }
 
 export const CycleProblemsModal: React.FC<CycleProblemsModalProps> = ({
-  opened,
-  problems,
+  openedModal,
+  displayingProblems,
   selectedProblemIdSet,
   problemIndexMap,
   activeTab,
@@ -28,9 +28,9 @@ export const CycleProblemsModal: React.FC<CycleProblemsModalProps> = ({
   onClearCustomSelect,
 }) => {
   return (
-    <Modal opened={opened} onClose={onClose}>
+    <Modal opened={openedModal} onClose={onClose}>
       <CycleProblemsModalContent
-        problems={problems}
+        problems={displayingProblems}
         selectedProblemIdSet={selectedProblemIdSet}
         problemIndexMap={problemIndexMap}
         activeTab={activeTab}
