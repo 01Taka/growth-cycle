@@ -6,10 +6,8 @@ import { XpIconPill } from '@/features/app/xp/components/XpIconPill';
 import { calculateTotalXPWithLearningCycle } from '@/features/app/xp/functions/calculateXP';
 import { XPResults } from '@/features/app/xp/types/xp-types';
 
-import '@/features/problemsList/functions/calc-avg-correct-rate';
+import '@/features/learningDataList/functions/problemList/calc-avg-correct-rate';
 
-import { ProblemList } from '@/features/problemsList/components/ProblemList';
-import { createProblemDataArray } from '@/features/problemsList/functions/calc-avg-correct-rate';
 import { LearningCycleDocument } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 import { useLearningCycleStore } from '@/shared/stores/useLearningCycleStore';
 import useUserStore from '@/shared/stores/useUserStore';
@@ -17,6 +15,7 @@ import {
   filterLearningCycles,
   groupingByDifferenceFromStartDate,
 } from '../functions/filter-learning-cycle';
+import { generateDummyLearningCycles } from '../utils/learning-cycle-dummy';
 import { HomeReviewCard } from './review/card/HomeReviewCard';
 import { GrowthPresentation } from './startStudy/GrowthPresentation';
 
@@ -26,9 +25,15 @@ export const HomeMain: React.FC<HomeMainProps> = ({}) => {
   const navigate = useNavigate();
 
   const { user, fetchUser } = useUserStore((state) => state);
-  const { learningCycles: learningCycles, fetchLearningCycles } = useLearningCycleStore(
+  const { learningCycles: _learningCycles, fetchLearningCycles } = useLearningCycleStore(
     (state) => state
   );
+
+  // ダミーデータの生成 (useMemoを使用して不要な再計算を防ぐ)
+  const learningCycles = useMemo(() => {
+    // 実際にFirestoreから取得する際は、この行を削除します
+    return [...generateDummyLearningCycles(3)];
+  }, []);
 
   const totalGainedXp = user?.totalGainedXp ?? 0;
 
@@ -47,6 +52,8 @@ export const HomeMain: React.FC<HomeMainProps> = ({}) => {
     () => filterLearningCycles(learningCycles),
     [learningCycles]
   );
+
+  console.log(learningCycles, todayReviewCycles, todayReviewedCycles, todayStartedCycles);
 
   const groupedTodayReviewCycles = useMemo(
     () => groupingByDifferenceFromStartDate(todayReviewCycles),

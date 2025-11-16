@@ -2,22 +2,24 @@
 
 import { useMemo } from 'react';
 // 適切なパスに修正してください
-import { getGradeByDifference } from '../functions/history-grade-color-utils'; // 適切なパスに修正してください
-import { AggregatedSection, DifferenceGrade } from '../types/learning-history-types';
+import { getGradeByDifference } from '../../learningDataList/functions/cycleList/cycle-list-color-utils'; // 適切なパスに修正してください
+import { CycleListItemAggregatedSection, DifferenceGrade } from '../types/learning-history-types';
 
 /**
  * 復習からの経過日数に基づいて、学習履歴のProgressバー用セクションデータを計算するカスタムフック
  * @param dateDifferencesFromReview - 各問題の復習からの経過日数の配列
  * @param totalProblemCount - 総問題数
- * @returns AggregatedSection[] - Progressバーに表示するための集約されたセクションデータの配列
+ * @returns CycleListItemAggregatedSection[] - Progressバーに表示するための集約されたセクションデータの配列
  */
-export const useAggregatedSections = (dateDifferencesFromReview: number[]): AggregatedSection[] => {
+export const useAggregatedSections = (
+  dateDifferencesFromReview: number[]
+): CycleListItemAggregatedSection[] => {
   // 1問題あたりの値 (パーセンテージ) を計算
   const valuePerSection =
     dateDifferencesFromReview.length > 0 ? 100 / dateDifferencesFromReview.length : 0;
 
   // aggregatedSections の計算を useMemo でメモ化する
-  const aggregatedSections: AggregatedSection[] = useMemo(() => {
+  const aggregatedSections: CycleListItemAggregatedSection[] = useMemo(() => {
     if (valuePerSection === 0) return [];
 
     // Mapを使って、各Gradeごとに値 (value) を集計する

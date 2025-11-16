@@ -2,13 +2,11 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Stack } from '@mantine/core';
 import { useLearningCycleStore } from '@/shared/stores/useLearningCycleStore';
-import { filterItems, sortItems } from '../functions/sort-and-filter';
-import { transformCycleToItemData } from '../functions/transform-cycle-item';
+import { filterItems, sortItems } from '../../learningDataList/functions/cycleList/sort-and-filter';
+import { transformCycleToItemData } from '../../learningDataList/functions/cycleList/transform-cycle-item';
+import { useLearningHistoryDetailModal } from '../../learningDataList/hooks/useCycleProblemsModal';
 import { HistorySortType } from '../types/learning-history-types';
-import { LearningHistoryItem } from './item/LearningHistoryItem';
 import { LearningHistoryHeader } from './LearningHistoryHeader';
-import { LearningHistoryDetailModal } from './start/LearningHistoryDetailModal';
-import { useLearningHistoryDetailModal } from './start/useLearningHistoryDetailModal';
 
 interface LearningHistoryMainProps {}
 

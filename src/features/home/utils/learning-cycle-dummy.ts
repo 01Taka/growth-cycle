@@ -169,7 +169,7 @@ export function generateDummyLearningCycle(
     units: units,
     categories: categories,
     sessions: sessions,
-    fixedReviewDates: [],
+    fixedReviewDates: ['2025-11-16'],
     // 生成されたセッションリストの最新タイムスタンプを参照
     latestAttemptedAt:
       sessions.length > 0 ? sessions[sessions.length - 1].attemptedAt : baseTimestamp,
