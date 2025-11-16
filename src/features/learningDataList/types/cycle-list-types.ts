@@ -1,5 +1,6 @@
 import { Plant } from '@/shared/types/plant-shared-types';
 import { Subject } from '@/shared/types/subject-types';
+import { ProblemListItemData } from './problem-list-types';
 
 export interface CycleListItemAggregatedSection {
   value: number;
@@ -8,6 +9,8 @@ export interface CycleListItemAggregatedSection {
   description: string;
   striped: boolean;
 }
+
+export type RecommendationJudgeFunction = (stage: number, item: ProblemListItemData) => boolean;
 
 export interface CycleItemBaseData {
   cycleId: string;

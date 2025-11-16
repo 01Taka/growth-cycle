@@ -1,12 +1,13 @@
 import { useCallback, useMemo, useState } from 'react';
 import { HistorySortType } from '@/features/learningHistory/types/learning-history-types';
 import { LearningCycleDocument } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
-import { createCycleListItems } from '../functions/cycleList/create-cycle-list-items';
+import { createFilteredCycleItemData } from '../functions/cycleList/create-cycle-list-items';
 import { filterCycleItems, sortCycleItems } from '../functions/cycleList/sort-and-filter';
 import { TestOverviewInfo } from '../types/cycle-list-types';
 import { ProblemListItemData } from '../types/problem-list-types';
 
 export const useCycleList = (
+  learningCycleKeySetMap: Record<string, Set<string>>,
   learningCycles: LearningCycleDocument[],
   problemsMap: Record<string, ProblemListItemData>,
   recommendedTestOverviewMap: Record<string, TestOverviewInfo>
@@ -27,7 +28,12 @@ export const useCycleList = (
   // 1. 全学習サイクルのデータ変換結果をメモ化（パフォーマンス対策）
   const itemsData = useMemo(() => {
     return learningCycles.map((cycle) =>
-      createCycleListItems(cycle, problemsMap, recommendedTestOverviewMap[cycle.id])
+      createFilteredCycleItemData(
+        learningCycleKeySetMap[cycle.id] ?? [],
+        problemsMap,
+        cycle,
+        recommendedTestOverviewMap[cycle.id]
+      )
     );
   }, [learningCycles, problemsMap, recommendedTestOverviewMap]);
 

@@ -18,7 +18,7 @@ export const CYCLE_LIST_ITEM_TEXTS = {
   // 詳細エリア
   problemCountLabel: '問題数:',
   problemCountUnit: '問',
-  estimatedTimeLabel: '推定時間:',
+  estimatedTimeLabel: 'テスト時間:',
   estimatedTimeUnit: '分',
   startReviewButton: '復習開始',
   actionIconAriaLabel: '勉強を開始',

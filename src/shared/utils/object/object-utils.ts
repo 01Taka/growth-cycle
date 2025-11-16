@@ -123,3 +123,26 @@ export function getFlattenedValuesByRegex<V>(map: Map<string, V[]>, regex: RegEx
     .filter(([key]) => regex.test(key))
     .flatMap(([, values]) => values);
 }
+
+/**
+ * オブジェクトとキーの配列を受け取り、配列に含まれるキーのみを持つ新しいオブジェクトを返します。
+ *
+ * @param obj フィルター対象のオブジェクト
+ * @param keys 保持したいキーの配列
+ * @returns フィルターされた新しいオブジェクト
+ */
+export function filterObjectKeys<T extends object, K extends keyof T>(
+  obj: T,
+  keys: K[]
+): Pick<T, K> {
+  return keys.reduce(
+    (acc, key) => {
+      // obj[key] の型は T[K] であり、これは acc のプロパティの型と一致する
+      // acc は Pick<T, K> として初期化されており、key は K の要素であるため、
+      // この代入は型安全です。
+      acc[key] = obj[key];
+      return acc;
+    },
+    {} as Pick<T, K>
+  );
+}

@@ -1,13 +1,15 @@
 import { LearningCycleDocument } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 import { safeArrayToRecord } from '@/shared/utils/object/object-utils';
-import { TestOverviewInfo } from '../../types/cycle-list-types';
+import { RecommendationJudgeFunction, TestOverviewInfo } from '../../types/cycle-list-types';
 import { ProblemListItemData } from '../../types/problem-list-types';
 import { mapProblemIndexToGroupKey } from '../problemList/problem-list-key-utils';
 import { calcReviewRecommendationStage } from '../utils/calc-review-recommendation';
 
 export const getRecommendedTestData = (
   learningCycles: LearningCycleDocument[],
-  itemMap: Record<string, ProblemListItemData>
+  itemMap: Record<string, ProblemListItemData>,
+  // 新しい引数：推奨かどうかを判定する関数
+  isRecommendedJudge: RecommendationJudgeFunction
 ): Record<string, Record<string, ProblemListItemData>> => {
   const mapEntries = learningCycles.map((learningCycle) => {
     // 1. learningCycle内のproblemIndexとitemMapのkeyをマッピング
@@ -25,19 +27,20 @@ export const getRecommendedTestData = (
         item.lastAttemptSM2Quality
       );
 
-      const isRecommended = stage === 0; // ステージ0が推奨を示すと仮定
+      const isRecommended = isRecommendedJudge(stage, item);
+
       return { item, isRecommended };
     });
 
     // 3. 推奨されたアイテムのみをフィルタリング
     const recommendedItems = itemsWithStage.filter((data) => data.isRecommended);
 
+    // ... (4. 以降は変更なし)
+
     // 4. 推奨されたアイテムの配列を作成
     const itemArray = recommendedItems.map((data) => data.item);
 
     // 5. itemArrayを Record<key, item> の形に変換
-    // safeArrayToRecord(itemArray, 'key') は、itemオブジェクトの 'key' プロパティをキーとして使用し、
-    // Record<key, item> を作成すると仮定します。
     const recommendedItemMap = safeArrayToRecord(itemArray, 'key');
 
     // 6. [learningCycle.id, recommendedItemMap] のペアを返す

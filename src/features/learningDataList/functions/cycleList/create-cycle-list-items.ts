@@ -46,22 +46,33 @@ const calculateFixation = (items: ProblemListItemData[]): number => {
   return correctItem.length / items.length;
 };
 
-export const createCycleListItems = (
-  targetCycle: LearningCycleDocument,
+/**
+ * 指定されたキーで問題をフィルタリングし、その結果を使ってサイクルの集計データ (CycleItemData) を生成します。
+ *
+ * @param filterProblemKeys フィルタリングに使用する問題キーの配列またはSet
+ * @param problemsMap すべての問題アイテムを含むマップ
+ * @param targetCycle 対象となる学習サイクルドキュメント
+ * @param testData テストの概要情報
+ * @returns フィルタリングされた問題に基づく集計データ (CycleItemData)
+ */
+export const createFilteredCycleItemData = (
+  filterProblemKeys: string[] | Set<string>,
   problemsMap: Record<string, ProblemListItemData>,
+  targetCycle: LearningCycleDocument,
   testData: TestOverviewInfo
 ): CycleItemData => {
-  const baseData = createCycleItemBaseData(targetCycle);
-  const indexKeyMap = mapProblemIndexToGroupKey(targetCycle);
-  const indexProblemMap = Object.fromEntries(
-    targetCycle.problems.map((problem) => {
-      const index = problem.problemIndex;
-      const key = indexKeyMap[index];
-      const item = problemsMap[key];
-      return [index, item];
-    })
+  // 1. キーのフィルタリングと問題アイテムの取得 (元の filterProblemListItems のロジック)
+  const keys = Array.isArray(filterProblemKeys) ? filterProblemKeys : Array.from(filterProblemKeys);
+  const items = keys.map((key) => problemsMap[key]);
+
+  // 型述語を使用して、確実に ProblemListItemData[] を取得
+  const targetProblems: ProblemListItemData[] = items.filter(
+    (item): item is ProblemListItemData => item !== undefined
   );
-  const targetProblems = Object.values(indexProblemMap);
+
+  // 2. サイクルアイテムデータの計算と生成 (元の createCycleListItems のロジック)
+  const baseData = createCycleItemBaseData(targetCycle);
+
   const fixation = calculateFixation(targetProblems);
   const aggregatedSections = aggregateReviewStages(targetProblems);
   const actionColor = getColorByRatio(fixation);

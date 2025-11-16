@@ -28,7 +28,7 @@ export const LearningHistoryMain: React.FC<LearningHistoryMainProps> = ({}) => {
     fetchLearningCycles();
   }, [fetchLearningCycles]);
 
-  const { problems, problemsMap } = useProblemList(learningCycles);
+  const { problems, problemsMap, learningCycleKeySetMap } = useProblemList(learningCycles);
 
   const { recommendedTestMap, recommendedTestOverviewMap } = useRecommendedTest(
     learningCycles,
@@ -43,9 +43,9 @@ export const LearningHistoryMain: React.FC<LearningHistoryMainProps> = ({}) => {
     setSortBy,
     setSubjectFilter,
     onToggleOpenedDetail,
-  } = useCycleList(learningCycles, problemsMap, recommendedTestOverviewMap);
+  } = useCycleList(learningCycleKeySetMap, learningCycles, problemsMap, recommendedTestOverviewMap);
 
-  const modalProps = useCycleProblemsModal(problems, recommendedTestMap);
+  const modalProps = useCycleProblemsModal(learningCycleKeySetMap, problems, recommendedTestMap);
 
   const learningCycleSubjects = useMemo(() => {
     return learningCycles.map((cycle) => cycle.subject);

@@ -1,11 +1,14 @@
-import { useMemo, useState } from 'react';
-import { createCycleListItems } from '@/features/learningDataList/functions/cycleList/create-cycle-list-items';
+import { useEffect, useMemo, useState } from 'react';
+import { createFilteredCycleItemData } from '@/features/learningDataList/functions/cycleList/create-cycle-list-items';
+import { getTestOverviewMap } from '@/features/learningDataList/functions/cycleList/test-problems-utils';
+import { mapProblemIndexToGroupKey } from '@/features/learningDataList/functions/problemList/problem-list-key-utils';
 import { useCycleList } from '@/features/learningDataList/hooks/useCycleList';
 import { useCycleProblemsModal } from '@/features/learningDataList/hooks/useCycleProblemsModal';
 import { useProblemList } from '@/features/learningDataList/hooks/useProblemList';
 import { useRecommendedTest } from '@/features/learningDataList/hooks/useRecommendedTest';
 import { CycleItemData } from '@/features/learningDataList/types/cycle-list-types';
 import { LearningCycleDocument } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
+import { filterObjectKeys } from '@/shared/utils/object/object-utils';
 import { groupingByDifferenceFromStartDate } from '../functions/filter-learning-cycle';
 import { ReviewSectionCycleListProps } from '../types/review-section-types';
 
@@ -66,20 +69,46 @@ export const useCycleListForHome = (
     return Array.from(allKeys).sort((a, b) => Number(a) - Number(b));
   }, [groupedTodayReviewCycles, groupedTodayReviewedCycles]);
 
-  const { problems, problemsMap } = useProblemList(allLearningCycles);
+  useEffect(() => {
+    setCurrentDisplayGroupKey((prev) => {
+      if (prev === null && uniqueStrDifferencesFromCycleStart.length > 0) {
+        return uniqueStrDifferencesFromCycleStart[0];
+      }
+      return prev;
+    });
+  }, [uniqueStrDifferencesFromCycleStart]);
 
-  const { recommendedTestMap, recommendedTestOverviewMap } = useRecommendedTest(
+  const { problems, problemsMap, learningCycleKeySetMap } = useProblemList(allLearningCycles);
+
+  const { recommendedTestMap, recommendedTestOverviewMap, avgTimeMap } = useRecommendedTest(
     allLearningCycles,
     problems
   );
 
   const { openedDetailItemId, onToggleOpenedDetail } = useCycleList(
+    learningCycleKeySetMap,
     allLearningCycles,
     problemsMap,
     recommendedTestOverviewMap
   );
 
-  const modalProps = useCycleProblemsModal(problems, recommendedTestMap);
+  const allTestOverviewMap = useMemo(() => {
+    const allTestMap = Object.fromEntries(
+      allLearningCycles.map((cycle) => {
+        const keys = mapProblemIndexToGroupKey(cycle);
+        const data = filterObjectKeys(problemsMap, Object.values(keys));
+        return [cycle.id, data];
+      })
+    );
+    return getTestOverviewMap(allTestMap, avgTimeMap);
+  }, [allLearningCycles, problemsMap, avgTimeMap]);
+
+  const modalProps = useCycleProblemsModal(
+    learningCycleKeySetMap,
+    problems,
+    recommendedTestMap,
+    'all'
+  );
 
   const listProps: ReviewSectionCycleListProps = useMemo(() => {
     const reviewCycles = currentDisplayGroupKey
@@ -91,11 +120,21 @@ export const useCycleListForHome = (
       : [];
 
     const reviewCycleItems = reviewCycles.map((cycle) =>
-      createCycleListItems(cycle, problemsMap, recommendedTestOverviewMap[cycle.id])
+      createFilteredCycleItemData(
+        learningCycleKeySetMap[cycle.id] ?? [],
+        problemsMap,
+        cycle,
+        allTestOverviewMap[cycle.id]
+      )
     );
 
     const reviewedCycleItems = reviewedCycles.map((cycle) =>
-      createCycleListItems(cycle, problemsMap, recommendedTestOverviewMap[cycle.id])
+      createFilteredCycleItemData(
+        learningCycleKeySetMap[cycle.id] ?? [],
+        problemsMap,
+        cycle,
+        allTestOverviewMap[cycle.id]
+      )
     );
 
     return {

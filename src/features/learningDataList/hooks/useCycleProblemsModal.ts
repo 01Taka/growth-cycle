@@ -1,4 +1,10 @@
 import { useCallback, useMemo, useState } from 'react';
+import {
+  LearningCycle,
+  LearningCycleDocument,
+} from '@/shared/data/documents/learning-cycle/learning-cycle-document';
+import { safeArrayToRecord } from '@/shared/utils/object/object-utils';
+import { mapProblemIndexToGroupKey } from '../functions/problemList/problem-list-key-utils';
 import { CycleProblemsModalTabType } from '../types/cycle-problems-modal-types';
 import { ProblemListItemData } from '../types/problem-list-types';
 
@@ -8,11 +14,13 @@ interface ModalData {
 }
 
 export const useCycleProblemsModal = (
+  learningCycleKeySetMap: Record<string, Set<string>>,
   problems: ProblemListItemData[],
-  recommendedTestMap: Record<string, Record<string, ProblemListItemData>>
+  recommendedTestMap: Record<string, Record<string, ProblemListItemData>>,
+  defaultModalTab: CycleProblemsModalTabType = 'recommended'
 ) => {
   const [openedModalData, setOpenedModalData] = useState<null | ModalData>(null);
-  const [tab, setTab] = useState<CycleProblemsModalTabType>('recommended');
+  const [tab, setTab] = useState<CycleProblemsModalTabType>(defaultModalTab);
   const [customSelectedProblemIdSet, setCustomSelectedProblemIdSet] = useState<Set<string>>(
     new Set()
   );
@@ -29,7 +37,7 @@ export const useCycleProblemsModal = (
   const displayingProblems = useMemo(() => {
     if (!openedModalData) return [];
     const filterProblems = problems.filter(
-      (problem) => problem.textbookId === openedModalData.textbookId
+      (problem) => learningCycleKeySetMap[openedModalData.cycleId]?.has(problem.key) ?? false
     );
     return filterProblems.sort((a, b) => a.problemIndexInTextbook - b.problemIndexInTextbook);
   }, [problems, openedModalData]);

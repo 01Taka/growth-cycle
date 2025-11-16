@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import {
   LearningCycle,
   LearningCycleDocument,
@@ -12,18 +12,24 @@ import {
   calculateAvgTimeMap,
   groupResultsByProblemWithAttemptAt,
 } from '../functions/problemList/cycles-to-map';
+import { RecommendationJudgeFunction } from '../types/cycle-list-types';
 import { ProblemListItemData } from '../types/problem-list-types';
 
 export const useRecommendedTest = (
   learningCycles: LearningCycleDocument[],
-  problems: ProblemListItemData[]
+  problems: ProblemListItemData[],
+  isRecommendedJudge?: RecommendationJudgeFunction
 ) => {
   const problemMap = useMemo(() => {
     return safeArrayToRecord(problems, 'key');
   }, [problems]);
 
+  const isRecommendedGetter = useMemo(() => {
+    return isRecommendedJudge ?? ((stage: number, _item: ProblemListItemData) => stage === 0);
+  }, [isRecommendedJudge]);
+
   const recommendedTestMap = useMemo(() => {
-    return getRecommendedTestData(learningCycles, problemMap);
+    return getRecommendedTestData(learningCycles, problemMap, isRecommendedGetter);
   }, [learningCycles, problemMap]);
 
   const avgTimeMap = useMemo(() => {
