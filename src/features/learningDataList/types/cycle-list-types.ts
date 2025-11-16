@@ -29,3 +29,9 @@ export interface CycleItemData extends CycleItemBaseData {
   testTargetProblemCount: number;
   estimatedTestTimeMin: number;
 }
+
+export interface TestOverviewInfo {
+  problemCount: number;
+  totalTime: number;
+  avgTime: number;
+}

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Group, rem, Text } from '@mantine/core';
-import { CYCLE_LIST_ITEM_TEXTS } from '../../constants/history-item-constants';
+import { CYCLE_LIST_ITEM_TEXTS } from '@/features/learningDataList/constants/cycle-list-item-constants';
 
 interface WaitingReviewBannerProps {
   differenceToNextFixedReview: number | null;

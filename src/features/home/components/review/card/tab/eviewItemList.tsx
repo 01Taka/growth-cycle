@@ -1,7 +1,6 @@
 import React from 'react';
 import { Text } from '@mantine/core';
 import { REVIEW_LABELS } from '@/features/home/constants/review-constants';
-import { LearningHistoryItem } from '@/features/learningHistory/components/item/LearningHistoryItem';
 import { LearningCycleDocument } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 
 interface ReviewItemListProps {
@@ -31,7 +30,7 @@ export const ReviewItemList: React.FC<ReviewItemListProps> = ({
 
   return (
     <>
-      {cycles.map((cycle, index) => (
+      {/* {cycles.map((cycle, index) => (
         <LearningHistoryItem
           key={`${isCompleted ? 'reviewed' : 'review'}-${tabKey}-${index}`}
           plant={cycle.plant}
@@ -55,7 +54,7 @@ export const ReviewItemList: React.FC<ReviewItemListProps> = ({
           fixation={0}
           aggregatedSections={[]}
         />
-      ))}
+      ))} */}
     </>
   );
 };

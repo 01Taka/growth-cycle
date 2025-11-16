@@ -14,7 +14,7 @@ export const useProblemList = (
         ? problems.filter((problem) => problemsFilter(problem))
         : problems;
 
-      return filteredProblems.sort((a, b) => a.problemIndexInTextbook - b.problemIndexInTextbook);
+      return filteredProblems.sort();
     }
     return [];
   }, [learningCycles, problemsFilter]);

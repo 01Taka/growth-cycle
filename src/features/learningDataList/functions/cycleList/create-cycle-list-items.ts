@@ -10,6 +10,7 @@ import {
   CycleItemBaseData,
   CycleItemData,
   CycleListItemAggregatedSection,
+  TestOverviewInfo,
 } from '../../types/cycle-list-types';
 import { ProblemListItemData } from '../../types/problem-list-types';
 import { mapProblemIndexToGroupKey } from '../problemList/problem-list-key-utils';
@@ -52,30 +53,10 @@ const calculateFixation = (items: ProblemListItemData[]): number => {
   return correctItem.length / items.length;
 };
 
-const getTestInfo = (
-  problemsMap: Record<string, ProblemListItemData>,
-  avgTimeMap: Record<string, number>,
-  testTargetProblemKeys: string[],
-  indexKeyMap: Record<number, string>
-) => {
-  const testProblems = testTargetProblemKeys.map((key) => problemsMap[key]);
-  const validKeySet = new Set(Object.values(indexKeyMap));
-  const targetTestProblems = testProblems.filter(
-    (problem) => problem !== undefined && validKeySet.has(problem.key)
-  );
-  const problemCount = targetTestProblems.length;
-  const totalTime = targetTestProblems.reduce(
-    (total, problem) => total + (avgTimeMap[problem.key] ?? 0),
-    0
-  );
-  return { problemCount, totalTime };
-};
-
-const createCycleListItems = (
+export const createCycleListItems = (
   targetCycle: LearningCycleDocument,
   problemsMap: Record<string, ProblemListItemData>,
-  avgTimeMap: Record<string, number>,
-  testTargetProblemKeys: string[]
+  testData: TestOverviewInfo
 ): CycleItemData => {
   const baseData = createCycleItemBaseData(targetCycle);
   const indexKeyMap = mapProblemIndexToGroupKey(targetCycle);
@@ -91,19 +72,13 @@ const createCycleListItems = (
   const fixation = calculateFixation(targetProblems);
   const aggregatedSections = aggregateReviewStages(targetProblems);
   const actionColor = getColorByRatio(fixation);
-  const { problemCount, totalTime } = getTestInfo(
-    problemsMap,
-    avgTimeMap,
-    testTargetProblemKeys,
-    indexKeyMap
-  );
 
   return {
     ...baseData,
+    testTargetProblemCount: testData.problemCount,
+    estimatedTestTimeMin: Math.floor(testData.totalTime / 60000),
     fixation,
     aggregatedSections,
     actionColor,
-    testTargetProblemCount: problemCount,
-    estimatedTestTimeMin: Math.floor(totalTime / 60000),
   };
 };

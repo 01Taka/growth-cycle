@@ -1,8 +1,8 @@
 import React from 'react';
 import { Box, Flex, Progress, rem, Text, Tooltip } from '@mantine/core';
+import { CYCLE_LIST_ITEM_TEXTS } from '@/features/learningDataList/constants/cycle-list-item-constants';
+import { CycleListItemAggregatedSection } from '@/features/learningDataList/types/cycle-list-types';
 import { UTIL_STYLES } from '@/shared/styles/shared-styles';
-import { CYCLE_LIST_ITEM_TEXTS } from '../../constants/history-item-constants';
-import { CycleListItemAggregatedSection } from '../../types/learning-history-types';
 
 interface FixationProgressProps {
   fixation: number;

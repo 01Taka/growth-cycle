@@ -2,28 +2,42 @@ import { useCallback, useMemo, useState } from 'react';
 import { CycleProblemsModalTabType } from '../types/cycle-problems-modal-types';
 import { ProblemListItemData } from '../types/problem-list-types';
 
-const isRecommended = (problem: ProblemListItemData) => {
-  return problem.lastAttemptSM2Quality < 3 || problem.differenceFromNextAttempt <= 0;
-};
+interface ModalData {
+  textbookId: string;
+  cycleId: string;
+}
 
-export const useCycleProblemsModal = (problems: ProblemListItemData[]) => {
-  const [openedModal, setOpenedModal] = useState(false);
+export const useCycleProblemsModal = (
+  problems: ProblemListItemData[],
+  recommendedTestMap: Record<string, Record<string, ProblemListItemData>>
+) => {
+  const [openedModalData, setOpenedModalData] = useState<null | ModalData>(null);
   const [tab, setTab] = useState<CycleProblemsModalTabType>('recommended');
   const [customSelectedProblemIdSet, setCustomSelectedProblemIdSet] = useState<Set<string>>(
     new Set()
   );
 
-  const problemIdSet = useMemo(() => {
-    const problemIds = problems.map((problem) => problem.key);
-    return new Set(problemIds);
-  }, [problems]);
+  const recommendedProblemIdSet: Set<string> = useMemo(() => {
+    if (openedModalData && openedModalData.cycleId in recommendedTestMap) {
+      const tests = recommendedTestMap[openedModalData.cycleId];
+      const keys = Object.values(tests).map((test) => test.key);
+      return new Set(keys);
+    }
+    return new Set();
+  }, [openedModalData, recommendedTestMap]);
 
-  const recommendedProblemIdSet = useMemo(() => {
-    const problemIds = problems
-      .filter((problem) => isRecommended(problem))
-      .map((problem) => problem.key);
+  const displayingProblems = useMemo(() => {
+    if (!openedModalData) return [];
+    const filterProblems = problems.filter(
+      (problem) => problem.textbookId === openedModalData.textbookId
+    );
+    return filterProblems.sort((a, b) => a.problemIndexInTextbook - b.problemIndexInTextbook);
+  }, [problems, openedModalData]);
+
+  const problemIdSet = useMemo(() => {
+    const problemIds = displayingProblems.map((problem) => problem.key);
     return new Set(problemIds);
-  }, [problems]);
+  }, [displayingProblems]);
 
   const selectedProblemIdSet = useMemo(() => {
     switch (tab) {
@@ -40,7 +54,7 @@ export const useCycleProblemsModal = (problems: ProblemListItemData[]) => {
     const result: Record<string, number> = {};
     let count = 0;
 
-    for (const problem of problems) {
+    for (const problem of displayingProblems) {
       if (selectedProblemIdSet.has(problem.key)) {
         result[problem.key] = count;
         count++;
@@ -48,7 +62,7 @@ export const useCycleProblemsModal = (problems: ProblemListItemData[]) => {
     }
 
     return result;
-  }, [problems, selectedProblemIdSet]);
+  }, [displayingProblems, selectedProblemIdSet]);
 
   const onToggleSelect = useCallback(
     (id: string) => {
@@ -85,15 +99,15 @@ export const useCycleProblemsModal = (problems: ProblemListItemData[]) => {
   }, []);
 
   return {
+    displayingProblems,
     activeTab: tab,
-    openedModal,
-    problems,
+    openedModal: openedModalData !== null,
     problemIndexMap,
     selectedProblemIdSet,
     onToggleSelect,
     onChangeTab,
-    onClose: () => setOpenedModal(false),
-    onOpen: () => setOpenedModal(true),
+    onClose: () => setOpenedModalData(null),
+    onOpen: (textbookId: string, cycleId: string) => setOpenedModalData({ textbookId, cycleId }),
     onClearCustomSelect,
   };
 };

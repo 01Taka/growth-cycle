@@ -1,23 +1,37 @@
 import React from 'react';
 import { Box, Stack } from '@mantine/core';
+import { CycleItemData } from '../../types/cycle-list-types';
 import { LearningCycleListItem } from './LearningCycleListItem';
 
-interface LearningCycleListProps {}
+interface LearningCycleListProps {
+  cycleListItems: CycleItemData[];
+  openedDetailId: string | null;
+  toggleOpenedDetail: (item: CycleItemData) => void;
+  onStartReview: (item: CycleItemData) => void;
+  onCheckAndSelectProblems: (item: CycleItemData) => void;
+}
 
-export const LearningCycleList: React.FC<LearningCycleListProps> = ({}) => {
+export const LearningCycleList: React.FC<LearningCycleListProps> = ({
+  cycleListItems,
+  openedDetailId,
+  toggleOpenedDetail,
+  onStartReview,
+  onCheckAndSelectProblems,
+}) => {
   return (
     <Stack gap="xs" align="center" w="100%">
-      {filteredAndSortedItemData.map(({ cycleId, data }, index) => {
-        const openedDetail = openedDetailId === cycleId || (openedDetailId === null && index === 0);
+      {cycleListItems.map((item, index) => {
+        const openedDetail =
+          openedDetailId === item.cycleId || (openedDetailId === null && index === 0);
 
         return (
-          <Box w={'95%'} key={cycleId}>
+          <Box w={'95%'} key={item.cycleId}>
             <LearningCycleListItem
-              {...data}
+              {...item}
               openedDetail={openedDetail}
-              toggleOpenedDetail={() => handleCheckDetail(cycleId)}
-              onStartReview={() => navigate(`/study?cycleId=${cycleId}&phase=test`)}
-              onCheckAndSelectProblems={() => handelOpen(data.textbookId)}
+              toggleOpenedDetail={() => toggleOpenedDetail(item)}
+              onStartReview={() => onStartReview(item)}
+              onCheckAndSelectProblems={() => onCheckAndSelectProblems(item)}
             />
           </Box>
         );
