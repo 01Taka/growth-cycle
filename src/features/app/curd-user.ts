@@ -1,5 +1,5 @@
 import { LOCAL_USER_ID } from '@/shared/constants/app-constants';
-import { User, UserDocument } from '@/shared/data/documents/user/user-document';
+import { User, UserDocument, UserDocumentSchema } from '@/shared/data/documents/user/user-document';
 import { generateIdbPath } from '@/shared/data/idb/generate-path';
 import { IDB_PATH } from '@/shared/data/idb/idb-path';
 import { idbStore } from '@/shared/data/idb/idb-store';
@@ -10,9 +10,14 @@ const LOCAL_USER_PATH = generateIdbPath(IDB_PATH.users, LOCAL_USER_ID);
 export const createLocalUser = async (initialUser?: Partial<User>) => {
   const user: User = {
     totalGainedXp: 0,
+    currentActiveLearningCycle: null,
     ...initialUser,
   };
   return await idbStore.add(LOCAL_USER_PATH, user);
+};
+
+export const updateLocalUser = async (user: Partial<User>) => {
+  return await createLocalUser(user);
 };
 
 export const readOrCreateLocalUser = async (): Promise<UserDocument> => {
@@ -23,9 +28,9 @@ export const readOrCreateLocalUser = async (): Promise<UserDocument> => {
     if (!user) {
       throw new Error('ユーザーの作成に失敗しました。');
     }
-    return user;
+    return UserDocumentSchema.parse(user);
   }
-  return user;
+  return UserDocumentSchema.parse(user);
 };
 
 export const incrementLocalUserXp = async (gainedXp: number) => {

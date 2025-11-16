@@ -12,10 +12,7 @@ import { CycleProblemsModal } from '@/features/learningDataList/components/cycle
 import { LearningCycleDocument } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 import { useLearningCycleStore } from '@/shared/stores/useLearningCycleStore';
 import useUserStore from '@/shared/stores/useUserStore';
-import {
-  filterLearningCycles,
-  groupingByDifferenceFromStartDate,
-} from '../functions/filter-learning-cycle';
+import { filterLearningCycles } from '../functions/filter-learning-cycle';
 import { useCycleListForHome } from '../hooks/useCycleListForHome';
 import { generateDummyLearningCycles } from '../utils/learning-cycle-dummy';
 import { HomeReviewCard } from './review/card/HomeReviewCard';

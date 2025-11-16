@@ -1,4 +1,5 @@
 import * as z from 'zod';
+import { readOrCreateLocalUser, updateLocalUser } from '@/features/app/curd-user';
 import { generatePlantShapeWithConfigLoad } from '@/features/plants/functions/plant-utils';
 import {
   LearningCycle,
@@ -14,6 +15,7 @@ import {
   TextbookDocument,
   TextbookSchema,
 } from '@/shared/data/documents/textbook/textbook-document';
+import { ActiveLearningCycleDocument } from '@/shared/data/documents/user/user-support';
 import { generateFirestoreId, generateIdbPath } from '@/shared/data/idb/generate-path';
 import { IDB_PATH } from '@/shared/data/idb/idb-path';
 import { idbStore } from '@/shared/data/idb/idb-store';
@@ -120,6 +122,18 @@ const getFixedReviewDates = (now: number): string[] => {
   return REVIEW_INTERVAL_DAYS.map((interval) => getDateAfterDaysBoundary(interval, now));
 };
 
+const updateUser = async (newLearningCycleData: LearningCycle, id: string, path: string) => {
+  const activeLearningCycle: ActiveLearningCycleDocument = {
+    ...newLearningCycleData,
+    id,
+    path,
+    attemptingProblemIndexes: newLearningCycleData.problems.map((problem) => problem.problemIndex),
+    actualTestDurationMs: newLearningCycleData.testDurationMs,
+    sessionStartedAt: newLearningCycleData.cycleStartAt,
+  };
+  await updateLocalUser({ currentActiveLearningCycle: activeLearningCycle });
+};
+
 // --- メイン関数 ---
 
 /**
@@ -170,6 +184,15 @@ export const createLearningCycle = async (
   }
 
   const plant = getNewPlant(plantShape, now);
+
+  const user = await readOrCreateLocalUser();
+  console.log(user, user.currentActiveLearningCycle !== null);
+
+  if (user.currentActiveLearningCycle !== null) {
+    throw new Error(
+      `There is an active cycle, please finish it first. ${user.currentActiveLearningCycle.id}`
+    );
+  }
 
   // 2. パスの生成
   const newLearningCyclePath = generateIdbPath(IDB_PATH.learningCycles, '', true);
@@ -231,7 +254,9 @@ export const createLearningCycle = async (
 
   // 9. IDBに新しいLearningCycleを追加
   try {
-    return await idbStore.add(newLearningCyclePath, parsedLearningCycle);
+    const id = await idbStore.add(newLearningCyclePath, parsedLearningCycle);
+    await updateUser(parsedLearningCycle, id, newLearningCyclePath);
+    return id;
   } catch (error) {
     throw new Error(`IDBへのLearningCycle追加に失敗しました (Path: ${newLearningCyclePath})`);
   }

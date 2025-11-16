@@ -164,7 +164,7 @@ export function runCustomSM2Test(numProblems: number, numSessions: number, inter
     const problem = cycle.problems[i];
     const index = problem.problemIndex;
     const nextDateMs = schedule[index];
-    const nextDateStr = formatDate(nextDateMs);
+    const nextDateStr = formatDate(nextDateMs ?? 0);
 
     console.log(`  * **問題 ${index}** (${problem.categoryId}): 推奨日: ${nextDateStr}`);
   }

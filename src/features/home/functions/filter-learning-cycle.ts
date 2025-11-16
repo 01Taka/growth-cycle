@@ -45,7 +45,7 @@ export const filterLearningCycles = (
     // includeNotReviewTargetがfalseなら、isReviewTargetがtrueの場合のみ含める
     const shouldInclude = (includeOption: boolean) => includeOption || isReviewTarget;
 
-    if (true || containsToday(cycle.fixedReviewDates ?? [])) {
+    if (containsToday(cycle.fixedReviewDates ?? [])) {
       const sessionDatesSet = new Set(
         cycle.sessions.map((session) => dateToyyyyMMdd(session.attemptedAt))
       );

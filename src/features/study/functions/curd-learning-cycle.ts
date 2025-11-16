@@ -1,4 +1,8 @@
-import { incrementLocalUserXp } from '@/features/app/curd-user';
+import {
+  incrementLocalUserXp,
+  readOrCreateLocalUser,
+  updateLocalUser,
+} from '@/features/app/curd-user';
 import { createExpandedLearningCycleTestResultsFromCycle } from '@/features/app/learningCycles/functions/expand-learning-cycle-utils';
 import { calculateMaxXP } from '@/features/app/xp/functions/calculate-max-xp';
 import { calculateTotalXPWithLearningCycle } from '@/features/app/xp/functions/calculateXP';
@@ -54,20 +58,34 @@ const checkIsFixedReviewSession = (pastLearningCycle: LearningCycle) => {
   return false;
 };
 
+const updateUser = async () => {
+  await updateLocalUser({ currentActiveLearningCycle: null });
+};
+
 export const handleRecordSession = async (
-  textbookId: string,
-  learningCycleId: string,
   scoringStatusMap: Record<number, ProblemScoringStatus>,
   selfEvaluationsMap: Record<number, TestSelfEvaluation>,
-  elapsedTimeMap: Record<number, number>
+  elapsedTimeMap: Record<number, number>,
+  confirmationTextbookId?: string,
+  confirmationLearningCycleId?: string
 ) => {
-  // 1. 入力値の基本チェック
-  if (!textbookId) {
-    throw new Error('textbookId must not be empty.');
+  const user = await readOrCreateLocalUser();
+  if (!user.currentActiveLearningCycle) {
+    throw new Error('There are currently no active cycles');
   }
-  if (!learningCycleId) {
-    throw new Error('learningCycleId must not be empty.');
+  if (
+    confirmationTextbookId &&
+    user.currentActiveLearningCycle.textbookId !== confirmationTextbookId
+  ) {
+    throw new Error('Textbook ID does not match');
   }
+  if (
+    confirmationLearningCycleId &&
+    user.currentActiveLearningCycle.id !== confirmationLearningCycleId
+  ) {
+    throw new Error('LearningCycle ID does not match');
+  }
+  const { textbookId, id: learningCycleId } = user.currentActiveLearningCycle;
 
   const textbookPath = generateIdbPath(IDB_PATH.textbooks, textbookId);
   const learningCyclePath = generateIdbPath(IDB_PATH.learningCycles, learningCycleId);
@@ -157,4 +175,5 @@ export const handleRecordSession = async (
   await idbStore.update<Textbook>(textbookPath, updatedTextbook);
   await idbStore.update<LearningCycle>(learningCyclePath, updatedLearningCycle);
   await incrementLocalUserXp(gainedXp);
+  await updateUser();
 };

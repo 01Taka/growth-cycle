@@ -124,11 +124,11 @@ export const useStudyData = (): StudyData => {
       if (isDataReady) {
         try {
           await handleRecordSession(
-            textbook.id,
-            learningCycle.id,
             args.scoringStatusMap,
             args.selfEvaluationMap,
-            args.elapsedTimeMap
+            args.elapsedTimeMap,
+            textbook.id,
+            learningCycle.id
           );
           await fetchLearningCycles(); // storeのデータを更新する
           navigate(`/?resultCycleId=${learningCycle.id}`);
