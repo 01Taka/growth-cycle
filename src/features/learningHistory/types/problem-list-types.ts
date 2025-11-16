@@ -7,6 +7,7 @@ export interface ProblemListItemData {
   key: string;
   textbookId: string;
   textbookName: string;
+  problemIndexInTextbook: number;
   unitId: string;
   unit: UnitDetail;
   unitName: string;

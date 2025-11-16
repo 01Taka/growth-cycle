@@ -2,12 +2,13 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Stack } from '@mantine/core';
 import { useLearningCycleStore } from '@/shared/stores/useLearningCycleStore';
-import { ProblemListItem } from '../../problemsList/components/ProblemListItem';
 import { filterItems, sortItems } from '../functions/sort-and-filter';
 import { transformCycleToItemData } from '../functions/transform-cycle-item';
 import { HistorySortType } from '../types/learning-history-types';
 import { LearningHistoryItem } from './item/LearningHistoryItem';
 import { LearningHistoryHeader } from './LearningHistoryHeader';
+import { LearningHistoryDetailModal } from './start/LearningHistoryDetailModal';
+import { useLearningHistoryDetailModal } from './start/useLearningHistoryDetailModal';
 
 interface LearningHistoryMainProps {}
 
@@ -34,6 +35,37 @@ export const LearningHistoryMain: React.FC<LearningHistoryMainProps> = ({}) => {
   const [sortBy, setSortBy] = useState<HistorySortType>('fixation');
   // 💡 教科フィルター
   const [subjectFilter, setSubjectFilter] = useState<string | null>(null);
+
+  const [openedModalTextbookId, setOpenedModalTextbookId] = useState<string | null>(null);
+
+  const {
+    activeTab,
+    openedModal,
+    problems,
+    selectedProblemIdSet,
+    problemIndexMap,
+    onToggleSelect,
+    onClearCustomSelect,
+    onChangeTab,
+    onClose,
+    onOpen,
+  } = useLearningHistoryDetailModal(
+    learningCycles,
+    (problem) => problem.textbookId === openedModalTextbookId
+  );
+
+  const handelOpen = useCallback(
+    (textbookId: string) => {
+      setOpenedModalTextbookId(textbookId);
+      onOpen();
+    },
+    [onOpen]
+  );
+
+  const handelClose = useCallback(() => {
+    onClose();
+    setOpenedModalTextbookId(null);
+  }, [onClose]);
 
   // onCheckDetailアクションの定義
   const handleCheckDetail = useCallback((cycleId: string) => {
@@ -86,12 +118,23 @@ export const LearningHistoryMain: React.FC<LearningHistoryMainProps> = ({}) => {
                 openedDetail={openedDetail}
                 toggleOpenedDetail={() => handleCheckDetail(cycleId)}
                 onStartReview={() => navigate(`/study?cycleId=${cycleId}&phase=test`)}
-                onCheckAndSelectProblems={() => {}}
+                onCheckAndSelectProblems={() => handelOpen(data.textbookId)}
               />
             </Box>
           );
         })}
       </Stack>
+      <LearningHistoryDetailModal
+        opened={openedModal}
+        problems={problems}
+        selectedProblemIdSet={selectedProblemIdSet}
+        problemIndexMap={problemIndexMap}
+        activeTab={activeTab}
+        onToggleSelect={onToggleSelect}
+        onChangeTab={onChangeTab}
+        onClose={handelClose}
+        onClearCustomSelect={onClearCustomSelect}
+      />
     </Stack>
   );
 };

@@ -31,6 +31,7 @@ export function updateSM2State(currentState: SM2State, qualityScore: number): SM
         qDiff * (p.EF_ADJUSTMENT_COEFFICIENT_B + qDiff * p.EF_ADJUSTMENT_COEFFICIENT_C));
 
     if (EF < p.MIN_EF) EF = p.MIN_EF;
+    if (EF > p.MAX_EF) EF = p.MAX_EF;
   } else {
     n = p.RESET_REPETITIONS;
     I = p.RESET_INTERVAL;

@@ -23,6 +23,7 @@ export interface LearningHistoryItemData {
   subject: Subject;
   fixation: number;
   unitNames: string[];
+  textbookId: string;
   textbookName: string;
   differenceFromLastAttempt: number;
   testTargetProblemCount: number;
@@ -39,3 +40,5 @@ export interface LearningItem {
 }
 
 export type HistorySortType = 'lastAttempt_desc' | 'lastAttempt_asc' | 'fixation';
+
+export type HistoryDetailModalTabType = 'recommended' | 'all' | 'custom';

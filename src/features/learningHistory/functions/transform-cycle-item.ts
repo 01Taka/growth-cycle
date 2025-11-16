@@ -64,6 +64,7 @@ export const transformCycleToItemData = (cycle: LearningCycle): LearningHistoryI
     subject: cycle.subject,
     fixation,
     unitNames: cycle.units.map((unit) => unit.name),
+    textbookId: cycle.textbookId,
     textbookName: cycle.textbookName,
     differenceFromLastAttempt: getDaysDifference(cycle.latestAttemptedAt),
     testTargetProblemCount: scheduledProblems.length,

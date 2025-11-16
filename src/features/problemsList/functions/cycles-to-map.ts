@@ -66,6 +66,7 @@ interface ProblemBase {
   unitId: string;
   categoryId: string;
   problemNumber: number;
+  problemIndexInTextbook: number;
 }
 
 /**
@@ -92,6 +93,7 @@ export const mapGroupKeyToProblemBase = (
           unitId: problem.unitId ?? DEFAULT_UNIT_ID,
           categoryId: problem.categoryId ?? DEFAULT_CATEGORY_ID,
           problemNumber: problem.problemNumber,
+          problemIndexInTextbook: problem.problemIndex,
         };
       }
     });

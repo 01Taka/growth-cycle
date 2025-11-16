@@ -5,13 +5,15 @@ import { ProblemListItem } from './ProblemListItem';
 
 interface ProblemListProps {
   problems: ProblemListItemData[];
-  selectedProblemIds: string[];
+  selectedProblemIdSet: Set<string>;
+  problemIndexMap: Record<string, number>;
   onToggleSelect: (id: string, problem: ProblemListItemData) => void;
 }
 
 export const ProblemList: React.FC<ProblemListProps> = ({
   problems,
-  selectedProblemIds,
+  selectedProblemIdSet,
+  problemIndexMap,
   onToggleSelect,
 }) => {
   return (
@@ -20,8 +22,8 @@ export const ProblemList: React.FC<ProblemListProps> = ({
         <ProblemListItem
           key={problem.key}
           problem={problem}
-          problemIndex={5}
-          isSelected={selectedProblemIds.includes(problem.key)}
+          problemIndex={problemIndexMap[problem.key]}
+          isSelected={selectedProblemIdSet.has(problem.key)}
           onToggleSelect={() => onToggleSelect(problem.key, problem)}
         />
       ))}

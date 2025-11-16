@@ -18,6 +18,7 @@ export const SM2_SCHEDULER_PARAMS = {
   EF_ADJUSTMENT_COEFFICIENT_C: 0.02,
   // EFの下限
   MIN_EF: 1.3,
+  MAX_EF: 3.0,
   // 即時復習の間隔 (ms): 間隔が1日未満の場合に適用
   IMMEDIATE_REVIEW_MS: 1 * 60 * 60 * 1000, // 1時間
 } as const;

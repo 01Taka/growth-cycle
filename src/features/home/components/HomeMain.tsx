@@ -77,16 +77,6 @@ export const HomeMain: React.FC<HomeMainProps> = ({}) => {
     }
   };
 
-  const problems = useMemo(() => {
-    if (learningCycles.length > 0) {
-      const problems = createProblemDataArray(learningCycles);
-      return problems.sort((a, b) => a.nextAttemptTimestamp - b.nextAttemptTimestamp);
-    }
-    return [];
-  }, [learningCycles]);
-
-  console.log(problems);
-
   const resultCycle = useMemo(() => {
     return learningCycles.find((cycle) => cycle.id === resultCycleId);
   }, [resultCycleId, learningCycles]);
@@ -118,8 +108,6 @@ export const HomeMain: React.FC<HomeMainProps> = ({}) => {
       />
 
       <GrowthPresentation learnings={learnings} onStartStudy={() => navigate('/textbooks')} />
-
-      <ProblemList problems={problems} selectedProblemIds={[]} onToggleSelect={() => {}} />
 
       <Card>
         <Button

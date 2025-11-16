@@ -1,16 +1,80 @@
 import React from 'react';
-import { LearningCycleProblem } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
+import { Button, Group, Stack, Tabs } from '@mantine/core';
+import { ProblemList } from '@/features/problemsList/components/ProblemList';
+import { HISTORY_DETAIL_TABS, HISTORY_MODAL_TEXT } from '../../constants/history-modal-constants';
+import { HistoryDetailModalTabType } from '../../types/learning-history-types';
+import { ProblemListItemData } from '../../types/problem-list-types';
 
-type HistoryDetailModalTabType = 'recommended' | 'all' | 'custom';
 interface HistoryModalContentProps {
-  problems: LearningCycleProblem[];
+  problems: ProblemListItemData[];
   selectedProblemIdSet: Set<string>;
-  onChangeTab: (type: HistoryDetailModalTabType) => {};
+  problemIndexMap: Record<string, number>;
+  activeTab: HistoryDetailModalTabType;
+  onChangeTab: (type: HistoryDetailModalTabType) => void;
+  onToggleSelect: (id: string, problem: ProblemListItemData) => void;
+  onClearCustomSelect: () => void;
 }
 
 export const HistoryModalContent: React.FC<HistoryModalContentProps> = ({
   problems,
   selectedProblemIdSet,
+  problemIndexMap,
+  activeTab,
+  onChangeTab,
+  onToggleSelect,
+  onClearCustomSelect,
 }) => {
-  return <div></div>;
+  const handleTabChange = (value: string | null) => {
+    if (value) {
+      onChangeTab(value as HistoryDetailModalTabType);
+    }
+  };
+
+  const isCustomTabActive = activeTab === 'custom';
+  const hasCustomSelections = selectedProblemIdSet.size > 0;
+
+  return (
+    <Stack gap="md" style={{ padding: '10px' }}>
+      <Tabs value={activeTab} onChange={handleTabChange} variant="pills" defaultValue="custom">
+        <Group justify="space-between" align="center" mb="sm">
+          <Tabs.List>
+            {/* 💡 定数配列をマップして Tabs.Tab を生成 */}
+            {HISTORY_DETAIL_TABS.map((tab) => (
+              <Tabs.Tab key={tab.value} value={tab.value}>
+                {tab.label}
+                {/* カスタムタブがアクティブで、選択がある場合にのみ数を表示 */}
+                {tab.value === activeTab && (
+                  <span style={{ marginLeft: '2px' }}>
+                    {HISTORY_MODAL_TEXT.selectionCountSeparator}
+                    {selectedProblemIdSet.size}
+                    {HISTORY_MODAL_TEXT.selectionCountCloser}
+                  </span>
+                )}
+              </Tabs.Tab>
+            ))}
+          </Tabs.List>
+
+          {/* 🗑️ すべて選択を解除ボタン (テキスト定数を使用) */}
+          {isCustomTabActive && hasCustomSelections && (
+            <Button
+              variant="light"
+              color="red"
+              size="xs"
+              onClick={onClearCustomSelect}
+              leftSection={<span style={{ fontSize: '1.2em' }}>❌</span>}
+            >
+              {HISTORY_MODAL_TEXT.clearButton}
+            </Button>
+          )}
+        </Group>
+
+        <ProblemList
+          problems={problems}
+          selectedProblemIdSet={selectedProblemIdSet}
+          problemIndexMap={problemIndexMap}
+          onToggleSelect={onToggleSelect}
+        />
+      </Tabs>
+    </Stack>
+  );
 };
