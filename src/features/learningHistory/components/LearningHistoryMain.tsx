@@ -1,12 +1,14 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Stack } from '@mantine/core';
+import { handleStartLearningCycleReview } from '@/features/app/learningCycles/functions/handle-start-learning-cycle-review';
 import { LearningCycleList } from '@/features/learningDataList/components/cycleList/LearningCycleList';
 import { CycleProblemsModal } from '@/features/learningDataList/components/cycleProblemsModal/CycleProblemsModal';
 import { useCycleList } from '@/features/learningDataList/hooks/useCycleList';
 import { useCycleProblemsModal } from '@/features/learningDataList/hooks/useCycleProblemsModal';
 import { useProblemList } from '@/features/learningDataList/hooks/useProblemList';
 import { useRecommendedTest } from '@/features/learningDataList/hooks/useRecommendedTest';
+import { CycleItemData } from '@/features/learningDataList/types/cycle-list-types';
 import { useLearningCycleStore } from '@/shared/stores/useLearningCycleStore';
 import { LearningHistoryHeader } from './LearningHistoryHeader';
 
@@ -30,7 +32,7 @@ export const LearningHistoryMain: React.FC<LearningHistoryMainProps> = ({}) => {
 
   const { problems, problemsMap, learningCycleKeySetMap } = useProblemList(learningCycles);
 
-  const { recommendedTestMap, recommendedTestOverviewMap } = useRecommendedTest(
+  const { recommendedTestMap, recommendedTestOverviewMap, avgTimeMap } = useRecommendedTest(
     learningCycles,
     problems
   );
@@ -45,7 +47,29 @@ export const LearningHistoryMain: React.FC<LearningHistoryMainProps> = ({}) => {
     onToggleOpenedDetail,
   } = useCycleList(learningCycleKeySetMap, learningCycles, problemsMap, recommendedTestOverviewMap);
 
-  const modalProps = useCycleProblemsModal(learningCycleKeySetMap, problems, recommendedTestMap);
+  const handleStartReviewWithRecommended = useCallback(
+    async (item: CycleItemData) => {
+      if (item?.cycleId && item.cycleId in recommendedTestMap) {
+        try {
+          const ids = Object.keys(recommendedTestMap[item.cycleId]);
+          if (ids && ids.length > 0) {
+            await handleStartLearningCycleReview(item.cycleId, ids, avgTimeMap);
+            navigate(`/study?phase=test`);
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    },
+    [recommendedTestMap, avgTimeMap]
+  );
+
+  const modalProps = useCycleProblemsModal(
+    learningCycleKeySetMap,
+    problems,
+    recommendedTestMap,
+    avgTimeMap
+  );
 
   const learningCycleSubjects = useMemo(() => {
     return learningCycles.map((cycle) => cycle.subject);
@@ -66,11 +90,7 @@ export const LearningHistoryMain: React.FC<LearningHistoryMainProps> = ({}) => {
         cycleListItems={cycleListItems}
         openedDetailId={openedDetailItemId}
         toggleOpenedDetail={(item) => onToggleOpenedDetail(item.cycleId)}
-        onStartReview={(item) => {
-          if (item?.cycleId) {
-            navigate(`/study?cycleId=${item.cycleId}&phase=test`);
-          }
-        }}
+        onStartReview={handleStartReviewWithRecommended}
         onCheckAndSelectProblems={(item) => modalProps.onOpen(item.textbookId, item.cycleId)}
       />
 

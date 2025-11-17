@@ -1,10 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
-import {
-  LearningCycle,
-  LearningCycleDocument,
-} from '@/shared/data/documents/learning-cycle/learning-cycle-document';
-import { safeArrayToRecord } from '@/shared/utils/object/object-utils';
-import { mapProblemIndexToGroupKey } from '../functions/problemList/problem-list-key-utils';
+import { useNavigate } from 'react-router-dom';
+import { handleStartLearningCycleReview } from '@/features/app/learningCycles/functions/handle-start-learning-cycle-review';
+import { CycleItemData } from '../types/cycle-list-types';
 import { CycleProblemsModalTabType } from '../types/cycle-problems-modal-types';
 import { ProblemListItemData } from '../types/problem-list-types';
 
@@ -17,6 +14,7 @@ export const useCycleProblemsModal = (
   learningCycleKeySetMap: Record<string, Set<string>>,
   problems: ProblemListItemData[],
   recommendedTestMap: Record<string, Record<string, ProblemListItemData>>,
+  avgTimeMap: Record<string, number>,
   defaultModalTab: CycleProblemsModalTabType = 'recommended'
 ) => {
   const [openedModalData, setOpenedModalData] = useState<null | ModalData>(null);
@@ -106,16 +104,42 @@ export const useCycleProblemsModal = (
     setCustomSelectedProblemIdSet(new Set());
   }, []);
 
+  const navigate = useNavigate();
+
+  const onStartReview = useCallback(async () => {
+    if (openedModalData?.cycleId) {
+      try {
+        const ids = Array.from(selectedProblemIdSet);
+        if (ids && ids.length > 0) {
+          await handleStartLearningCycleReview(openedModalData.cycleId, ids, avgTimeMap);
+          navigate(`/study?phase=test`);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  }, [selectedProblemIdSet, avgTimeMap, openedModalData]);
+
+  const testDurationMs = useMemo(() => {
+    return Array.from(selectedProblemIdSet).reduce(
+      (total, key) => total + (avgTimeMap[key] ?? 0),
+      0
+    );
+  }, [selectedProblemIdSet]);
+
   return {
     displayingProblems,
     activeTab: tab,
     openedModal: openedModalData !== null,
     problemIndexMap,
     selectedProblemIdSet,
+    problemCount: selectedProblemIdSet.size,
+    testDurationMs,
     onToggleSelect,
     onChangeTab,
     onClose: () => setOpenedModalData(null),
     onOpen: (textbookId: string, cycleId: string) => setOpenedModalData({ textbookId, cycleId }),
     onClearCustomSelect,
+    onStartReview,
   };
 };

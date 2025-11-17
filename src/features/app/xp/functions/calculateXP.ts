@@ -127,7 +127,7 @@ export function calculateXPLearningTime(learningDurationMs: number) {
 }
 
 export function calculateXPPlantGrowth(nextPlantStage: number | null) {
-  return nextPlantStage ? (PLANT_GROWTH_PX_MAP[nextPlantStage] ?? 0) : 0;
+  return nextPlantStage !== null ? (PLANT_GROWTH_PX_MAP[nextPlantStage] ?? 0) : 0;
 }
 /**
  * LearningCycleSessionの配列から、平均正解率（パーセンテージ）を計算します。

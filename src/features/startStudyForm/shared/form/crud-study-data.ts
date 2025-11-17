@@ -1,6 +1,9 @@
 import * as z from 'zod';
 import { readOrCreateLocalUser } from '@/features/app/curd-user';
-import { setUserCurrentActiveLearningCycle } from '@/features/app/learningCycles/functions/curd-learning-cycle-utils';
+import {
+  setUserCurrentActiveLearningCycle,
+  unsetUserCurrentActiveLearningCycle,
+} from '@/features/app/learningCycles/functions/curd-learning-cycle-utils';
 import { generatePlantShapeWithConfigLoad } from '@/features/plants/functions/plant-utils';
 import {
   LearningCycle,
@@ -238,6 +241,11 @@ export const createLearningCycle = async (
       throw new Error(`LearningCycleバリデーション失敗 (Zod): ${error.message}`);
     }
     throw new Error('LearningCycleバリデーション中に予期せぬエラーが発生しました');
+  }
+
+  if (user.currentActiveLearningCycle !== null) {
+    await unsetUserCurrentActiveLearningCycle();
+    console.error('セッションがある状態で開始しようとしたため強制終了しました。');
   }
 
   // 9. IDBに新しいLearningCycleを追加

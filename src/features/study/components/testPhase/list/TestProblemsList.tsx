@@ -7,8 +7,8 @@ import { TestProblemsItem } from './TestProblemsItem';
 
 interface TestProblemsListProps {
   problems: ExpandedLearningCycleProblem[];
-  elapsedTimeMap: Record<number, number>;
-  selfEvaluationMap: Record<number, TestSelfEvaluation>;
+  elapsedTimeMap: Record<string, number>;
+  selfEvaluationMap: Record<string, TestSelfEvaluation>;
   currentProblemIndex: number;
   theme: SubjectColorMap;
   onClick: (problem: ExpandedLearningCycleProblem) => void;
@@ -74,8 +74,8 @@ export const TestProblemsList: React.FC<TestProblemsListProps> = ({
           <TestProblemsItem
             key={index}
             problem={problem}
-            elapsedTimeMs={elapsedTimeMap[problem.problemIndex]}
-            selfEvaluation={selfEvaluationMap[problem.problemIndex] ?? 'unrated'}
+            elapsedTimeMs={elapsedTimeMap[problem.structuredId]}
+            selfEvaluation={selfEvaluationMap[problem.structuredId] ?? 'unrated'}
             isCurrent={problem.problemIndex === currentProblemIndex}
             colSizes={colSizes}
             theme={theme}

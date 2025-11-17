@@ -112,6 +112,7 @@ export const useCycleListForHome = (
     learningCycleKeySetMap,
     problems,
     recommendedTestMap,
+    avgTimeMap,
     'all'
   );
 
@@ -120,9 +121,15 @@ export const useCycleListForHome = (
   const handleStartReviewWithQuickButton = useCallback(
     async (item: CycleItemData) => {
       if (item && item.cycleId in learningCycleKeySetMap) {
-        const keys = Array.from(learningCycleKeySetMap[item.cycleId]);
-        await handleStartLearningCycleReview(item.cycleId, keys, avgTimeMap);
-        navigate(`/study?phase=test`);
+        try {
+          const ids = Array.from(learningCycleKeySetMap[item.cycleId]);
+          if (ids && ids.length > 0) {
+            await handleStartLearningCycleReview(item.cycleId, ids, avgTimeMap);
+            navigate(`/study?phase=test`);
+          }
+        } catch (error) {
+          console.error(error);
+        }
       }
     },
     [learningCycleKeySetMap, avgTimeMap]

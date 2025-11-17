@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const PLANT_MAX_STAGE = 3;
+export const PLANT_MAX_STAGE = 4;
 
 export const ImportPlantsTypeSchema = z.union([z.literal('adult'), z.literal('bud')]);
 
