@@ -10,8 +10,8 @@ import { toRGBA } from '@/shared/utils/color/color-convert-utils';
 import { PlantImageItem } from './PlantImageItem';
 
 interface PlantWithEffectProps {
-  plant: Plant;
-  subject: Subject;
+  plant: Plant | null;
+  subject: Subject | 'unselected';
   label?: string;
   imagePath?: string;
   auraEffect?: {
@@ -22,6 +22,7 @@ interface PlantWithEffectProps {
   plantSize?: number;
   dirtSize?: number;
   zIndex?: number;
+  hidePlant?: boolean;
 }
 
 export const PlantWithEffect: React.FC<PlantWithEffectProps> = ({
@@ -33,8 +34,10 @@ export const PlantWithEffect: React.FC<PlantWithEffectProps> = ({
   plantSize = 64,
   dirtSize,
   zIndex = 0,
+  hidePlant = false,
 }) => {
   const theme = useSubjectColorMap(subject);
+
   return (
     <Stack
       w={plantSize}
@@ -63,16 +66,18 @@ export const PlantWithEffect: React.FC<PlantWithEffectProps> = ({
         </Text>
       )}
 
-      <PlantImageItem
-        subject={subject}
-        plant={plant}
-        width={plantSize}
-        height={plantSize}
-        style={{
-          ...UTIL_STYLES.absoluteCenter,
-          zIndex: zIndex + 1,
-        }}
-      />
+      {!hidePlant && !!plant && subject !== 'unselected' && (
+        <PlantImageItem
+          subject={subject}
+          plant={plant}
+          width={plantSize}
+          height={plantSize}
+          style={{
+            ...UTIL_STYLES.absoluteCenter,
+            zIndex: zIndex + 1,
+          }}
+        />
+      )}
       <DirtMound
         size={dirtSize ?? plantSize}
         style={{
