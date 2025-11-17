@@ -1,5 +1,5 @@
-import { JSX, useCallback, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { JSX, useCallback, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ExpandedLearningCycleProblem } from '@/features/app/learningCycles/types/expand-learning-cycle-types';
 import { LearningCycleDocument } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 import {
@@ -7,13 +7,14 @@ import {
   TestSelfEvaluation,
 } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { TextbookDocument } from '@/shared/data/documents/textbook/textbook-document';
+import { ActiveLearningCycle } from '@/shared/data/documents/user/user-support';
 import { SingleTimerData } from '@/shared/hooks/multi-timer/multi-timer-types';
 import { useLearningCycleStore } from '@/shared/stores/useLearningCycleStore';
 import { useTextbookStore } from '@/shared/stores/useTextbookStore';
+import useUserStore from '@/shared/stores/useUserStore';
+import { createPseudoLearningCycleDocument } from '../../../app/learningCycles/functions/active-learning-cycle-utils';
 import { handleRecordSession } from '../../functions/curd-learning-cycle';
 import { StudyLoadingOrError } from './StudyLoadingOrError';
-
-const CYCLE_ID_KEY = 'cycleId';
 
 interface StudyResultData {
   selfEvaluationMap: Record<number, TestSelfEvaluation>;
@@ -26,18 +27,22 @@ interface StudyResultData {
 
 // 戻り値の型定義
 export interface StudyData {
-  cycleId: string | null;
-  learningCycle: LearningCycleDocument | undefined;
+  pseudoLearningCycleDocument: LearningCycleDocument | null;
   textbook: TextbookDocument | undefined;
-  isFoundCycle: boolean;
-  isFoundTextbook: boolean;
-  overallLoading: boolean;
-  cycleError: any;
-  textbookError: any;
   isDataReady: boolean;
+
   // レンダリングのためのLoading/Errorコンポーネント
   renderLoadingOrError: () => JSX.Element;
   handleFinishLearning: (args: StudyResultData) => Promise<void>;
+
+  learningCycle?: LearningCycleDocument | undefined;
+  activeLearningCycle?: ActiveLearningCycle | null;
+  cycleId?: string | null;
+  isFoundCycle?: boolean;
+  isFoundTextbook?: boolean;
+  overallLoading?: boolean;
+  cycleError?: any;
+  textbookError?: any;
 }
 
 /**
@@ -45,10 +50,22 @@ export interface StudyData {
  */
 export const useStudyData = (): StudyData => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const cycleId = searchParams.get(CYCLE_ID_KEY);
 
   // --- Zustand Store Data ---
+  const { user, fetchUser } = useUserStore((state) => state);
+  useEffect(() => {
+    fetchUser();
+  }, [fetchUser]);
+
+  const cycleId = user?.currentActiveLearningCycle?.id ?? null;
+  const currentActiveLearningCycle = user?.currentActiveLearningCycle ?? null;
+
+  const pseudoLearningCycleDocument = useMemo(() => {
+    return currentActiveLearningCycle
+      ? createPseudoLearningCycleDocument(currentActiveLearningCycle)
+      : null;
+  }, [currentActiveLearningCycle]);
+
   const {
     activeLearningCycle,
     getLearningCycleById,
@@ -148,15 +165,17 @@ export const useStudyData = (): StudyData => {
   );
 
   return {
+    isDataReady,
+    textbook,
     cycleId,
     learningCycle,
-    textbook,
+    pseudoLearningCycleDocument,
+    activeLearningCycle: currentActiveLearningCycle,
     isFoundCycle,
     isFoundTextbook,
     overallLoading,
     cycleError,
     textbookError,
-    isDataReady,
     renderLoadingOrError,
     handleFinishLearning,
   };

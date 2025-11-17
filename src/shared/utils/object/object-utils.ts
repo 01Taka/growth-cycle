@@ -146,3 +146,23 @@ export function filterObjectKeys<T extends object, K extends keyof T>(
     {} as Pick<T, K>
   );
 }
+
+/**
+ * Recordのキーでソートされた値の配列を返します。
+ *
+ * @param record ソートするRecord<string, T>オブジェクト
+ * @returns キーでソートされた値の配列
+ */
+export function sortRecordByKeys<T>(record: Record<string, T>): T[] {
+  // 1. Object.entries()で [キー, 値] の配列に変換
+  const entries = Object.entries(record);
+
+  // 2. キー（インデックス0）に基づいてソート
+  // stringの比較（辞書順）でソートされます。
+  entries.sort(([keyA], [keyB]) => keyA.localeCompare(keyB));
+
+  // 3. map()でソートされたペアから値（インデックス1）のみを取り出す
+  const sortedValues = entries.map(([, value]) => value);
+
+  return sortedValues;
+}

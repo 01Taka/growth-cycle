@@ -1,8 +1,5 @@
-import { useCallback, useMemo } from 'react';
-import {
-  LearningCycle,
-  LearningCycleDocument,
-} from '@/shared/data/documents/learning-cycle/learning-cycle-document';
+import { useMemo } from 'react';
+import { LearningCycleDocument } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 import { safeArrayToRecord } from '@/shared/utils/object/object-utils';
 import {
   getRecommendedTestData,

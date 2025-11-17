@@ -9,12 +9,10 @@ import { XPResults } from '@/features/app/xp/types/xp-types';
 import '@/features/learningDataList/functions/problemList/calc-avg-correct-rate';
 
 import { CycleProblemsModal } from '@/features/learningDataList/components/cycleProblemsModal/CycleProblemsModal';
-import { LearningCycleDocument } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 import { useLearningCycleStore } from '@/shared/stores/useLearningCycleStore';
 import useUserStore from '@/shared/stores/useUserStore';
 import { filterLearningCycles } from '../functions/filter-learning-cycle';
 import { useCycleListForHome } from '../hooks/useCycleListForHome';
-import { generateDummyLearningCycles } from '../utils/learning-cycle-dummy';
 import { HomeReviewCard } from './review/card/HomeReviewCard';
 import { GrowthPresentation } from './startStudy/GrowthPresentation';
 
@@ -46,12 +44,6 @@ export const HomeMain: React.FC<HomeMainProps> = ({}) => {
   useEffect(() => {
     fetchUser();
   }, [fetchUser]);
-
-  const handleStartReview = (cycle: LearningCycleDocument | null) => {
-    if (cycle) {
-      navigate(`/study?cycleId=${cycle.id}&phase=test`);
-    }
-  };
 
   const resultCycle = useMemo(() => {
     return learningCycles.find((cycle) => cycle.id === resultCycleId);

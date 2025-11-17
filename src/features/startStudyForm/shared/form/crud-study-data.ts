@@ -1,5 +1,6 @@
 import * as z from 'zod';
 import { readOrCreateLocalUser, updateLocalUser } from '@/features/app/curd-user';
+import { getSortedProblemKeys } from '@/features/learningDataList/functions/problemList/problem-list-key-utils';
 import { generatePlantShapeWithConfigLoad } from '@/features/plants/functions/plant-utils';
 import {
   LearningCycle,
@@ -15,7 +16,7 @@ import {
   TextbookDocument,
   TextbookSchema,
 } from '@/shared/data/documents/textbook/textbook-document';
-import { ActiveLearningCycleDocument } from '@/shared/data/documents/user/user-support';
+import { ActiveLearningCycle } from '@/shared/data/documents/user/user-support';
 import { generateFirestoreId, generateIdbPath } from '@/shared/data/idb/generate-path';
 import { IDB_PATH } from '@/shared/data/idb/idb-path';
 import { idbStore } from '@/shared/data/idb/idb-store';
@@ -123,11 +124,11 @@ const getFixedReviewDates = (now: number): string[] => {
 };
 
 const updateUser = async (newLearningCycleData: LearningCycle, id: string, path: string) => {
-  const activeLearningCycle: ActiveLearningCycleDocument = {
+  const activeLearningCycle: ActiveLearningCycle = {
     ...newLearningCycleData,
     id,
     path,
-    attemptingProblemIndexes: newLearningCycleData.problems.map((problem) => problem.problemIndex),
+    attemptingProblemKeys: getSortedProblemKeys(newLearningCycleData),
     actualTestDurationMs: newLearningCycleData.testDurationMs,
     sessionStartedAt: newLearningCycleData.cycleStartAt,
   };
@@ -186,7 +187,6 @@ export const createLearningCycle = async (
   const plant = getNewPlant(plantShape, now);
 
   const user = await readOrCreateLocalUser();
-  console.log(user, user.currentActiveLearningCycle !== null);
 
   if (user.currentActiveLearningCycle !== null) {
     throw new Error(

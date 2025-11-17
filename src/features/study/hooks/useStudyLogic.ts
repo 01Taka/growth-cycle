@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { groupingTestResultsByIndex } from '@/features/app/learningCycles/functions/grouping-test-results';
 import {
   ExpandedLearningCycle,
   ExpandedLearningCycleProblem,
@@ -14,7 +15,6 @@ import { Subject } from '@/shared/types/subject-types';
 import {
   createExpandedLearningCycleTestResultsFromCycle,
   expandLearningCycle,
-  groupingTestResultsByIndex,
 } from '../../app/learningCycles/functions/expand-learning-cycle-utils';
 import { useStudyTimer } from '../hooks/useStudyTimer';
 

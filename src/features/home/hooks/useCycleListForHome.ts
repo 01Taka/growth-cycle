@@ -1,7 +1,12 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { handleStartLearningCycleReview } from '@/features/app/learningCycles/functions/handle-start-learning-cycle-review';
 import { createFilteredCycleItemData } from '@/features/learningDataList/functions/cycleList/create-cycle-list-items';
 import { getTestOverviewMap } from '@/features/learningDataList/functions/cycleList/test-problems-utils';
-import { mapProblemIndexToGroupKey } from '@/features/learningDataList/functions/problemList/problem-list-key-utils';
+import {
+  getSortedProblemKeys,
+  mapProblemIndexToGroupKey,
+} from '@/features/learningDataList/functions/problemList/problem-list-key-utils';
 import { useCycleList } from '@/features/learningDataList/hooks/useCycleList';
 import { useCycleProblemsModal } from '@/features/learningDataList/hooks/useCycleProblemsModal';
 import { useProblemList } from '@/features/learningDataList/hooks/useProblemList';
@@ -110,6 +115,19 @@ export const useCycleListForHome = (
     'all'
   );
 
+  const navigate = useNavigate();
+
+  const handleStartReviewWithQuickButton = useCallback(
+    async (item: CycleItemData) => {
+      if (item && item.cycleId in learningCycleKeySetMap) {
+        const keys = Array.from(learningCycleKeySetMap[item.cycleId]);
+        await handleStartLearningCycleReview(item.cycleId, keys, avgTimeMap);
+        navigate(`/study?phase=test`);
+      }
+    },
+    [learningCycleKeySetMap, avgTimeMap]
+  );
+
   const listProps: ReviewSectionCycleListProps = useMemo(() => {
     const reviewCycles = currentDisplayGroupKey
       ? (groupedTodayReviewCycles[currentDisplayGroupKey] ?? [])
@@ -149,7 +167,7 @@ export const useCycleListForHome = (
       currentDisplayGroupKey,
       setCurrentDisplayGroupKey,
       toggleOpenedDetail: (item) => onToggleOpenedDetail(item.cycleId),
-      onStartReview: (item: CycleItemData) => {},
+      onStartReview: (item: CycleItemData) => handleStartReviewWithQuickButton(item),
       onCheckAndSelectProblems: (item: CycleItemData) =>
         modalProps.onOpen(item.textbookId, item.cycleId),
     };
@@ -160,6 +178,7 @@ export const useCycleListForHome = (
     openedDetailItemId,
     onToggleOpenedDetail,
     setCurrentDisplayGroupKey,
+    handleStartReviewWithQuickButton,
   ]);
 
   return {

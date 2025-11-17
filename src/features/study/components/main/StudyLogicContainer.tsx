@@ -25,7 +25,7 @@ export const StudyLogicContainer: React.FC<StudyLogicContainerProps> = ({
   studyData,
   debugTime,
 }) => {
-  const { learningCycle, textbook, isDataReady } = studyData;
+  const { pseudoLearningCycleDocument, textbook, isDataReady, handleFinishLearning } = studyData;
 
   const [searchParams, setSearchParam] = useSearchParams();
   const phaseInUrl = searchParams.get(PHASE_KEY) as Phase | null;
@@ -41,10 +41,10 @@ export const StudyLogicContainer: React.FC<StudyLogicContainerProps> = ({
   };
 
   useEffect(() => {
-    if (studyData.learningCycle?.learningDurationMs === 0 && phase === 'study') {
+    if (studyData.activeLearningCycle?.learningDurationMs === 0 && phase === 'study') {
       setPhase('test');
     }
-  }, [studyData.learningCycle?.learningDurationMs, phase, setPhase]);
+  }, [studyData.activeLearningCycle?.learningDurationMs, phase, setPhase]);
 
   // --- useStudyLogic ---
   const timerProvider = useMemo(
@@ -53,21 +53,21 @@ export const StudyLogicContainer: React.FC<StudyLogicContainerProps> = ({
   );
 
   const studyLogicProps = useStudyLogic({
-    learningCycle: learningCycle ?? null,
+    learningCycle: pseudoLearningCycleDocument ?? null,
     studyDuration: debugTime
       ? 2000
-      : isDataReady && learningCycle
-        ? learningCycle.learningDurationMs
+      : isDataReady && pseudoLearningCycleDocument
+        ? pseudoLearningCycleDocument.learningDurationMs
         : 0,
     testDuration: debugTime
       ? 2000
-      : isDataReady && learningCycle
-        ? learningCycle.testDurationMs
+      : isDataReady && pseudoLearningCycleDocument
+        ? pseudoLearningCycleDocument.testDurationMs
         : 0,
-    problemCount: learningCycle?.problems.length ?? 0,
+    problemCount: pseudoLearningCycleDocument?.problems.length ?? 0,
     header: {
       textbookName: textbook?.name ?? 'Loading...',
-      units: (learningCycle?.units ?? []).map((unit) => unit.name),
+      units: (pseudoLearningCycleDocument?.units ?? []).map((unit) => unit.name),
       subject: textbook?.subject ?? 'japanese',
     },
     timerProvider,
@@ -135,7 +135,7 @@ export const StudyLogicContainer: React.FC<StudyLogicContainerProps> = ({
     // // ポップアップの表示などに利用
     // const _isCompleted = isEnteredData && isTimerCompleted;
 
-    studyData.handleFinishLearning({
+    handleFinishLearning({
       selfEvaluationMap,
       scoringStatusMap,
       elapsedTimeMap,
@@ -154,7 +154,7 @@ export const StudyLogicContainer: React.FC<StudyLogicContainerProps> = ({
             problems={expandedLearningCycle?.problems ?? []}
             isReadyTest={studyTimer.remainingTime <= 0}
             header={header}
-            plant={learningCycle?.plant ?? null}
+            plant={pseudoLearningCycleDocument?.plant ?? null}
             timer={studyTimer}
             theme={theme}
             switchState={studyTimer.switchState}

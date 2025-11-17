@@ -1,10 +1,10 @@
 import { z } from 'zod';
 import { IDBDocumentSchema } from '../../idb/idb-types';
-import { ActiveLearningCycleDocumentSchema } from './user-support';
+import { ActiveLearningCycleSchema } from './user-support';
 
 export const UserSchema = z.object({
   totalGainedXp: z.number(),
-  currentActiveLearningCycle: ActiveLearningCycleDocumentSchema.nullable().default(null),
+  currentActiveLearningCycle: ActiveLearningCycleSchema.nullable().default(null),
 });
 
 export const UserDocumentSchema = UserSchema.and(IDBDocumentSchema);

@@ -23,7 +23,6 @@ export const LearningCycleToUpdateSchema = LearningCycleSchema.pick({
 
 export type LearningCycleToUpdate = z.infer<typeof LearningCycleToUpdateSchema>;
 
-// Static スキーマで必要なキーを定義
 const STATIC_KEYS = [
   'textbookId',
   'testMode',
@@ -36,14 +35,33 @@ const STATIC_KEYS = [
   'cycleStartAt',
   'units',
   'categories',
+  'plant',
 ] as const;
 
+// 1. ZodのPickオブジェクトを、Mapped TypeとUtility Typeを使って型レベルで正確に生成
+//    これにより、Object.fromEntries()を避け、型が正確に推論されるようにします。
+type StaticPickKeys = (typeof STATIC_KEYS)[number]; // -> 'textbookId' | 'testMode' | ...
+type StaticPickObject = {
+  [K in StaticPickKeys]: true;
+};
+// Static スキーマで必要なキーを定義
 export const StaticLearningCycleDataSchema = LearningCycleSchema.pick({
-  ...Object.fromEntries(STATIC_KEYS.map((key) => [key, true])),
-} as const).extend({
+  textbookId: true,
+  testMode: true,
+  learningDurationMs: true,
+  testDurationMs: true,
+  problems: true,
+  isReviewTarget: true,
+  textbookName: true,
+  subject: true,
+  cycleStartAt: true,
+  units: true,
+  categories: true,
+  plant: true,
+} as const satisfies StaticPickObject).extend({
+  // satisfies を使うことで、キーがSTATIC_KEYSと一致することを保証
   id: z.string(),
   path: z.string(),
-  plant: PlantShapeSchema,
 });
 
 export type StaticLearningCycleData = z.infer<typeof StaticLearningCycleDataSchema>;

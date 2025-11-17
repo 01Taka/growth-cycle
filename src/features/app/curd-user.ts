@@ -17,7 +17,7 @@ export const createLocalUser = async (initialUser?: Partial<User>) => {
 };
 
 export const updateLocalUser = async (user: Partial<User>) => {
-  return await createLocalUser(user);
+  return await idbStore.update(LOCAL_USER_PATH, user);
 };
 
 export const readOrCreateLocalUser = async (): Promise<UserDocument> => {

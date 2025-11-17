@@ -60,7 +60,3 @@ export function calculateMaxXP(): number {
 
   return floatMaxXP;
 }
-
-// 実行例
-// const MAX_XP = calculateMaxXP();
-// console.log(`理論上の最大XP: ${MAX_XP}`);
