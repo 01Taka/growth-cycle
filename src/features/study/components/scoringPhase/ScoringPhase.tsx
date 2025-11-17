@@ -15,8 +15,8 @@ import { ScoringList } from './ScoringList';
 import { ScoringSummary } from './ScoringSummary';
 
 interface ScoringPhaseProps {
-  scoringStatusMap: Record<number, ProblemScoringStatus>;
-  selfEvaluationsMap: Record<number, TestSelfEvaluation>;
+  scoringStatusMap: Record<string, ProblemScoringStatus>;
+  selfEvaluationsMap: Record<string, TestSelfEvaluation>;
   problems: ExpandedLearningCycleProblem[];
   header: { subject: Subject; textbookName: string; units: string[] };
   theme: SubjectColorMap;

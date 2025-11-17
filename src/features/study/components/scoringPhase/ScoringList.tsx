@@ -9,8 +9,8 @@ import { ScoringItem } from './ScoringItem';
 
 interface ScoringListProps {
   problems: ExpandedLearningCycleProblem[];
-  selfEvaluationsMap: Record<number, TestSelfEvaluation>;
-  scoringStatusMap: Record<number, ProblemScoringStatus>;
+  selfEvaluationsMap: Record<string, TestSelfEvaluation>;
+  scoringStatusMap: Record<string, ProblemScoringStatus>;
   bottomMargin?: number | string;
   onScoreChange: (
     problem: ExpandedLearningCycleProblem,
@@ -31,8 +31,8 @@ export const ScoringList: React.FC<ScoringListProps> = ({
         <ScoringItem
           key={index}
           problem={problem}
-          selfEvaluation={selfEvaluationsMap[problem.problemIndex] ?? 'unrated'}
-          scoringStatus={scoringStatusMap[problem.problemIndex] ?? 'unrated'}
+          selfEvaluation={selfEvaluationsMap[problem.structuredId] ?? 'unrated'}
+          scoringStatus={scoringStatusMap[problem.structuredId] ?? 'unrated'}
           onScoreChange={(scoringStatus) => onScoreChange(problem, scoringStatus)}
         />
       ))}

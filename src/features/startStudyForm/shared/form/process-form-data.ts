@@ -131,7 +131,7 @@ export const createProblemsAndUsedMetadata = (
         const categoryId = category ? category.id : null;
 
         const structuredId = generateProblemStructuredIdDirect({
-          textbookId: '',
+          textbookId,
           unitId,
           categoryId,
           problemNumber,

@@ -40,8 +40,8 @@ export const expandLearningCycleProblems = (
 export const createExpandedLearningCycleTestResultsFromCycle = (
   attemptAt: number,
   learningCycle: LearningCycle | ExpandedLearningCycle,
-  selfEvaluationsMap: Record<number, TestSelfEvaluation>,
-  scoringStatusMap: Record<number, ProblemScoringStatus>,
+  selfEvaluationsMap: Record<string, TestSelfEvaluation>,
+  scoringStatusMap: Record<string, ProblemScoringStatus>,
   elapsedTimeMap: Record<string, number>
 ): ExpandedLearningCycleTestResult[] => {
   const unitMap =

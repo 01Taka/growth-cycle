@@ -1,6 +1,6 @@
 import * as z from 'zod';
-import { readOrCreateLocalUser, updateLocalUser } from '@/features/app/curd-user';
-import { getSortedProblemKeys } from '@/features/learningDataList/functions/problemList/problem-list-key-utils';
+import { readOrCreateLocalUser } from '@/features/app/curd-user';
+import { setUserCurrentActiveLearningCycle } from '@/features/app/learningCycles/functions/curd-learning-cycle-utils';
 import { generatePlantShapeWithConfigLoad } from '@/features/plants/functions/plant-utils';
 import {
   LearningCycle,
@@ -16,7 +16,6 @@ import {
   TextbookDocument,
   TextbookSchema,
 } from '@/shared/data/documents/textbook/textbook-document';
-import { ActiveLearningCycle } from '@/shared/data/documents/user/user-support';
 import { generateFirestoreId, generateIdbPath } from '@/shared/data/idb/generate-path';
 import { IDB_PATH } from '@/shared/data/idb/idb-path';
 import { idbStore } from '@/shared/data/idb/idb-store';
@@ -121,18 +120,6 @@ const getNewPlant = (plantShape: PlantShape, now: number): Plant => {
 const getFixedReviewDates = (now: number): string[] => {
   const REVIEW_INTERVAL_DAYS = [1, 7];
   return REVIEW_INTERVAL_DAYS.map((interval) => getDateAfterDaysBoundary(interval, now));
-};
-
-const updateUser = async (newLearningCycleData: LearningCycle, id: string, path: string) => {
-  const activeLearningCycle: ActiveLearningCycle = {
-    ...newLearningCycleData,
-    id,
-    path,
-    attemptingProblemStructuredIds: getSortedProblemKeys(newLearningCycleData),
-    actualTestDurationMs: newLearningCycleData.testDurationMs,
-    sessionStartedAt: newLearningCycleData.cycleStartAt,
-  };
-  await updateLocalUser({ currentActiveLearningCycle: activeLearningCycle });
 };
 
 // --- メイン関数 ---
@@ -256,7 +243,7 @@ export const createLearningCycle = async (
   // 9. IDBに新しいLearningCycleを追加
   try {
     const id = await idbStore.add(newLearningCyclePath, parsedLearningCycle);
-    await updateUser(parsedLearningCycle, id, newLearningCyclePath);
+    await setUserCurrentActiveLearningCycle(id, null, null);
     return id;
   } catch (error) {
     throw new Error(`IDBへのLearningCycle追加に失敗しました (Path: ${newLearningCyclePath})`);

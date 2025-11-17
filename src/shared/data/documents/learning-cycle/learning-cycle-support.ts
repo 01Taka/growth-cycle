@@ -88,7 +88,7 @@ export type ProblemScoringStatus = z.infer<typeof ProblemScoringStatusSchema>;
 
 export const LearningCycleTestResultSchema = z
   .object({
-    structuredId: StructuredIdSchema,
+    structuredId: StructuredIdSchema.default(''),
     problemIndex: z.number().int().min(0).describe('i18n:result.problem_index'),
     selfEvaluation: TestSelfEvaluationSchema.describe('i18n:result.self_evaluation'),
     scoringStatus: ProblemScoringStatusSchema.describe('i18n:result.is_correct'),
@@ -111,7 +111,7 @@ export type LearningCycleSession = z.infer<typeof LearningCycleSessionSchema>;
 
 export const LearningCycleProblemSchema = z
   .object({
-    structuredId: StructuredIdSchema,
+    structuredId: StructuredIdSchema.default(''),
     problemIndex: z
       .number()
       .int()
