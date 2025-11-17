@@ -1,3 +1,9 @@
+import {
+  DEFAULT_CATEGORY_ID,
+  DEFAULT_UNIT_ID,
+  generateProblemStructuredId,
+  truncateProblemStructuredId,
+} from '@/features/app/learningCycles/functions/problem-structured-id';
 import { LearningCycle } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 import {
   CategoryDetail,
@@ -6,12 +12,6 @@ import {
 } from '@/shared/data/documents/learning-cycle/learning-cycle-support';
 import { safeArrayToRecord } from '@/shared/utils/object/object-utils';
 import { CycleResultWithAttemptedAt, ProblemBase } from '../../types/problem-list-types';
-import {
-  DEFAULT_CATEGORY_ID,
-  DEFAULT_UNIT_ID,
-  generateProblemListKey,
-  truncateProblemListKey,
-} from './problem-list-key-utils';
 
 /**
  * 全ての学習サイクルから、問題のメタデータを抽出し、グループキーをキーとするマップを作成します。
@@ -27,7 +27,7 @@ export const mapGroupKeyToProblemBase = (
   learningCycles.forEach((cycle) => {
     cycle.problems.forEach((problem) => {
       // groupingResultsByProblemと同じロジックでキーを作成
-      const key = generateProblemListKey(cycle, problem);
+      const key = generateProblemStructuredId(cycle, problem);
 
       // 同じ問題が複数のサイクルに現れる場合があるが、ProblemBase情報は同じはず
       if (!problemBaseMap[key]) {
@@ -72,7 +72,7 @@ export const groupResultsByProblemWithAttemptAt = (
         if (!problem) return; // 問題が見つからない場合はスキップ
         // 問題を一意に識別するキーを作成
 
-        const key = generateProblemListKey(cycle, problem); // 結果配列に現在のresultを追加（初期化と追加を同時に行う）
+        const key = generateProblemStructuredId(cycle, problem); // 結果配列に現在のresultを追加（初期化と追加を同時に行う）
 
         if (resultsMap[key]) {
           resultsMap[key].push({ ...result, attemptedAt: session.attemptedAt });
@@ -93,7 +93,7 @@ export const calculateAvgTimeMap = (
   // 1. カテゴリ/ユニットレベルで時間とカウントを集計
   const totals = Object.entries(resultsByProblemKey).reduce(
     (acc, [problemKey, results]) => {
-      const categoryKey = truncateProblemListKey(problemKey, levelsToKeep);
+      const categoryKey = truncateProblemStructuredId(problemKey, levelsToKeep);
       const categoryTotal = acc[categoryKey] || { totalTime: 0, count: 0 };
 
       results.forEach((result) => {

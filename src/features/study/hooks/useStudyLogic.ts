@@ -19,31 +19,31 @@ import {
 import { useStudyTimer } from '../hooks/useStudyTimer';
 
 interface UseStudyLogicArgs {
+  attemptProblemIds: string[];
   learningCycle: LearningCycle | null;
   studyDuration: number;
   testDuration: number;
   header: { subject: Subject; textbookName: string; units: string[] };
   timerProvider?: MultiTimerPersistenceProvider;
-  problemCount: number;
 }
 
 export const useStudyLogic = ({
+  attemptProblemIds,
   learningCycle,
   studyDuration,
   testDuration,
   header,
   timerProvider,
-  problemCount,
 }: UseStudyLogicArgs) => {
   // 教科はヘッダーから取得
   const subject = header.subject;
   // 1. フェーズ管理 (初期値を受け取り、変更関数は外部のものを利用)
 
   // 2. 状態管理
-  const [selfEvaluationMap, setSelfEvaluationMap] = useState<Record<number, TestSelfEvaluation>>(
+  const [selfEvaluationMap, setSelfEvaluationMap] = useState<Record<string, TestSelfEvaluation>>(
     {}
   );
-  const [scoringStatusMap, setScoringStatusMap] = useState<Record<number, ProblemScoringStatus>>(
+  const [scoringStatusMap, setScoringStatusMap] = useState<Record<string, ProblemScoringStatus>>(
     {}
   );
 
@@ -61,7 +61,7 @@ export const useStudyLogic = ({
     handleSwitchTimerRunning,
     stopAll,
     resetAll,
-  } = useStudyTimer(problemCount, timerProvider);
+  } = useStudyTimer(attemptProblemIds, timerProvider);
 
   useEffect(() => {
     changeStudyDuration(studyDuration);
@@ -72,8 +72,8 @@ export const useStudyLogic = ({
   }, [testDuration, changeTestDuration]);
 
   // 4. アクションハンドラ
-  const handleSelfEvaluationMap = (index: number, evaluation: TestSelfEvaluation) => {
-    setSelfEvaluationMap((prev) => ({ ...prev, [index]: evaluation }));
+  const handleSelfEvaluationMap = (id: string, evaluation: TestSelfEvaluation) => {
+    setSelfEvaluationMap((prev) => ({ ...prev, [id]: evaluation }));
   };
 
   const handleScoreChange = (
@@ -82,8 +82,8 @@ export const useStudyLogic = ({
   ) => {
     setScoringStatusMap((prev) => ({
       ...prev,
-      [problem.problemIndex]:
-        prev[problem.problemIndex] === scoringStatus ? 'unrated' : scoringStatus,
+      [problem.structuredId]:
+        prev[problem.structuredId] === scoringStatus ? 'unrated' : scoringStatus,
     }));
   };
 
@@ -115,8 +115,8 @@ export const useStudyLogic = ({
     const validEvaluations = Object.values(selfEvaluationMap).filter(
       (value) => value !== 'unrated'
     );
-    return validEvaluations.length === problemCount;
-  }, [selfEvaluationMap, problemCount]);
+    return validEvaluations.length === attemptProblemIds.length;
+  }, [selfEvaluationMap, attemptProblemIds.length]);
 
   // 6. 必要なすべての値を返す
   return {

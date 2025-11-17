@@ -1,3 +1,4 @@
+import { truncateProblemStructuredId } from '@/features/app/learningCycles/functions/problem-structured-id';
 import { calculateSM2Quality } from '@/features/app/sm2/functions/calculate-sm2-quality';
 import { calculateSM2State } from '@/features/app/sm2/functions/calculate-sm2-state';
 import { LearningCycle } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
@@ -6,7 +7,6 @@ import {
   ProblemSM2CalculationResult,
 } from '../../types/problem-list-types';
 import { calculateAvgTimeMap, groupResultsByProblemWithAttemptAt } from './cycles-to-map';
-import { truncateProblemListKey } from './problem-list-key-utils';
 
 /**
  * 個別の問題に対するSM-2の状態、タイミング、および最新の品質スコアを計算します。
@@ -75,7 +75,7 @@ export const mapGroupKeyToMS2State = (
   // 3. グループ化された結果をループし、新しいヘルパー関数で計算
   const resultEntries = Object.entries(group).map(([key, data]) => {
     // 問題番号を除いたキー (カテゴリ/ユニットキー) を作成
-    const newKey = truncateProblemListKey(key, levelsToKeep);
+    const newKey = truncateProblemStructuredId(key, levelsToKeep);
 
     // 平均時間を取得
     const avgTime = avgTimeMap[newKey] ?? 0; // 平均時間が存在しない場合は安全に0とする

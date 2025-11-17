@@ -1,5 +1,6 @@
 import { JSX, useCallback, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { handleFinishCurrentLearningCycle } from '@/features/app/learningCycles/functions/handle-finish-learning-cycle.ts';
 import { ExpandedLearningCycleProblem } from '@/features/app/learningCycles/types/expand-learning-cycle-types';
 import { LearningCycleDocument } from '@/shared/data/documents/learning-cycle/learning-cycle-document';
 import {
@@ -13,7 +14,6 @@ import { useLearningCycleStore } from '@/shared/stores/useLearningCycleStore';
 import { useTextbookStore } from '@/shared/stores/useTextbookStore';
 import useUserStore from '@/shared/stores/useUserStore';
 import { createPseudoLearningCycleDocument } from '../../../app/learningCycles/functions/active-learning-cycle-utils';
-import { handleRecordSession } from '../../functions/curd-learning-cycle';
 import { StudyLoadingOrError } from './StudyLoadingOrError';
 
 interface StudyResultData {
@@ -27,6 +27,7 @@ interface StudyResultData {
 
 // 戻り値の型定義
 export interface StudyData {
+  attemptProblemIds: string[];
   pseudoLearningCycleDocument: LearningCycleDocument | null;
   textbook: TextbookDocument | undefined;
   isDataReady: boolean;
@@ -140,7 +141,7 @@ export const useStudyData = (): StudyData => {
     async (args: StudyResultData) => {
       if (isDataReady) {
         try {
-          await handleRecordSession(
+          await handleFinishCurrentLearningCycle(
             args.scoringStatusMap,
             args.selfEvaluationMap,
             args.elapsedTimeMap,
@@ -154,17 +155,11 @@ export const useStudyData = (): StudyData => {
         }
       }
     },
-    [
-      isDataReady,
-      textbook?.id,
-      learningCycle?.id,
-      navigate,
-      fetchLearningCycles,
-      handleRecordSession,
-    ]
+    [isDataReady, textbook?.id, learningCycle?.id, navigate, fetchLearningCycles]
   );
 
   return {
+    attemptProblemIds: currentActiveLearningCycle?.attemptingProblemStructuredIds ?? [],
     isDataReady,
     textbook,
     cycleId,

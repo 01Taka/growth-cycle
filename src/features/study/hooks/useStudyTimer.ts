@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { MultiTimerPersistenceProvider } from '@/shared/hooks/multi-timer/multi-timer-types';
 import { useMultiTimer } from '@/shared/hooks/multi-timer/useMultiTimer';
-import { range } from '@/shared/utils/range';
+import { omitObjectKeys } from '@/shared/utils/object/object-utils';
 
 // --- 定数とユーティリティ ---
 
@@ -11,58 +11,35 @@ const TEST_TIMER_ID = 'test';
 // 25分をミリ秒で表現: 25 * 60 * 1000
 const INITIAL_MAIN_DURATION_MS = 25 * 60000;
 
-/**
- * 特定のインデックスの問題タイマーIDを生成する
- * @param index - 問題のインデックス
- * @returns 問題タイマーのID文字列
- */
-const getProblemTimerId = (index: number): string => {
-  return `problem_timer_${index}`;
-};
-
-/**
- * 問題タイマーIDから問題のインデックスを抽出する
- * @param timerId - 問題タイマーのID文字列 (例: "problem_timer_123")
- * @returns 問題のインデックス (数値) エラー時は -1
- */
-const getProblemIndexFromTimerId = (timerId: string): number => {
-  const prefix = 'problem_timer_';
-
-  if (!timerId.startsWith(prefix)) {
-    console.error(`IDの形式が不正です。"${prefix}"で始まっていません: ${timerId}`);
-    return -1;
-  }
-
-  // プレフィックス以降の部分を取得
-  const indexString = timerId.substring(prefix.length);
-
-  // 数値への変換を試みる
-  const index = parseInt(indexString, 10);
-
-  // 有効な数値であることを確認
-  if (isNaN(index)) {
-    console.error(`IDの形式が不正です。インデックス部分が数値ではありません: ${timerId}`);
-    return -1;
-  }
-
-  return index;
-};
-
 // --- カスタムフック ---
 
 export const useStudyTimer = (
-  totalProblemsNumber: number,
+  attemptProblemIds: string[],
   timerProvider?: MultiTimerPersistenceProvider
 ) => {
+  const getProblemId = useCallback(
+    (index: number | null) => {
+      if (index !== null && index >= 0 && index < attemptProblemIds.length) {
+        return attemptProblemIds[index];
+      }
+      return null;
+    },
+    [attemptProblemIds]
+  );
+
+  const getIndexFromProblemId = useCallback(
+    (id: string) => {
+      return attemptProblemIds.indexOf(id) ?? null;
+    },
+    [attemptProblemIds]
+  );
+
   // 2. 問題タイマーの初期DurationMapを生成
   const problemDurationMap = useMemo(() => {
     // 問題タイマーのDurationは、全てのタイマーで Number.MAX_SAFE_INTEGER とする
-    const data = range(totalProblemsNumber).map((index) => [
-      getProblemTimerId(index),
-      Number.MAX_SAFE_INTEGER,
-    ]);
+    const data = attemptProblemIds.map((id) => [id, Number.MAX_SAFE_INTEGER]);
     return Object.fromEntries(data);
-  }, [totalProblemsNumber]); // totalProblemsNumberが変わる時だけ再計算
+  }, [attemptProblemIds]); // totalProblemsNumberが変わる時だけ再計算
 
   // 3. useMultiTimer の初期化
   const timer = useMultiTimer({
@@ -87,36 +64,19 @@ export const useStudyTimer = (
   // 6. 現在アクティブな問題タイマーのインスタンスを取得
   const currentActiveProblemTimer = useMemo(
     () => {
-      // インデックスがnullでなく、かつ totalProblemsNumber の範囲内であることを確認
-      if (
-        currentTestProblemIndex !== null &&
-        currentTestProblemIndex >= 0 &&
-        currentTestProblemIndex < totalProblemsNumber
-      ) {
-        const id = getProblemTimerId(currentTestProblemIndex);
+      const id = getProblemId(currentTestProblemIndex);
+      if (!!id) {
         return timer.getSingleTimer(id);
       }
       return null;
     },
     // timer.getSingleTimer は関数なので参照が安定していればOK。
     // currentTestProblemIndex が変更されたときのみ再計算
-    [timer.getSingleTimer, currentTestProblemIndex, totalProblemsNumber]
+    [timer.getSingleTimer, currentTestProblemIndex, getProblemId]
   );
 
   const elapsedTimeMap = useMemo(
-    () =>
-      Object.fromEntries(
-        Object.entries(timer.elapsedTimeMap)
-          .map(([key, value]) => {
-            if (key === TEST_TIMER_ID || key === STUDY_TIMER_ID) return undefined;
-            const index = getProblemIndexFromTimerId(key);
-            if (index !== -1) {
-              return [index, value] as const;
-            }
-            return undefined;
-          })
-          .filter((entry): entry is readonly [number, number] => entry !== undefined)
-      ),
+    () => omitObjectKeys(timer.elapsedTimeMap, [STUDY_TIMER_ID, TEST_TIMER_ID]),
     [timer.elapsedTimeMap]
   );
 
@@ -129,7 +89,7 @@ export const useStudyTimer = (
           // prevIndexは存在するがエラー対策
           const index = type === 'set' ? newIndex : (prevIndex ?? 0) + newIndex;
           // 0から totalProblemsNumber - 1 の範囲に収める
-          validatedIndex = Math.min(Math.max(index, 0), totalProblemsNumber - 1);
+          validatedIndex = Math.min(Math.max(index, 0), attemptProblemIds.length - 1);
         }
 
         // 変更がない場合は何もしない
@@ -139,14 +99,14 @@ export const useStudyTimer = (
         const isMainTimerRunning = testTimer.isRunning;
 
         // 1. 既存のタイマー (prevIndex) があれば停止
-        if (isMainTimerRunning && prevIndex !== null) {
-          const prevTimerId = getProblemTimerId(prevIndex);
+        const prevTimerId = getProblemId(prevIndex);
+        if (isMainTimerRunning && prevTimerId !== null) {
           timer.stop(prevTimerId);
         }
 
         // 2. 新しいタイマー (validatedIndex) があれば開始
-        if (isMainTimerRunning && validatedIndex !== null) {
-          const newTimerId = getProblemTimerId(validatedIndex);
+        const newTimerId = getProblemId(validatedIndex);
+        if (isMainTimerRunning && newTimerId !== null) {
           timer.start(newTimerId);
         }
 
@@ -157,7 +117,7 @@ export const useStudyTimer = (
     // testTimer.isRunningはchangeProblemTimerが定義される際にキャプチャされる値なので、
     // useMultiTimerのAPIが変更されない限りtimer全体ではなく、timer.stopとtimer.startに依存するのが理想だが、
     // useMultiTimerのAPIが安定していると仮定し、依存関係を絞る。
-    [totalProblemsNumber, testTimer.isRunning, timer.stop, timer.start]
+    [attemptProblemIds.length, testTimer.isRunning, timer.stop, timer.start]
   );
 
   const isFinishTestTimer = useMemo(() => testTimer.remainingTime < 0, [testTimer.remainingTime]);

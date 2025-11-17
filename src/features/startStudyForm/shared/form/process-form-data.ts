@@ -1,4 +1,5 @@
 import { range } from '@mantine/hooks';
+import { generateProblemStructuredIdDirect } from '@/features/app/learningCycles/functions/problem-structured-id';
 import {
   CategoryDetail,
   LearningCycleProblem,
@@ -98,6 +99,7 @@ export function processProblemMetadata(
  * フォームの範囲情報から問題リストと使用されたユニット/カテゴリのメタデータを生成する
  */
 export const createProblemsAndUsedMetadata = (
+  textbookId: string,
   problemsWithRanges: {
     unitName: string;
     categoryName: string;
@@ -125,11 +127,22 @@ export const createProblemsAndUsedMetadata = (
       // range関数のendのデフォルト値ロジックを維持
       const end = rangeValue.end ?? rangeValue.start;
       for (const problemNumber of range(rangeValue.start, end)) {
-        problems.push({
-          problemIndex: index++, // indexをインクリメント
+        const unitId = unit ? unit.id : null;
+        const categoryId = category ? category.id : null;
+
+        const structuredId = generateProblemStructuredIdDirect({
+          textbookId: '',
+          unitId,
+          categoryId,
           problemNumber,
-          unitId: unit ? unit.id : null,
-          categoryId: category ? category.id : null,
+        });
+
+        problems.push({
+          structuredId,
+          problemIndex: index++, // indexをインクリメント
+          unitId,
+          categoryId,
+          problemNumber,
         });
       }
     }

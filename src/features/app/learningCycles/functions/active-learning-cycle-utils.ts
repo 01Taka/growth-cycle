@@ -7,7 +7,7 @@ export const createPseudoLearningCycleDocument = (activeLearningCycle: ActiveLea
   const keyProblemMap = mapGroupKeyToProblem(activeLearningCycle);
   const filterProblemMap = filterObjectKeys(
     keyProblemMap,
-    activeLearningCycle.attemptingProblemKeys
+    activeLearningCycle.attemptingProblemStructuredIds
   );
 
   const learningCycle: LearningCycleDocument = {

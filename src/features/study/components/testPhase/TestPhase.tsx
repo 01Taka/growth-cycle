@@ -25,13 +25,13 @@ interface TestPhaseProps {
   isAllProblemsEvaluated: boolean;
   mainTimer: SingleTimerData;
   currentTimerElapsedTime: number | null;
-  elapsedTimeMap: Record<number, number>;
-  selfEvaluationMap: Record<number, TestSelfEvaluation>;
+  elapsedTimeMap: Record<string, number>;
+  selfEvaluationMap: Record<string, TestSelfEvaluation>;
   theme: SubjectColorMap;
   currentProblemIndex: number;
   switchTimerRunning: () => void;
   changeCurrentTestProblem: (newIndex: number, type: 'set' | 'increment') => void;
-  onSelectSelfEvaluation: (index: number, evaluation: TestSelfEvaluation) => void;
+  onSelectSelfEvaluation: (id: string, evaluation: TestSelfEvaluation) => void;
   onStartScoring: () => void;
 }
 
@@ -63,11 +63,11 @@ export const TestPhase: React.FC<TestPhaseProps> = ({
     null) as ExpandedLearningCycleProblem | null;
 
   const selfEvaluations = problems.map(
-    (problem) => selfEvaluationMap[problem.problemIndex] ?? 'unrated'
+    (problem) => selfEvaluationMap[problem.structuredId] ?? 'unrated'
   );
   const totalProblemsNumber = problems.length;
   const isProblemUnrated =
-    (currentProblem ? (selfEvaluationMap[currentProblem.problemIndex] ?? 'unrated') : 'unrated') ===
+    (currentProblem ? (selfEvaluationMap[currentProblem.structuredId] ?? 'unrated') : 'unrated') ===
     'unrated';
 
   if (!currentProblem) {
@@ -126,13 +126,13 @@ export const TestPhase: React.FC<TestPhaseProps> = ({
         )}
         <TestProblemCard
           problem={currentProblem}
-          selfEvaluation={selfEvaluationMap[currentProblem.problemIndex] ?? 'unrated'}
+          selfEvaluation={selfEvaluationMap[currentProblem.structuredId] ?? 'unrated'}
           currentElapsedTime={currentTimerElapsedTime}
           totalProblemsNumber={totalProblemsNumber}
           isAutoSlide={isProblemUnrated}
           theme={theme}
           onSelectSelfEvaluation={(evaluation) => {
-            onSelectSelfEvaluation(currentProblem.problemIndex, evaluation);
+            onSelectSelfEvaluation(currentProblem.structuredId, evaluation);
             if (isProblemUnrated) {
               changeCurrentTestProblem(1, 'increment');
             }

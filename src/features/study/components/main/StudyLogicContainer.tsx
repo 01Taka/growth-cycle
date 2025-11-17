@@ -25,7 +25,13 @@ export const StudyLogicContainer: React.FC<StudyLogicContainerProps> = ({
   studyData,
   debugTime,
 }) => {
-  const { pseudoLearningCycleDocument, textbook, isDataReady, handleFinishLearning } = studyData;
+  const {
+    attemptProblemIds,
+    pseudoLearningCycleDocument,
+    textbook,
+    isDataReady,
+    handleFinishLearning,
+  } = studyData;
 
   const [searchParams, setSearchParam] = useSearchParams();
   const phaseInUrl = searchParams.get(PHASE_KEY) as Phase | null;
@@ -53,6 +59,7 @@ export const StudyLogicContainer: React.FC<StudyLogicContainerProps> = ({
   );
 
   const studyLogicProps = useStudyLogic({
+    attemptProblemIds,
     learningCycle: pseudoLearningCycleDocument ?? null,
     studyDuration: debugTime
       ? 2000
@@ -64,7 +71,6 @@ export const StudyLogicContainer: React.FC<StudyLogicContainerProps> = ({
       : isDataReady && pseudoLearningCycleDocument
         ? pseudoLearningCycleDocument.testDurationMs
         : 0,
-    problemCount: pseudoLearningCycleDocument?.problems.length ?? 0,
     header: {
       textbookName: textbook?.name ?? 'Loading...',
       units: (pseudoLearningCycleDocument?.units ?? []).map((unit) => unit.name),

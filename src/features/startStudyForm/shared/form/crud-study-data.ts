@@ -128,7 +128,7 @@ const updateUser = async (newLearningCycleData: LearningCycle, id: string, path:
     ...newLearningCycleData,
     id,
     path,
-    attemptingProblemKeys: getSortedProblemKeys(newLearningCycleData),
+    attemptingProblemStructuredIds: getSortedProblemKeys(newLearningCycleData),
     actualTestDurationMs: newLearningCycleData.testDurationMs,
     sessionStartedAt: newLearningCycleData.cycleStartAt,
   };
@@ -215,6 +215,7 @@ export const createLearningCycle = async (
 
   // 6. 問題リストと使用メタデータの生成
   const { problems, usedUnits, usedCategories } = createProblemsAndUsedMetadata(
+    textbook.id,
     validRanges,
     newTextbook.units,
     newTextbook.categories

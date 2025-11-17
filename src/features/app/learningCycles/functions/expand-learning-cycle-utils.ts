@@ -69,31 +69,32 @@ export const createExpandedLearningCycleTestResults = (
   attemptAt: number,
   unitMap: Record<string, UnitDetail>,
   categoryMap: Record<string, CategoryDetail>,
-  selfEvaluationsMap: Record<number, TestSelfEvaluation>,
-  scoringStatusMap: Record<number, ProblemScoringStatus>,
+  selfEvaluationsMap: Record<string, TestSelfEvaluation>,
+  scoringStatusMap: Record<string, ProblemScoringStatus>,
   elapsedTimeMap: Record<string, number>
 ): ExpandedLearningCycleTestResult[] => {
   return problems.map((problem) => {
-    const selfEvaluation = selfEvaluationsMap[problem.problemIndex] ?? 'unrated';
-    const scoringStatus = scoringStatusMap[problem.problemIndex] ?? 'unrated';
+    const selfEvaluation = selfEvaluationsMap[problem.structuredId] ?? 'unrated';
+    const scoringStatus = scoringStatusMap[problem.structuredId] ?? 'unrated';
     const necessity = calculateReviewNecessity(selfEvaluation, scoringStatus);
     const unit = problem.unitId ? (unitMap[problem.unitId] ?? null) : null;
     const category = problem.categoryId ? (categoryMap[problem.categoryId] ?? null) : null;
 
     return {
-      necessity,
+      structuredId: problem.structuredId,
       problemIndex: problem.problemIndex,
+      unitId: problem.unitId,
+      categoryId: problem.categoryId,
+      problemNumber: problem.problemNumber,
+      unit,
+      category,
+      unitName: unit?.name ?? '',
+      categoryName: category?.name ?? '',
+      timeSpentMs: elapsedTimeMap[problem.structuredId] ?? 0,
+      necessity,
       attemptAt,
       selfEvaluation,
       scoringStatus,
-      timeSpentMs: elapsedTimeMap[problem.problemIndex] ?? 0,
-      unitId: problem.unitId,
-      categoryId: problem.categoryId,
-      problemNumber: problem.problemIndex,
-      unitName: unit?.name ?? '',
-      categoryName: category?.name ?? '',
-      unit,
-      category,
     };
   });
 };

@@ -70,6 +70,7 @@ export function generateDummyLearningCycle(
 
   // 1. 問題リストの生成
   const problems: LearningCycleProblem[] = Array.from({ length: numProblems }, (_, i) => ({
+    structuredId: '',
     problemIndex: i,
     unitId: units[i % units.length].id,
     categoryId: categories[i % categories.length].id,
@@ -125,6 +126,7 @@ export function generateDummyLearningCycle(
       const selfEvaluation = selfEvalOptions[Math.floor(Math.random() * selfEvalOptions.length)];
 
       return {
+        structuredId: '',
         problemIndex: problem.problemIndex,
         selfEvaluation: selfEvaluation,
         scoringStatus: isCorrect ? ('correct' as const) : ('incorrect' as const),

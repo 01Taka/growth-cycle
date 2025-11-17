@@ -148,6 +148,34 @@ export function filterObjectKeys<T extends object, K extends keyof T>(
 }
 
 /**
+ * オブジェクトと除外したいキーの配列を受け取り、
+ * 配列に含まれないキーのみを持つ新しいオブジェクトを返します。
+ *
+ * @param obj フィルター対象のオブジェクト
+ * @param keys 除外したいキーの配列
+ * @returns フィルターされた新しいオブジェクト (指定されたキーは含まれない)
+ */
+export function omitObjectKeys<T extends object, K extends keyof T>(obj: T, keys: K[]): Omit<T, K> {
+  const keysToOmit = new Set(keys);
+
+  // 1. Object.keys() は string[] を返すため、keyof T[] にアサートする
+  const allKeys = Object.keys(obj) as (keyof T)[];
+
+  // 2. allKeys をフィルタリングして、除外しないキーのみを取得
+  const keysToKeep = allKeys.filter((key) => !keysToOmit.has(key as K)) as Exclude<keyof T, K>[];
+
+  // 3. 必要なキーのみで新しいオブジェクトを構築
+  return keysToKeep.reduce(
+    (acc, key) => {
+      // key は Exclude<keyof T, K> 型であり、acc は Omit<T, K> 型なので型安全
+      acc[key] = obj[key] as T[Exclude<keyof T, K>];
+      return acc;
+    },
+    // 初期値も Omit<T, K> としてアサート
+    {} as Omit<T, K>
+  );
+}
+/**
  * Recordのキーでソートされた値の配列を返します。
  *
  * @param record ソートするRecord<string, T>オブジェクト

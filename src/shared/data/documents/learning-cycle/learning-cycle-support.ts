@@ -61,6 +61,19 @@ export const CategoryDetailSchema = z
 
 export interface CategoryDetail extends z.infer<typeof CategoryDetailSchema> {}
 
+export const StructuredIdSchema = z.string().regex(
+  // 正規表現:
+  // [英数字]+_[英数字]+_[英数字]+_[0-9]+
+  // - 各セグメントは1文字以上の英数字 (a-z, A-Z, 0-9) を想定
+  // - 最後の problemIndex は1桁以上の数字を想定
+  // - 全体は ^ (文字列の先頭) から $ (文字列の末尾) まで完全に一致する必要がある
+  /^[a-zA-Z0-9]+_[a-zA-Z0-9]+_[a-zA-Z0-9]+_[0-9]+$/,
+  { message: 'structuredIdの形式が不正です。形式: textId_unitId_categoryId_problemIndex' }
+);
+
+// 型の推論 (省略可能ですが便利です)
+export type StructuredId = z.infer<typeof StructuredIdSchema>;
+
 // ------------------------------------------------------------
 // セッションと結果の構造
 // ------------------------------------------------------------
@@ -75,6 +88,7 @@ export type ProblemScoringStatus = z.infer<typeof ProblemScoringStatusSchema>;
 
 export const LearningCycleTestResultSchema = z
   .object({
+    structuredId: StructuredIdSchema,
     problemIndex: z.number().int().min(0).describe('i18n:result.problem_index'),
     selfEvaluation: TestSelfEvaluationSchema.describe('i18n:result.self_evaluation'),
     scoringStatus: ProblemScoringStatusSchema.describe('i18n:result.is_correct'),
@@ -97,6 +111,7 @@ export type LearningCycleSession = z.infer<typeof LearningCycleSessionSchema>;
 
 export const LearningCycleProblemSchema = z
   .object({
+    structuredId: StructuredIdSchema,
     problemIndex: z
       .number()
       .int()

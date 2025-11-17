@@ -26,7 +26,7 @@ const getTestDuration = (
 export const setUserCurrentActiveLearningCycle = async (
   learningCycleId: string,
   // nullの場合すべて
-  attemptingProblemKeys: string[] | null,
+  attemptingProblemStructuredIds: string[] | null,
   // nullの場合デフォルト値
   testDurationMs: number | Record<string, number> | null,
   sessionStartedAt = Date.now()
@@ -42,14 +42,14 @@ export const setUserCurrentActiveLearningCycle = async (
   const learningCycle = await fetchLearningCycle(learningCycleId);
 
   const keys =
-    attemptingProblemKeys !== null
-      ? getSortedProblemKeys(learningCycle, { filterProblemKeys: attemptingProblemKeys })
+    attemptingProblemStructuredIds !== null
+      ? getSortedProblemKeys(learningCycle, { filterProblemKeys: attemptingProblemStructuredIds })
       : getSortedProblemKeys(learningCycle); // attemptingProblemKeysがない場合はフィルターせずにすべて返す
 
   const actualTestDurationMs = getTestDuration(learningCycle, keys, testDurationMs);
   const activeLearningCycle: ActiveLearningCycle = {
     ...learningCycle,
-    attemptingProblemKeys: keys,
+    attemptingProblemStructuredIds: keys,
     actualTestDurationMs,
     sessionStartedAt,
   };
@@ -89,7 +89,7 @@ export const fetchCurrentActiveCycleAndTextbook = async () => {
   const textbook = TextbookDocumentSchema.parse(textbookData);
   const learningCycle = LearningCycleDocumentSchema.parse(learningCycleData);
 
-  return { textbook, learningCycle };
+  return { textbook, learningCycle, currentActiveLearningCycle: user.currentActiveLearningCycle };
 };
 
 export const fetchLearningCycle = async (learningCycleId: string) => {
